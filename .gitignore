@@ -1,0 +1,14 @@
+# Android Studio & Gradle
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+
+# LibGDX specifics
+html/build/
+android/build/
+core/build/
+desktop/build/
+ios/build/
