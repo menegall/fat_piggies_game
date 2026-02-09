@@ -20,12 +20,34 @@ We use **GitHub Projects** (Kanban Board) to track who is doing what.
 2.  **Title:** Be specific (e.g., "Implement Box2D collision for walls").
 3.  **Assignees:** Select yourself (or the person responsible).
 4.  **Projects:** Select "Fat Piggies Dev" (this adds it to the Todo column).
-5.  **Labels:** Add a label to categorize the work:
-    * `bug` 🐞
-    * `feature` ✨
-    * `graphics` 🎨
-    * `physics` 🧱
-    * `ui` 🖥️
+5.  **Labels:** Add at least one label to categorize the work (see the guide below).
+
+---
+
+## 🏷️ Label Guide
+
+Use these labels to help the team filter tasks. **Always verify you have the right label!**
+
+### 🟥 Priority & Type (Standard GitHub)
+| Label | Color | When to use it |
+| :--- | :--- | :--- |
+| `bug` | Red | **Something isn't working.** (e.g., Game crash, physics glitch). |
+| `enhancement` | Teal | **New feature request.** (e.g., Add double jump, create new map). |
+| `documentation` | Blue | **Writing docs.** (e.g., Updating README, Wiki, or comments). |
+| `question` | Pink | **Need info.** (e.g., "How do we handle multiplayer sync?"). |
+| `help wanted` | Green | **Stuck?** Use this to signal you need assistance from a teammate. |
+| `good first issue` | Purple | **Easy task.** Perfect for warming up or for new members. |
+| `wontfix` | White | **Cancelled.** The team decided not to work on this. |
+| `duplicate` | Grey | **Repeat.** This issue already exists (link to the original). |
+
+### 🎮 Game Specific Domains
+Use these to identify *which part* of the game code you are touching.
+
+* `graphics` 🎨 - Sprites, Textures, Animations, Particle Effects.
+* `physics` 🧱 - Box2D, Collisions, Gravity, Movement logic.
+* `ui` 🖥️ - Menus, HUD, Buttons, on-screen controls.
+* `audio` 🎵 - Sound Effects (SFX), Background Music.
+* `networking` 🌐 - Multiplayer code, Server/Client sync, Latency handling.
 
 ---
 
