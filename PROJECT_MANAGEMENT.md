@@ -19,7 +19,7 @@ We use **GitHub Projects** (Kanban Board) to track who is doing what.
 1.  Go to the **Issues** tab -> **New Issue**.
 2.  **Title:** Be specific (e.g., "Implement Box2D collision for walls").
 3.  **Assignees:** Select yourself (or the person responsible).
-4.  **Projects:** Select "Fat Piggies Board" (this adds it to the Todo column).
+4.  **Projects:** Select "Fat Piggies Dev" (this adds it to the Todo column).
 5.  **Labels:** Add a label to categorize the work:
     * `bug` 🐞
     * `feature` ✨
