@@ -46,7 +46,7 @@ To run the project locally:
 
 1.  **Clone the repo:**
     ```bash
-    git clone [https://github.com/YOUR-ORG/fat-piggies.git](https://github.com/YOUR-ORG/fat-piggies.git)
+    git clone https://github.com/menegall/fat_piggies_game.git
     ```
 2.  **Open in Android Studio:**
     * File -> Open -> Select the `build.gradle` file in the root folder.
