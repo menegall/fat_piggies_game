@@ -18,12 +18,13 @@ Closes #
 ## ✅ Self-Review Checklist
 
 ### Code Quality
-- [ ] My code follows the **Java coding style** of this project.
-- [ ] I have commented my code in hard-to-understand areas.
-- [ ] I have removed all temporary `System.out.println` debug logs.
+- [ ] My code follows the **Naming Conventions** in `CONTRIBUTING.md`.
+- [ ] I have added **Javadoc** for all new public methods.
+- [ ] I have deleted all `System.out.println` and unused imports.
 
 ### Assets & Resources
 - [ ] I have added all new assets to the correct `android/assets` folder.
+- [ ] I have verified that no `new Texture()` or similar objects are created in the `render()` loop.
 - [ ] I have verified that I am NOT committing large binary files (>100MB) without LFS.
 
 ### Testing
