@@ -59,10 +59,10 @@ To run the project locally:
 
 Built with ❤️ and coffee by:
 
-* **[Member Name 1]** - *Role*
-* **[Member Name 2]** - *Role*
-* **[Member Name 3]** - *Role*
-* **[Member Name 4]** - *Role*
-* **[Member Name 5]** - *Role*
-* **[Member Name 6]** - *Role*
-* **[Member Name 7]** - *Role*
+* **Gabin** - *Latex Goat*
+* **Liangchen** - *Is just here for vibes*
+* **Patrick** - *Role*
+* **Pia** - *Role*
+* **Paula** - *Role*
+* **Ingvild** - *Role*
+* **Gina** - *Role*
