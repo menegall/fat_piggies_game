@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "826563276168",
+    "firebase_url": "https://fat-piggies-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "fat-piggies",
+    "storage_bucket": "fat-piggies.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:826563276168:android:cd1519e2114441d3ff5e3d",
+        "android_client_info": {
+          "package_name": "com.fatpiggies.game"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACmCKogD7kINP2rXgNKnJKvgsroIs4nLg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

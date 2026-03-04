@@ -8,6 +8,7 @@ buildscript {
   }
   dependencies {
     classpath "com.android.tools.build:gradle:8.9.3"
+    classpath 'com.google.gms:google-services:4.4.4'
 
   }
 }
@@ -23,6 +24,9 @@ allprojects {
       testOutputDir = file('build/classes/java/test')
     }
   }
+   repositories {
+     google()
+   }
 }
 
 configure(subprojects - project(':android')) {
