@@ -18,7 +18,12 @@ When creating a branch, use these prefixes:
 
 ---
 
-## 2. Code Standards & Naming (TEAM MUST FOLLOW)
+## 2. Commit message rules
+Commit messages should follow this format:
+
+type-of-commit: Commit description (#issue number)
+
+## 3. Code Standards & Naming (TEAM MUST FOLLOW)
 
 To ensure consistency and simplify peer reviews, we adhere to standard Java conventions:
 
@@ -37,7 +42,7 @@ To ensure consistency and simplify peer reviews, we adhere to standard Java conv
 
 ---
 
-## 3. Javadoc & Documentation
+## 4. Javadoc & Documentation
 
 Since this is an Architecture course, documenting the *why* and *how* is crucial. Use Javadoc for all **public** methods and classes.
 
@@ -58,7 +63,7 @@ public float calculateImpact(float velocity, float weight) {
 
 ---
 
-## 4. Daily Workflow
+## 5. Daily Workflow
 
 1.  **Sync:** Always pull `develop` before starting: `git pull origin develop`.
 2.  **Branch:** Create your branch: `git checkout -b feature/my-new-feature`.
@@ -75,7 +80,7 @@ When **`develop`** reached a milestone and is tested and safe, it can be merged 
 
 ---
 
-## 5. Releases & Tagging (Milestones)
+## 6. Releases & Tagging (Milestones)
 We use **Tags** to mark specific versions of the game (e.g., for project deliveries). A Tag is a fixed snapshot of the code at a specific moment.
 
 **How to Tag a Version**
@@ -93,7 +98,7 @@ When we reach a milestone on **`main`**, the Team Leader will create a tag:
 
 ---
 
-## 6. Code Quality & Performance (LibGDX Specifics)
+## 7. Code Quality & Performance (LibGDX Specifics)
 * **No Breaking Builds:** Never push code to `develop` that doesn't compile. Run the `Desktop` launcher locally before committing.
 * **Memory Managemnet:** LibGDX objects (Texture, SpriteBatch, Sound, Stage) use native memory. You **MUST** call `.dispose()` in the appropriate method to prevent memory leaks.
 * **Assets Management:**
@@ -106,7 +111,7 @@ When we reach a milestone on **`main`**, the Team Leader will create a tag:
 
 ---
 
-## 7. LibGDX Specific Rules
+## 8. LibGDX Specific Rules
 
 ### ⛔ The `.gitignore`
 Ensure your local environment respects the `.gitignore`.
