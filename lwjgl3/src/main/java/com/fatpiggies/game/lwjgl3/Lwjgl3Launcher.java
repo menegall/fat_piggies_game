@@ -3,16 +3,21 @@ package com.fatpiggies.game.lwjgl3;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.fatpiggies.game.FatPiggiesGame;
+import com.fatpiggies.game.network.AuthService;
+import com.fatpiggies.game.network.DatabaseService;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
+    private static AuthService authService;
+    private static DatabaseService databaseService;
+
     public static void main(String[] args) {
         if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
         createApplication();
     }
 
     private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new FatPiggiesGame(), getDefaultConfiguration());
+        return new Lwjgl3Application(new FatPiggiesGame(authService, databaseService), getDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
