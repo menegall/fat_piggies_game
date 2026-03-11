@@ -12,8 +12,6 @@ import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.network.dto.LobbyInfo;
 import com.fatpiggies.game.network.dto.PlayerInput;
 import com.fatpiggies.game.network.dto.PlayerSetup;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -56,7 +54,7 @@ public class AndroidDatabase implements DatabaseService {
         newLobbyRef.onDisconnect().removeValue();
 
         // Generate random lobby code
-        String lobbyCode = generateRandomCode(4);
+        String lobbyCode = generateRandomCode();
 
         LobbyInfo info = new LobbyInfo("waiting", lobbyCode, hostId);
         PlayerSetup hostSetup = new PlayerSetup(100, playerName);
@@ -65,21 +63,15 @@ public class AndroidDatabase implements DatabaseService {
 
         // Set lobby info in DB
         newLobbyRef.child("info").setValue(info)
-            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    long endTime = System.currentTimeMillis();
-                    long duration = endTime - startTime;
-                    Log.d(TAG_DATABASE, "Lobby created successfully. Duration: " + duration + " ms");
-                    callback.onSuccess(lobbyId);
-                }
+            .addOnSuccessListener(aVoid -> {
+                long endTime = System.currentTimeMillis();
+                long duration = endTime - startTime;
+                Log.d(TAG_DATABASE, "Lobby created successfully. Duration: " + duration + " ms");
+                callback.onSuccess(lobbyId);
             })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.e(TAG_DATABASE, "Error creating lobby: " + e.getMessage());
-                    callback.onError(NetworkError.DATABASE_ERROR, e.getMessage());
-                }
+            .addOnFailureListener(e -> {
+                Log.e(TAG_DATABASE, "Error creating lobby: " + e.getMessage());
+                callback.onError(NetworkError.DATABASE_ERROR, e.getMessage());
             });
     }
 
@@ -94,7 +86,9 @@ public class AndroidDatabase implements DatabaseService {
             .addOnCompleteListener(task -> {
                 // Check if the task was successful
                 if (!task.isSuccessful()) {
-                    callback.onError(NetworkError.DATABASE_ERROR, "Network Error: " + task.getException().getMessage());
+                    Exception e = task.getException();
+                    String errorMsg = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown Error";
+                    callback.onError(NetworkError.DATABASE_ERROR, "Network Error: " + errorMsg);
                     return;
                 }
 
@@ -110,6 +104,11 @@ public class AndroidDatabase implements DatabaseService {
                 // Iterate through the lobbies and find the first one with status "waiting"
                 for (com.google.firebase.database.DataSnapshot lobbySnapshot : dataSnapshot.getChildren()) {
                     String lobbyId = lobbySnapshot.getKey();
+                    if (lobbyId == null) {
+                        Log.d(TAG_DATABASE, "Something went wrong with lobbyId");
+                        callback.onError(NetworkError.LOBBY_NOT_FOUND, "Something went wrong");
+                        return;
+                    }
                     String status = lobbySnapshot.child("info").child("status").getValue(String.class);
 
                     // Check if the game is "waiting"
@@ -127,7 +126,7 @@ public class AndroidDatabase implements DatabaseService {
                     // Check if name already exist
                     for (com.google.firebase.database.DataSnapshot playerSnapshot : lobbySnapshot.child("info").child("players_setup").getChildren()) {
                         String playerNameDB = playerSnapshot.child("name").getValue(String.class);
-                        if (playerNameDB.equals(playerName)) {
+                        if (java.util.Objects.equals(playerNameDB, playerName)) {
                             callback.onError(NetworkError.NAME_ALREADY_EXIST, "Name already exist");
                             return;
                         }
@@ -143,23 +142,17 @@ public class AndroidDatabase implements DatabaseService {
 
                     // Write player setup to the database
                     playerSetupRef.setValue(setup)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                long endTime = System.currentTimeMillis();
-                                long duration = endTime - startTime;
-                                Log.d(TAG_DATABASE, playerName + " joined lobby " + lobbyId
-                                    + " successfully. Duration: " + duration + " ms");
-                                callback.onSuccess(lobbyId);
-                            }
+                        .addOnSuccessListener(aVoid -> {
+                            long endTime = System.currentTimeMillis();
+                            long duration = endTime - startTime;
+                            Log.d(TAG_DATABASE, playerName + " joined lobby " + lobbyId
+                                + " successfully. Duration: " + duration + " ms");
+                            callback.onSuccess(lobbyId);
                         })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG_DATABASE, "Error joining lobby: " + lobbyId + ". " + e.getMessage());
-                                callback.onError(NetworkError.DATABASE_ERROR,
-                                    "Error writing to database: " + e.getMessage());
-                            }
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG_DATABASE, "Error joining lobby: " + lobbyId + ". " + e.getMessage());
+                            callback.onError(NetworkError.DATABASE_ERROR,
+                                "Error writing to database: " + e.getMessage());
                         });
                 }
             });
@@ -356,7 +349,8 @@ public class AndroidDatabase implements DatabaseService {
     }
 
     // --- Helper Method ---
-    private String generateRandomCode(int length) {
+    private String generateRandomCode() {
+        int length = 4;
         String chars = "0123456789";
         StringBuilder code = new StringBuilder();
         Random rnd = new Random();

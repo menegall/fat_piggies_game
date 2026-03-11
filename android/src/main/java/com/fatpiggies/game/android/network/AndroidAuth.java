@@ -4,16 +4,11 @@ import static com.fatpiggies.game.utils.Config.TAG_AUTH;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.fatpiggies.game.network.AuthService;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class AndroidAuth implements AuthService {
-    private FirebaseAuth mAuth;
+    private final FirebaseAuth mAuth;
 
     public AndroidAuth() {
         mAuth = FirebaseAuth.getInstance();
@@ -26,20 +21,17 @@ public class AndroidAuth implements AuthService {
         final long startTime = System.currentTimeMillis();
 
         mAuth.signInAnonymously()
-            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    long endTime = System.currentTimeMillis();
-                    long duration = endTime - startTime;
-                    if (task.isSuccessful()) {
-                        // Sign in success
-                        Log.d(TAG_AUTH, "signInAnonymously:success. Duration: " + duration + "ms");
-                        callback.onSuccess(getCurrentUserId());
-                    } else {
-                        // If sign in fails.
-                        Log.w(TAG_AUTH, "signInAnonymously:failure. Duration: " + duration + "ms", task.getException());
-                        callback.onFailure("Authentication failed.");
-                    }
+            .addOnCompleteListener(task -> {
+                long endTime = System.currentTimeMillis();
+                long duration = endTime - startTime;
+                if (task.isSuccessful()) {
+                    // Sign in success
+                    Log.d(TAG_AUTH, "signInAnonymously:success. Duration: " + duration + "ms");
+                    callback.onSuccess(getCurrentUserId());
+                } else {
+                    // If sign in fails.
+                    Log.w(TAG_AUTH, "signInAnonymously:failure. Duration: " + duration + "ms", task.getException());
+                    callback.onFailure("Authentication failed.");
                 }
             });
     }
@@ -54,7 +46,7 @@ public class AndroidAuth implements AuthService {
 
     @Override
     public String getCurrentUserId() {
-        String userId = mAuth.getCurrentUser().getUid();
-        return userId;
+        com.google.firebase.auth.FirebaseUser currentUser = mAuth.getCurrentUser();
+        return currentUser != null ? currentUser.getUid() : null;
     }
 }
