@@ -14,6 +14,12 @@ public class AndroidAuth implements AuthService {
         mAuth = FirebaseAuth.getInstance();
     }
 
+    // Constructor for testing
+    @androidx.annotation.VisibleForTesting
+    public AndroidAuth(FirebaseAuth auth) {
+        this.mAuth = auth;
+    }
+
     @Override
     public void signIn(AuthCallback callback) {
         Log.i(TAG_AUTH, "signInAnonymously");
