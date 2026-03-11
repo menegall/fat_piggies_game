@@ -11,7 +11,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/**
+ * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
+ */
 public class FatPiggiesGame extends ApplicationAdapter {
     AuthService authService;
     DatabaseService databaseService;
@@ -32,6 +34,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
             public void onSuccess(String userId) {
                 // TODO something with userId
             }
+
             @Override
             public void onFailure(String error) {
                 // TODO handle error
@@ -54,6 +57,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
         Gdx.app.log(TAG_APP, "Dispose App");
         batch.dispose();
         image.dispose();
+        // TODO implement leaveLobby() if user is in a lobby
         databaseService.stopListening();
         authService.signOut();
     }

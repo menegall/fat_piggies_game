@@ -16,7 +16,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.core.Tag;
 
 import java.util.Map;
 import java.util.Random;
@@ -40,7 +39,8 @@ public class AndroidDatabase implements DatabaseService {
 
     @Override
     public void createLobby(String hostId, String playerName, LobbyCallback callback) {
-        Log.i(TAG_DATABASE, playerName + "create a new lobby");
+        final long startTime = System.currentTimeMillis();
+        Log.i(TAG_DATABASE, playerName + " create a new lobby");
         DatabaseReference lobbiesRef = dbRef.child("lobbies");
         // Push new lobby node and get its ID
         DatabaseReference newLobbyRef = lobbiesRef.push();
@@ -52,8 +52,11 @@ public class AndroidDatabase implements DatabaseService {
             return;
         }
 
+        // If host disconnect remove lobby node
+        newLobbyRef.onDisconnect().removeValue();
+
         // Generate random lobby code
-        String lobbyCode = generateRandomCode(6);
+        String lobbyCode = generateRandomCode(4);
 
         LobbyInfo info = new LobbyInfo("waiting", lobbyCode, hostId);
         PlayerSetup hostSetup = new PlayerSetup(100, playerName);
@@ -65,7 +68,9 @@ public class AndroidDatabase implements DatabaseService {
             .addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    Log.d(TAG_DATABASE, "Lobby created successfully");
+                    long endTime = System.currentTimeMillis();
+                    long duration = endTime - startTime;
+                    Log.d(TAG_DATABASE, "Lobby created successfully. Duration: " + duration + " ms");
                     callback.onSuccess(lobbyId);
                 }
             })
@@ -80,6 +85,7 @@ public class AndroidDatabase implements DatabaseService {
 
     @Override
     public void joinLobby(String lobbyCode, String playerId, String playerName, LobbyCallback callback) {
+        final long startTime = System.currentTimeMillis();
         Log.i(TAG_DATABASE, playerName + "join lobby " + lobbyCode);
         DatabaseReference lobbiesRef = dbRef.child("lobbies");
 
@@ -112,7 +118,8 @@ public class AndroidDatabase implements DatabaseService {
                         return;
                     }
                     // Check if the lobby is full
-                    long numPlayers = lobbySnapshot.child("info").child("players_setup").getChildrenCount();
+                    long numPlayers = lobbySnapshot.child("info")
+                        .child("players_setup").getChildrenCount();
                     if (numPlayers >= 4) {
                         callback.onError(NetworkError.LOBBY_FULL, "The lobby is full");
                         return;
@@ -126,19 +133,34 @@ public class AndroidDatabase implements DatabaseService {
                         }
                     }
 
+                    DatabaseReference playerSetupRef = lobbiesRef.child(lobbyId)
+                        .child("info/players_setup").child(playerId);
+                    // If client disconnect remove node
+                    playerSetupRef.onDisconnect().removeValue();
+
                     // Prepare player setup
                     PlayerSetup setup = new PlayerSetup(100 + Math.toIntExact(numPlayers), playerName);
 
                     // Write player setup to the database
-                    dbRef.child("lobbies").child(lobbyId)
-                        .child("info/players_setup").child(playerId).setValue(setup)
-                        .addOnSuccessListener(aVoid ->
-                            callback.onSuccess(lobbyId))
-                        .addOnFailureListener(e ->
-                            callback.onError(NetworkError.DATABASE_ERROR,
-                                "Error writing to database: " + e.getMessage()));
-                    Log.d(TAG_DATABASE, "Player joined the lobby successfully");
-                    return;
+                    playerSetupRef.setValue(setup)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                long endTime = System.currentTimeMillis();
+                                long duration = endTime - startTime;
+                                Log.d(TAG_DATABASE, playerName + " joined lobby " + lobbyId
+                                    + " successfully. Duration: " + duration + " ms");
+                                callback.onSuccess(lobbyId);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e(TAG_DATABASE, "Error joining lobby: " + lobbyId + ". " + e.getMessage());
+                                callback.onError(NetworkError.DATABASE_ERROR,
+                                    "Error writing to database: " + e.getMessage());
+                            }
+                        });
                 }
             });
 
@@ -157,14 +179,14 @@ public class AndroidDatabase implements DatabaseService {
                     // CASE 1: Host is leaving.
                     // Delete all the lobby node
                     lobbyRef.removeValue()
-                        .addOnSuccessListener(aVoid -> Log.d(TAG_DATABASE,"Lobby deleted successfully"))
-                        .addOnFailureListener(e -> Log.e(TAG_DATABASE,"Error: " + e.getMessage()));
+                        .addOnSuccessListener(aVoid -> Log.d(TAG_DATABASE, "Lobby deleted successfully"))
+                        .addOnFailureListener(e -> Log.e(TAG_DATABASE, "Error: " + e.getMessage()));
                 } else {
                     // CASE 2: Client is leaving.
                     // Remove only the player from the players_setup node
                     lobbyRef.child("info/players_setup").child(playerId).removeValue()
-                        .addOnSuccessListener(aVoid -> Log.d(TAG_DATABASE,"Client leave the lobby successfully."))
-                        .addOnFailureListener(e -> Log.e(TAG_DATABASE,"Error: " + e.getMessage()));
+                        .addOnSuccessListener(aVoid -> Log.d(TAG_DATABASE, "Client leave the lobby successfully."))
+                        .addOnFailureListener(e -> Log.e(TAG_DATABASE, "Error: " + e.getMessage()));
                 }
             } else {
                 Log.e(TAG_DATABASE, "Impossible determine host.");
@@ -203,6 +225,12 @@ public class AndroidDatabase implements DatabaseService {
                     if (info != null) {
                         callback.onInfoUpdated(info);
                     }
+                } else {
+                    // Node doesn't exist anymore! Host or server deleted it.
+                    Log.w(TAG_DATABASE, "Lobby was destroyed by host or server.");
+                    callback.onError(NetworkError.LOBBY_NOT_FOUND, "Lobby Closed");
+
+                    // TODO Controller Must call databaseService.stopListening() to destroy listener.
                 }
             }
 
@@ -252,6 +280,7 @@ public class AndroidDatabase implements DatabaseService {
                     callback.onInputsReceived(inputs);
                 }
             }
+
             @Override
             public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
                 callback.onError(NetworkError.DATABASE_ERROR, error.getMessage());
@@ -288,8 +317,15 @@ public class AndroidDatabase implements DatabaseService {
                     if (state != null) {
                         callback.onDataReceived(state);
                     }
+                } else {
+                    // Node doesn't exist anymore! Host or server deleted it.
+                    Log.w(TAG_DATABASE, "Lobby was destroyed by host or server.");
+                    callback.onError(NetworkError.LOBBY_NOT_FOUND, "Lobby Closed");
+
+                    // TODO Controller Must call databaseService.stopListening() to destroy listener.
                 }
             }
+
             @Override
             public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
                 callback.onError(NetworkError.DATABASE_ERROR, error.getMessage());
@@ -321,7 +357,7 @@ public class AndroidDatabase implements DatabaseService {
 
     // --- Helper Method ---
     private String generateRandomCode(int length) {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        String chars = "0123456789";
         StringBuilder code = new StringBuilder();
         Random rnd = new Random();
         for (int i = 0; i < length; i++) {

@@ -22,17 +22,22 @@ public class AndroidAuth implements AuthService {
     @Override
     public void signIn(AuthCallback callback) {
         Log.i(TAG_AUTH, "signInAnonymously");
+        // Used to monitor response time
+        final long startTime = System.currentTimeMillis();
+
         mAuth.signInAnonymously()
             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
+                    long endTime = System.currentTimeMillis();
+                    long duration = endTime - startTime;
                     if (task.isSuccessful()) {
                         // Sign in success
-                        Log.d(TAG_AUTH, "signInAnonymously:success");
+                        Log.d(TAG_AUTH, "signInAnonymously:success. Duration: " + duration + "ms");
                         callback.onSuccess(getCurrentUserId());
                     } else {
                         // If sign in fails.
-                        Log.w(TAG_AUTH, "signInAnonymously:failure", task.getException());
+                        Log.w(TAG_AUTH, "signInAnonymously:failure. Duration: " + duration + "ms", task.getException());
                         callback.onFailure("Authentication failed.");
                     }
                 }
