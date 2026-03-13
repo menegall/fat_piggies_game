@@ -1,5 +1,7 @@
 package com.fatpiggies.game.model.ecs.components;
 
-public class CollectibleComponent {
+import com.badlogic.ashley.core.Component;
+
+public class CollectibleComponent implements Component {
 
 }

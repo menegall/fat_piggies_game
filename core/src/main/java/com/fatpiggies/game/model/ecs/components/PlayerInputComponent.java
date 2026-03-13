@@ -1,4 +1,6 @@
 package com.fatpiggies.game.model.ecs.components;
 
-public class PlayerInputComponent {
+import com.badlogic.ashley.core.Component;
+
+public class PlayerInputComponent implements Component {
 }

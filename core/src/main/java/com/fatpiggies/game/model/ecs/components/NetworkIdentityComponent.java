@@ -1,5 +1,7 @@
 package com.fatpiggies.game.model.ecs.components;
 
-public class NetworkIdentityComponent {
+import com.badlogic.ashley.core.Component;
+
+public class NetworkIdentityComponent implements Component {
     public int playerId;
 }

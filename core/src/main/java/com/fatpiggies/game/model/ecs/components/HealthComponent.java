@@ -1,5 +1,7 @@
 package com.fatpiggies.game.model.ecs.components;
 
-public class HealthComponent {
+import com.badlogic.ashley.core.Component;
+
+public class HealthComponent implements Component {
     public int currentLife;
 }

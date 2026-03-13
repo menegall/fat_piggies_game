@@ -1,5 +1,7 @@
 package com.fatpiggies.game.model.ecs.components;
 
-public class RenderComponent {
+import com.badlogic.ashley.core.Component;
+
+public class RenderComponent implements Component {
     public String textureId;
 }
