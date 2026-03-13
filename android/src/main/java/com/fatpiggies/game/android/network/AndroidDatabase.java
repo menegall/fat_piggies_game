@@ -51,7 +51,7 @@ public class AndroidDatabase implements DatabaseService {
         }
 
         // If host disconnect remove lobby node
-        newLobbyRef.onDisconnect().removeValue();
+        // TODO newLobbyRef.onDisconnect().removeValue();
 
         // Generate random lobby code
         String lobbyCode = generateRandomCode();
@@ -118,13 +118,14 @@ public class AndroidDatabase implements DatabaseService {
                     }
                     // Check if the lobby is full
                     long numPlayers = lobbySnapshot.child("info")
-                        .child("players_setup").getChildrenCount();
+                        .child("playersSetup").getChildrenCount();
                     if (numPlayers >= 4) {
                         callback.onError(NetworkError.LOBBY_FULL, "The lobby is full");
                         return;
                     }
                     // Check if name already exist
-                    for (com.google.firebase.database.DataSnapshot playerSnapshot : lobbySnapshot.child("info").child("players_setup").getChildren()) {
+                    for (com.google.firebase.database.DataSnapshot playerSnapshot : lobbySnapshot
+                        .child("info").child("playersSetup").getChildren()) {
                         String playerNameDB = playerSnapshot.child("name").getValue(String.class);
                         if (java.util.Objects.equals(playerNameDB, playerName)) {
                             callback.onError(NetworkError.NAME_ALREADY_EXIST, "Name already exist");
@@ -133,7 +134,7 @@ public class AndroidDatabase implements DatabaseService {
                     }
 
                     DatabaseReference playerSetupRef = lobbiesRef.child(lobbyId)
-                        .child("info/players_setup").child(playerId);
+                        .child("info/playersSetup").child(playerId);
                     // If client disconnect remove node
                     playerSetupRef.onDisconnect().removeValue();
 
@@ -176,8 +177,8 @@ public class AndroidDatabase implements DatabaseService {
                         .addOnFailureListener(e -> Log.e(TAG_DATABASE, "Error: " + e.getMessage()));
                 } else {
                     // CASE 2: Client is leaving.
-                    // Remove only the player from the players_setup node
-                    lobbyRef.child("info/players_setup").child(playerId).removeValue()
+                    // Remove only the player from the playersSetup node
+                    lobbyRef.child("info/playersSetup").child(playerId).removeValue()
                         .addOnSuccessListener(aVoid -> Log.d(TAG_DATABASE, "Client leave the lobby successfully."))
                         .addOnFailureListener(e -> Log.e(TAG_DATABASE, "Error: " + e.getMessage()));
                 }

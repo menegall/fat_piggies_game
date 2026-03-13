@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
+import com.fatpiggies.game.network.NetworkError;
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
@@ -33,6 +34,19 @@ public class FatPiggiesGame extends ApplicationAdapter {
             @Override
             public void onSuccess(String userId) {
                 // TODO something with userId
+                databaseService.createLobby(userId, "Marco", new DatabaseService.LobbyCallback() {
+                    @Override
+                    public void onSuccess(String lobbyId) {
+                        // TODO something with lobbyId
+
+
+                    }
+
+                    @Override
+                    public void onError(NetworkError error, String errorMessage) {
+                        // TODO handle error
+                    }
+                });
             }
 
             @Override

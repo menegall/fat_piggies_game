@@ -5,7 +5,7 @@
                 "status": "playing",
                 "code": "ABC123",
                 "host_id": "user_uid_1",
-                "players_setup": {
+                "playersSetup": {
                     "user_uid_1": { "texture_id": 4647, "name": "Marco" },
                     "user_uid_2": { "texture_id": 1024, "name": "Luca" }
                 }

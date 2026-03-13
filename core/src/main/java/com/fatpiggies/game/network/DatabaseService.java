@@ -28,7 +28,7 @@ public interface DatabaseService {
      * Attempts to join an existing lobby using a short 6-character code.
      * If successful, the player's data is added to the lobby.
      *
-     * @param lobbyCode  The short 6-character code shared by the Host.
+     * @param lobbyCode  The short code shared by the Host.
      * @param playerId   The unique identifier of the user joining (from AuthService).
      * @param playerName The display name chosen by the player.
      * @param callback   Triggered with the unique lobby ID on success, or a specific {@link NetworkError}.
