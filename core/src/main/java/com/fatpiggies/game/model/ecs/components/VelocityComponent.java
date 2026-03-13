@@ -1,4 +1,4 @@
-package com.fatpiggies.game.model.ecs.component;
+package com.fatpiggies.game.model.ecs.components;
 
 public class VelocityComponent {
     public double baseMaxVelocity;
