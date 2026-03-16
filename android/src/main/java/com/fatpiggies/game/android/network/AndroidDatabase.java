@@ -21,7 +21,7 @@ import java.util.Random;
 public class AndroidDatabase implements DatabaseService {
     // DOC: https://firebase.google.com/docs/database/android/read-and-write?hl=it&authuser=0
 
-    private final DatabaseReference dbRef;
+    private final DatabaseReference lobbiesRef;
     private DatabaseReference lobbyInfoRef;
     private com.google.firebase.database.ValueEventListener lobbyInfoListener;
 
@@ -32,34 +32,26 @@ public class AndroidDatabase implements DatabaseService {
     private com.google.firebase.database.ValueEventListener gameStateListener;
 
     public AndroidDatabase() {
-        dbRef = FirebaseDatabase.getInstance().getReference();
+        lobbiesRef = FirebaseDatabase.getInstance().getReference().child("lobbies");
     }
 
     @Override
     public void createLobby(String hostId, String playerName, LobbyCallback callback) {
         final long startTime = System.currentTimeMillis();
         Log.i(TAG_DATABASE, playerName + " create a new lobby");
-        DatabaseReference lobbiesRef = dbRef.child("lobbies");
         // Push new lobby node and get its ID
         DatabaseReference newLobbyRef = lobbiesRef.push();
         String lobbyId = newLobbyRef.getKey();
+        if (isLobbyIdNull(lobbyId, callback)) return;
 
-        if (lobbyId == null) {
-            callback.onError(NetworkError.DATABASE_ERROR, "Impossible to generate lobby uid");
-            Log.w(TAG_DATABASE, "Impossible to generate lobby uid");
-            return;
-        }
+        // TODO newLobbyRef.onDisconnect().removeValue(); // If host disconnect remove lobby node
 
-        // If host disconnect remove lobby node
-        // TODO newLobbyRef.onDisconnect().removeValue();
-
-        // Generate random lobby code
         String lobbyCode = generateRandomCode();
 
         LobbyInfo info = new LobbyInfo("waiting", lobbyCode, hostId);
         PlayerSetup hostSetup = new PlayerSetup(100, playerName);
-        // Add host to playersSetup
-        info.playersSetup.put(hostId, hostSetup);
+
+        info.playersSetup.put(hostId, hostSetup); // Add host to playersSetup
 
         // Set lobby info in DB
         newLobbyRef.child("info").setValue(info)
@@ -79,66 +71,32 @@ public class AndroidDatabase implements DatabaseService {
     public void joinLobby(String lobbyCode, String playerId, String playerName, LobbyCallback callback) {
         final long startTime = System.currentTimeMillis();
         Log.i(TAG_DATABASE, playerName + "join lobby " + lobbyCode);
-        DatabaseReference lobbiesRef = dbRef.child("lobbies");
-
         // Find lobby by code
         lobbiesRef.orderByChild("info/code").equalTo(lobbyCode).get()
             .addOnCompleteListener(task -> {
-                // Check if the task was successful
-                if (!task.isSuccessful()) {
-                    Exception e = task.getException();
-                    String errorMsg = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown Error";
-                    callback.onError(NetworkError.DATABASE_ERROR, "Network Error: " + errorMsg);
-                    return;
-                }
+                if (hasTaskFailed(task, callback)) return;
 
                 // Get the result of the query
                 com.google.firebase.database.DataSnapshot dataSnapshot = task.getResult();
 
-                // Check if the lobby exists
-                if (!dataSnapshot.exists()) {
-                    callback.onError(NetworkError.LOBBY_NOT_FOUND, "No lobby with code: " + lobbyCode);
-                    return;
-                }
-
+                if (isLobbyMissing(dataSnapshot, callback, lobbyCode)) return;
                 // Iterate through the lobbies and find the first one with status "waiting"
                 for (com.google.firebase.database.DataSnapshot lobbySnapshot : dataSnapshot.getChildren()) {
                     String lobbyId = lobbySnapshot.getKey();
-                    if (lobbyId == null) {
-                        Log.d(TAG_DATABASE, "Something went wrong with lobbyId");
-                        callback.onError(NetworkError.LOBBY_NOT_FOUND, "Something went wrong");
-                        return;
-                    }
-                    String status = lobbySnapshot.child("info").child("status").getValue(String.class);
+                    if (isLobbyIdNull(lobbyId, callback)) return;
+                    if (isGameAlreadyStarted(lobbySnapshot, callback)) return;
+                    if (isLobbyFull(lobbySnapshot, callback)) return;
+                    if (isPlayerNameTaken(lobbySnapshot, playerName, callback)) return;
 
-                    // Check if the game is "waiting"
-                    if (!"waiting".equals(status)) {
-                        callback.onError(NetworkError.LOBBY_ALREADY_STARTED, "The game already started");
-                        return;
-                    }
-                    // Check if the lobby is full
-                    long numPlayers = lobbySnapshot.child("info")
-                        .child("playersSetup").getChildrenCount();
-                    if (numPlayers >= 4) {
-                        callback.onError(NetworkError.LOBBY_FULL, "The lobby is full");
-                        return;
-                    }
-                    // Check if name already exist
-                    for (com.google.firebase.database.DataSnapshot playerSnapshot : lobbySnapshot
-                        .child("info").child("playersSetup").getChildren()) {
-                        String playerNameDB = playerSnapshot.child("name").getValue(String.class);
-                        if (java.util.Objects.equals(playerNameDB, playerName)) {
-                            callback.onError(NetworkError.NAME_ALREADY_EXIST, "Name already exist");
-                            return;
-                        }
-                    }
-
+                    assert lobbyId != null; // Assert that lobbyId is not null
                     DatabaseReference playerSetupRef = lobbiesRef.child(lobbyId)
                         .child("info/playersSetup").child(playerId);
-                    // If client disconnect remove node
-                    playerSetupRef.onDisconnect().removeValue();
+
+                    playerSetupRef.onDisconnect().removeValue(); // If client disconnect remove node
 
                     // Prepare player setup
+                    long numPlayers = lobbySnapshot.child("info")
+                        .child("playersSetup").getChildrenCount();
                     PlayerSetup setup = new PlayerSetup(100 + Math.toIntExact(numPlayers), playerName);
 
                     // Write player setup to the database
@@ -163,7 +121,7 @@ public class AndroidDatabase implements DatabaseService {
     @Override
     public void leaveLobby(String lobbyId, String playerId) {
         Log.i(TAG_DATABASE, "Player" + playerId + " leave the lobby " + lobbyId);
-        DatabaseReference lobbyRef = dbRef.child("lobbies").child(lobbyId);
+        DatabaseReference lobbyRef = lobbiesRef.child(lobbyId);
         // Check who is the host
         lobbyRef.child("info/host_id").get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult().exists()) {
@@ -193,21 +151,18 @@ public class AndroidDatabase implements DatabaseService {
     @Override
     public void startGame(String lobbyId) {
         Log.i(TAG_DATABASE, "Start Game");
-        DatabaseReference lobbiesRef = dbRef.child("lobbies");
-        lobbiesRef.child(lobbyId).child("info").child("status").setValue("playing");
+        lobbiesRef.child(lobbyId).child("info/status").setValue("playing");
     }
 
     @Override
     public void endGame(String lobbyId) {
         Log.i(TAG_DATABASE, "End Game");
-        DatabaseReference lobbiesRef = dbRef.child("lobbies");
-        lobbiesRef.child(lobbyId).child("info").child("status").setValue("over");
+        lobbiesRef.child(lobbyId).child("info/status").setValue("over");
     }
 
     @Override
     public void listenToLobbyInfo(String lobbyId, LobbyInfoCallback callback) {
-        // Get a reference to the lobby info node
-        lobbyInfoRef = dbRef.child("lobbies").child(lobbyId).child("info");
+        lobbyInfoRef = lobbiesRef.child(lobbyId).child("info");
 
         // Create a listener to listen for changes in the lobby info node
         lobbyInfoListener = new com.google.firebase.database.ValueEventListener() {
@@ -240,9 +195,7 @@ public class AndroidDatabase implements DatabaseService {
 
     @Override
     public void pushGameState(String lobbyId, GameState state) {
-        // Get a reference to the game state node
-        gameStateRef = dbRef.child("lobbies").child(lobbyId)
-            .child("game_state");
+        gameStateRef = lobbiesRef.child(lobbyId).child("game_state");
         // Write the game state data to the database
         gameStateRef.setValue(state);
         // TODO only host can push game state
@@ -252,9 +205,7 @@ public class AndroidDatabase implements DatabaseService {
 
     @Override
     public void listenToInputs(String lobbyId, InputsCallback callback) {
-        // Get a reference to the player input node
-        inputsRef = dbRef.child("lobbies").child(lobbyId)
-            .child("inputs");
+        inputsRef = lobbiesRef.child(lobbyId).child("inputs");
 
         // Create a listener to listen for changes in the player input node
         inputsListener = new com.google.firebase.database.ValueEventListener() {
@@ -287,9 +238,7 @@ public class AndroidDatabase implements DatabaseService {
 
     @Override
     public void pushPlayerInput(String lobbyId, String playerId, PlayerInput data) {
-        // Get a reference to the player input node
-        DatabaseReference playerInputRef = dbRef.child("lobbies").child(lobbyId)
-            .child("inputs").child(playerId);
+        DatabaseReference playerInputRef = lobbiesRef.child(lobbyId).child("inputs").child(playerId);
         // Write the player input data to the database
         playerInputRef.setValue(data);
 
@@ -298,8 +247,7 @@ public class AndroidDatabase implements DatabaseService {
 
     @Override
     public void listenToGameState(String lobbyId, GameStateCallback callback) {
-        // Get a reference to the game state node
-        gameStateRef = dbRef.child("lobbies").child(lobbyId).child("game_state");
+        gameStateRef = lobbiesRef.child(lobbyId).child("game_state");
 
         // Create a listener to listen for changes in the game state node
         gameStateListener = new com.google.firebase.database.ValueEventListener() {
@@ -359,5 +307,67 @@ public class AndroidDatabase implements DatabaseService {
             code.append(chars.charAt(rnd.nextInt(chars.length())));
         }
         return code.toString();
+    }
+
+    private boolean hasTaskFailed(com.google.android.gms.tasks.Task<?> task,
+                                  LobbyCallback callback) {
+        if (!task.isSuccessful()) {
+            Exception e = task.getException();
+            String errorMsg = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown Error";
+            callback.onError(NetworkError.DATABASE_ERROR, "Network Error: " + errorMsg);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isLobbyMissing(com.google.firebase.database.DataSnapshot dataSnapshot,
+                                   LobbyCallback callback,
+                                   String lobbyCode) {
+        if (!dataSnapshot.exists()) {
+            callback.onError(NetworkError.LOBBY_NOT_FOUND, "No lobby with code: " + lobbyCode);
+            return true;
+        } else return false;
+    }
+
+    private boolean isLobbyIdNull(String lobbyId, LobbyCallback callback) {
+        if (lobbyId == null) {
+            Log.d(TAG_DATABASE, "Something went wrong with lobbyId");
+            callback.onError(NetworkError.DATABASE_ERROR, "Something went wrong");
+            return true;
+        } else return false;
+    }
+
+    private boolean isLobbyFull(com.google.firebase.database.DataSnapshot lobbySnapshot,
+                                LobbyCallback callback) {
+        long numPlayers = lobbySnapshot.child("info").child("playersSetup").getChildrenCount();
+        if (numPlayers >= 4) {
+            callback.onError(NetworkError.LOBBY_FULL, "The lobby is full");
+            return true; // Indicates the lobby is full and the error was handled
+        }
+        return false;
+    }
+
+    private boolean isPlayerNameTaken(com.google.firebase.database.DataSnapshot lobbySnapshot,
+                                      String playerName,
+                                      LobbyCallback callback) {
+        for (com.google.firebase.database.DataSnapshot playerSnapshot : lobbySnapshot.child("info/playersSetup").getChildren()) {
+            String playerNameDB = playerSnapshot.child("name").getValue(String.class);
+            if (java.util.Objects.equals(playerNameDB, playerName)) {
+                callback.onError(NetworkError.NAME_ALREADY_EXIST, "Name already exist");
+                return true; // Indicates the name is taken and the error was handled
+            }
+        }
+        return false;
+    }
+
+    private boolean isGameAlreadyStarted(com.google.firebase.database.DataSnapshot lobbySnapshot,
+                                         LobbyCallback callback) {
+        String status = lobbySnapshot.child("info").child("status").getValue(String.class);
+        if (!"waiting".equals(status)) {
+            callback.onError(NetworkError.LOBBY_ALREADY_STARTED, "The game already started");
+            return true; // Indicates the game is not waiting and the error was handled
+        }
+        return false;
     }
 }
