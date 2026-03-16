@@ -1,32 +1,44 @@
 package com.fatpiggies.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.fatpiggies.game.model.Snapshot;
+import com.fatpiggies.game.view.SkinManager;
+import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.view.states.GameStateManager;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class FatPiggiesGame extends ApplicationAdapter {
     private SpriteBatch batch;
-    private Texture image;
+
 
     @Override
     public void create() {
         batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
+
+        // FOR TESTING
+        TextureManager.loadAll();
+        SkinManager.load();
+        GameStateManager.getInstance().pushLobbyState(false);
     }
 
     @Override
     public void render() {
+        float dt = Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        batch.begin();
-        batch.draw(image, 140, 210);
-        batch.end();
+
+        // FOR TESTING
+        Snapshot snapshot = new Snapshot();
+        GameStateManager.getInstance().render(batch, snapshot);
     }
 
     @Override
     public void dispose() {
+        TextureManager.dispose();
+        SkinManager.dispose();
         batch.dispose();
-        image.dispose();
     }
 }
