@@ -9,6 +9,11 @@ public class MenuController {
 
     private GameStateManager gsm;
     private SpriteBatch batch;
+    private MainController main;
+
+    public MenuController(MainController main) {
+        this.main = main;
+    }
 
     public void create(boolean isHost){
         batch = new SpriteBatch();
