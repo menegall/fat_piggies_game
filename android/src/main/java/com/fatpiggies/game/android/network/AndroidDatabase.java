@@ -22,8 +22,11 @@ public class AndroidDatabase implements DatabaseService {
     // DOC: https://firebase.google.com/docs/database/android/read-and-write?hl=it&authuser=0
 
     private final DatabaseReference lobbiesRef;
-    private DatabaseReference lobbyInfoRef;
-    private com.google.firebase.database.ValueEventListener lobbyInfoListener;
+    private DatabaseReference lobbyStatusRef;
+    private DatabaseReference playersSetupRef;
+
+    private com.google.firebase.database.ValueEventListener lobbyStatusListener;
+    private com.google.firebase.database.ValueEventListener playersSetupListener;
 
     private DatabaseReference inputsRef;
     private com.google.firebase.database.ValueEventListener inputsListener;
@@ -161,25 +164,18 @@ public class AndroidDatabase implements DatabaseService {
     }
 
     @Override
-    public void listenToLobbyInfo(String lobbyId, LobbyInfoCallback callback) {
-        lobbyInfoRef = lobbiesRef.child(lobbyId).child("info");
-
+    public void listenToPlayersSetup(String lobbyId, PlayersSetupCallback callback) {
+        playersSetupRef = lobbiesRef.child(lobbyId).child("info").child("playersSetup");
         // Create a listener to listen for changes in the lobby info node
-        lobbyInfoListener = new com.google.firebase.database.ValueEventListener() {
+        playersSetupListener = new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
+                // TODO Check if the follows work
                 if (snapshot.exists()) {
-                    // Firebase automatically convert JSON to Java Object
-                    LobbyInfo info = snapshot.getValue(LobbyInfo.class);
-                    if (info != null) {
-                        callback.onInfoUpdated(info);
+                    Map<String, PlayerSetup> playersSetup = snapshot.getValue(Map.class);
+                    if (playersSetup != null) {
+                        callback.onPlayersSetupUpdated(playersSetup);
                     }
-                } else {
-                    // Node doesn't exist anymore! Host or server deleted it.
-                    Log.w(TAG_DATABASE, "Lobby was destroyed by host or server.");
-                    callback.onError(NetworkError.LOBBY_NOT_FOUND, "Lobby Closed");
-
-                    // TODO Controller Must call databaseService.stopListening() to destroy listener.
                 }
             }
 
@@ -190,7 +186,33 @@ public class AndroidDatabase implements DatabaseService {
         };
 
         // Attach the listener to the lobby info node
-        lobbyInfoRef.addValueEventListener(lobbyInfoListener);
+        playersSetupRef.addValueEventListener(playersSetupListener);
+    }
+
+    @Override
+    public void listenToLobbyStatus(String lobbyId, LobbyStatusCallback callback) {
+        lobbyStatusRef = lobbiesRef.child(lobbyId).child("info").child("status");
+
+        // Create a listener to listen for changes in the lobby info node
+        lobbyStatusListener = new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String status = snapshot.getValue(String.class);
+                    if (status != null) {
+                        callback.onStatusUpdated(status);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
+                callback.onError(NetworkError.DATABASE_ERROR, error.getMessage());
+            }
+        };
+
+        //  Attach the listener to the lobby info node
+        lobbyStatusRef.addValueEventListener(playersSetupListener);
     }
 
     @Override
@@ -281,9 +303,14 @@ public class AndroidDatabase implements DatabaseService {
     @Override
     public void stopListening() {
         // Remove listener to avoid memory leak and improve performance
-        if (lobbyInfoRef != null && lobbyInfoListener != null) {
-            lobbyInfoRef.removeEventListener(lobbyInfoListener);
-            lobbyInfoListener = null;
+        if (lobbyStatusRef != null && lobbyStatusListener != null) {
+            lobbyStatusRef.removeEventListener(lobbyStatusListener);
+            lobbyStatusListener = null;
+        }
+
+        if (playersSetupRef != null && playersSetupListener != null) {
+            playersSetupRef.removeEventListener(playersSetupListener);
+            playersSetupListener = null;
         }
 
         if (inputsRef != null && inputsListener != null) {

@@ -1,8 +1,8 @@
 package com.fatpiggies.game.network;
 
 import com.fatpiggies.game.network.dto.GameState;
-import com.fatpiggies.game.network.dto.LobbyInfo;
 import com.fatpiggies.game.network.dto.PlayerInput;
+import com.fatpiggies.game.network.dto.PlayerSetup;
 
 import java.util.Map;
 
@@ -24,6 +24,7 @@ public interface DatabaseService {
      * @param callback   Triggered with the unique lobby ID on success, or a specific {@link NetworkError}.
      */
     void createLobby(String hostId, String playerName, LobbyCallback callback);
+
     /**
      * Attempts to join an existing lobby using a short 6-character code.
      * If successful, the player's data is added to the lobby.
@@ -34,6 +35,7 @@ public interface DatabaseService {
      * @param callback   Triggered with the unique lobby ID on success, or a specific {@link NetworkError}.
      */
     void joinLobby(String lobbyCode, String playerId, String playerName, LobbyCallback callback);
+
     /**
      * Removes a player from the lobby.
      * If the caller is a Client, only their data is removed.
@@ -43,6 +45,7 @@ public interface DatabaseService {
      * @param playerId The unique ID of the player leaving.
      */
     void leaveLobby(String lobbyId, String playerId);
+
     /**
      * Changes the lobby status from "waiting" to "playing".
      * This signals to all listening clients that they should transition to the PlayState.
@@ -59,20 +62,38 @@ public interface DatabaseService {
      * @param lobbyId The unique ID of the lobby.
      */
     void endGame(String lobbyId);
+
     /**
-     * Listens for changes in the lobby's setup information (e.g., new players joining, status changes).
-     * This is primarily used in the LobbyState while waiting for the game to start.
-     * Remember to call {@link #stopListening()} when leaving the waiting area.
-     * Is also used in PlayState to listen for changes in lobby status.
+     * Listens for real-time updates regarding the lobby's lifecycle state ( waiting, playing, over).
+     * <p>
+     * This is essential for triggering transitions between different game states and ensuring
+     * all clients are synchronized with the server's master state.
+     * Ensure {@link #stopListening()} is called when the listener is no longer needed to
+     * prevent memory leaks and unnecessary network traffic.
+     * </p>
+     *
+     * @param lobbyId  The unique ID of the lobby to monitor.
+     * @param callback Triggered whenever the lobby's operational status changes.
+     */
+    void listenToLobbyStatus(String lobbyId, LobbyStatusCallback callback);
+
+    /**
+     * Monitors changes players configurations within a specific lobby.
+     * <p>
+     * This method tracks changes in players joined to the specified lobby.
+     * It is typically used to dynamically refresh the player list UI during the pre-game assembly phase.
+     * Remember to call {@link #stopListening()} when navigating away from the lobby screen.
+     * </p>
      *
      * @param lobbyId  The unique ID of the lobby.
-     * @param callback Triggered every time the lobby info changes.
+     * @param callback Triggered every time a player's setup or readiness is updated.
      */
-    void listenToLobbyInfo(String lobbyId, LobbyInfoCallback callback);
+    void listenToPlayersSetup(String lobbyId, PlayersSetupCallback callback);
 
     // ======================================
     // ---- Game State Management (Host) ----
     // ======================================
+
     /**
      * Pushes the authoritative game state to the database.
      * This includes entity positions, health, and power-ups calculated by the server logic.
@@ -82,6 +103,7 @@ public interface DatabaseService {
      * @param state   The full calculated game state object.
      */
     void pushGameState(String lobbyId, GameState state);
+
     /**
      * Listens for incoming movement and action inputs from all clients.
      * The Host uses these inputs to calculate the physics simulation.
@@ -94,6 +116,7 @@ public interface DatabaseService {
     // ========================================
     // ---- Game State Management (Client) ----
     // ========================================
+
     /**
      * Pushes the local player's input to the database.
      * This updates only the specific player's node to prevent overwriting others.
@@ -104,6 +127,7 @@ public interface DatabaseService {
      * @param data     The input data containing velocities and actions.
      */
     void pushPlayerInput(String lobbyId, String playerId, PlayerInput data);
+
     /**
      * Listens for the authoritative game state calculated by the Host.
      * Clients use this data to correct local predictions and update remote entities.
@@ -116,6 +140,7 @@ public interface DatabaseService {
     // ==============================
     // ---- Cleanup and Callback ----
     // ==============================
+
     /**
      * Removes all active database listeners (LobbyInfo, GameState, Inputs).
      * MUST be called to prevent memory leaks and unnecessary network usage when
@@ -126,18 +151,31 @@ public interface DatabaseService {
     // ---- Callback ----
     interface LobbyCallback {
         void onSuccess(String lobbyId);
+
         void onError(NetworkError error, String errorMessage);
     }
-    interface LobbyInfoCallback {
-        void onInfoUpdated(LobbyInfo info);
+
+    interface LobbyStatusCallback {
+        void onStatusUpdated(String status);
+
         void onError(NetworkError error, String errorMessage);
     }
+
+    interface PlayersSetupCallback {
+        void onPlayersSetupUpdated(Map<String, PlayerSetup> playersSetup);
+
+        void onError(NetworkError error, String errorMessage);
+    }
+
     interface InputsCallback {
         void onInputsReceived(Map<String, PlayerInput> inputs);
+
         void onError(NetworkError error, String errorMessage);
     }
+
     interface GameStateCallback {
         void onDataReceived(GameState data);
+
         void onError(NetworkError error, String errorMessage);
 
     }
