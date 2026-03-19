@@ -4,7 +4,37 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.fatpiggies.game.model.ecs.components.*;
-
+/**
+ * A system responsible for resolving collisions and handling collectibles
+ * in the ECS architecture.
+ * <p><b>How it works internally:</b><br>
+ * The system targets entities that have a {@link CollisionEventComponent}. For each
+ * collision event, it checks the involved entities and applies one of the following:
+ * <ul>
+ *     <li><b>Physics collision:</b> If both entities have {@link VelocityComponent} and
+ *     {@link MassComponent}, a proper knockback is applied based on their relative
+ *     velocity and mass using a simple impulse formula.</li>
+ *     <li><b>Collectibles:</b> If one entity has a {@link CollectibleComponent} and
+ *     the other can move, the system creates a temporary "buff" entity attached to
+ *     the collector. Any modifier components ({@link AccelerationModifierComponent},
+ *     {@link VelocityModifierComponent}, {@link MassModifierComponent}) and
+ *     {@link LifetimeComponent} from the collected item are copied to the buff entity,
+ *     and the original item is removed from the engine.</li>
+ * </ul>
+ * <p><b>Usage and Initialization:</b><br>
+ * Add this system to the {@code Engine} for both local and networked gameplay:
+ * <pre>
+ * {@code
+ * engine.addSystem(new CollisionResolutionSystem());
+ * }
+ * </pre>
+ * The system automatically processes collisions each frame for all entities with
+ * {@link CollisionEventComponent}.
+ * <p><b>Execution Order Note:</b><br>
+ * It should be added <b>after</b> any system that calculates collisions or updates
+ * entity positions (e.g., movement or physics systems), but <b>before</b> rendering
+ * to ensure knockbacks and collectible effects are applied before drawing.
+ */
 public class CollisionResolutionSystem extends IteratingSystem {
 
     private final ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
@@ -86,7 +116,7 @@ public class CollisionResolutionSystem extends IteratingSystem {
 
     // Attach to player
     AttachedComponent attached = getEngine().createComponent(AttachedComponent.class);
-    attached.targetEntityId = collector.hashCode(); // or better: network id
+    attached.targetEntityId = (int) collector.hashCode(); // or better: network id
     buff.add(attached);
 
     // Copy acceleration modifier
