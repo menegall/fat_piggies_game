@@ -7,14 +7,12 @@ public class MainController {
 
     public GameWorld world;
     public PlayController playController;
-    public MenuController menuController;
+    public LobbyController lobbyController;
     public GameStateManager gsm;
     // TODO: add AuthService and DBService into constructor, when firebase is merged
-    public MainController() {
-        playController = new PlayController(this);
-        menuController = new MenuController(this);
+    public MainController(AuthService auth, DatabaseService db) {
+        lobbyController = new LobbyController(this);
         gsm = new GameStateManager();
-        world = new GameWorld();
     }
 
 
