@@ -3,15 +3,14 @@ package com.fatpiggies.game.controller;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.fatpiggies.game.view.states.GameStateManager;
 import com.fatpiggies.game.view.states.LobbyState;
-import com.fatpiggies.game.view.states.State;
 
-public class MenuController {
+public class LobbyController {
 
     private GameStateManager gsm;
     private SpriteBatch batch;
     private MainController main;
 
-    public MenuController(MainController main) {
+    public LobbyController(MainController main) {
         this.main = main;
     }
 
@@ -19,7 +18,6 @@ public class MenuController {
         batch = new SpriteBatch();
         gsm = new GameStateManager();
         gsm.set(new LobbyState(isHost));
-
     }
 
     public void render(){
