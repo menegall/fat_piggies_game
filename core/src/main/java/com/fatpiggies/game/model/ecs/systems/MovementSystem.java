@@ -12,13 +12,14 @@ import com.fatpiggies.game.model.ecs.components.VelocityComponent;
 /**
  * Responsible for moving the local player’s entity by applying physical
  * laws (velocity and acceleration) based on the PlayerInputComponent. It
- * provides
- * immediate feedback to the player (Client-Side Prediction).
+ * provides immediate feedback to the player (Client-Side Prediction).
  */
 public class MovementSystem extends IteratingSystem {
     private final ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
     private final ComponentMapper<VelocityComponent> vsm = ComponentMapper.getFor(VelocityComponent.class);
     private final ComponentMapper<PlayerInputComponent> pim = ComponentMapper.getFor(PlayerInputComponent.class);
+    // Reusable vector prevents Garbage Collection stutters
+    private final Vector2 desiredVelocity = new Vector2();
 
     public MovementSystem() {
         // We take all with TransformComponent, VelocityComponent and PlayerInputComponent
@@ -32,8 +33,9 @@ public class MovementSystem extends IteratingSystem {
         VelocityComponent velocity = vsm.get(entity);
         PlayerInputComponent playerInput = pim.get(entity);
 
-        Vector2 desiredVelocity = new Vector2(playerInput.joystickPourcentageX, playerInput.joystickPourcentageY).nor()
-                .scl(velocity.currentMaxVelocity);
+        desiredVelocity.set(playerInput.joystickPourcentageX, playerInput.joystickPourcentageY);
+        desiredVelocity.limit(1f).scl(velocity.currentMaxVelocity);
+
         velocity.vx = desiredVelocity.x;
         velocity.vy = desiredVelocity.y;
 
