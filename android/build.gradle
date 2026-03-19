@@ -6,6 +6,7 @@ buildscript {
   }
 }
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 
 android {
@@ -22,6 +23,9 @@ android {
       jniLibs.setSrcDirs(['libs'])
     }
   }
+  testOptions {
+    unitTests.returnDefaultValues = true
+  }
   packagingOptions {
 		resources {
 			excludes += ['META-INF/robovm/ios/robovm.xml', 'META-INF/DEPENDENCIES.txt', 'META-INF/DEPENDENCIES',
@@ -32,7 +36,7 @@ android {
   }
   defaultConfig {
     applicationId 'com.fatpiggies.game'
-    minSdkVersion 21
+    minSdkVersion 23
     targetSdkVersion 35
     versionCode 1
     versionName "1.0"
@@ -63,6 +67,12 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
   implementation project(':core')
 
+  implementation platform('com.google.firebase:firebase-bom:34.10.0')
+  // When using the BoM, don't specify versions in Firebase dependencies
+  // https://firebase.google.com/docs/android/setup#available-libraries
+  implementation("com.google.firebase:firebase-auth")
+  implementation("com.google.firebase:firebase-database")
+
   natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
   natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a"
   natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
@@ -72,6 +82,9 @@ dependencies {
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
 
+  testImplementation 'junit:junit:4.13.2'
+  testImplementation 'org.mockito:mockito-core:5.11.0'
+  testImplementation 'org.mockito:mockito-inline:5.2.0'
 }
 
 // Called every time gradle gets executed, takes the native dependencies of
