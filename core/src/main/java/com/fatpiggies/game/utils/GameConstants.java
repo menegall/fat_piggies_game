@@ -15,6 +15,14 @@ public final class GameConstants {
     public static final float PLAYER_BASE_MASS = 10f;
     public static final int MAX_PLAYERS = 4;
 
+    // --- POWERUP SETTINGS ---
+    public static final float POWERUP_SPAWN_INTERVAL = 7.0f; // Spawns a new power-up every 7 seconds
+    public static final float POWERUP_MIN_LIFETIME = 10.0f;  // Minimum seconds the power-up live
+    public static final float POWERUP_MAX_LIFETIME = 40.0f;  // Maximum seconds the power-up live
+    public static final int POWER_VELOCITY_MODIFIER = 20;
+    public static final int POWER_ACCELERATION_MODIFIER = 20;
+    public static final int POWER_MASS_MODIFIER = 20;
+
     private GameConstants() {
     }
 }
