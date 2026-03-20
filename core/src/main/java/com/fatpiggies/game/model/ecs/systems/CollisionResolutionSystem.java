@@ -1,9 +1,20 @@
 package com.fatpiggies.game.model.ecs.systems;
 
-import com.badlogic.ashley.core.*;
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
-import com.fatpiggies.game.model.ecs.components.*;
+import com.fatpiggies.game.model.ecs.components.AccelerationModifierComponent;
+import com.fatpiggies.game.model.ecs.components.AttachedComponent;
+import com.fatpiggies.game.model.ecs.components.CollectibleComponent;
+import com.fatpiggies.game.model.ecs.components.CollisionEventComponent;
+import com.fatpiggies.game.model.ecs.components.LifetimeComponent;
+import com.fatpiggies.game.model.ecs.components.MassComponent;
+import com.fatpiggies.game.model.ecs.components.MassModifierComponent;
+import com.fatpiggies.game.model.ecs.components.TransformComponent;
+import com.fatpiggies.game.model.ecs.components.VelocityComponent;
+import com.fatpiggies.game.model.ecs.components.VelocityModifierComponent;
 /**
  * A system responsible for resolving collisions and handling collectibles
  * in the ECS architecture.
@@ -116,7 +127,7 @@ public class CollisionResolutionSystem extends IteratingSystem {
 
     // Attach to player
     AttachedComponent attached = getEngine().createComponent(AttachedComponent.class);
-    attached.targetEntityId = (int) collector.hashCode(); // or better: network id
+        // TODO repair this line: attached.targetEntityId = (int) collector.hashCode(); // or better: network id
     buff.add(attached);
 
     // Copy acceleration modifier
