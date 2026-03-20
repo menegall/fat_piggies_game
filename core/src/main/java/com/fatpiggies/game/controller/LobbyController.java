@@ -1,32 +1,50 @@
 package com.fatpiggies.game.controller;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.view.states.GameStateManager;
 import com.fatpiggies.game.view.states.LobbyState;
 
 public class LobbyController {
+    private boolean isHost;
+    private String playerId;
+    private String playerName;
+    private String lobbyCode;
 
+    private DatabaseService dbs;
     private GameStateManager gsm;
-    private SpriteBatch batch;
-    private MainController main;
+
+    // Is this the right way to get callback?
+    private DatabaseService.LobbyCallback callback;
 
     public LobbyController(MainController main) {
-        this.main = main;
-    }
-
-    public void create(boolean isHost){
-        batch = new SpriteBatch();
-        gsm = new GameStateManager();
+        gsm = GameStateManager.getInstance();
         gsm.set(new LobbyState(isHost));
     }
 
-    public void render(){
-        gsm.render(batch);
+    // TODO: Could host- and createLobby be joined together -> startGame()?
+    public void hostLobby(String lobbyCode) {
+
     }
 
-    public void dispose(){
-        batch.dispose();
+    public void createLobby() {
+        isHost = true;
+
+        // TODO: This will be implemented in gsm according to view?
+        // gsm.setLobbyScreen();
+        dbs.createLobby(playerId, playerName, callback);
+        // Should a listen function be used to listen to changes in lobby status?
     }
 
+    public void joinLobby(String playerId) {
+        isHost = false;
+        dbs.joinLobby(lobbyCode, playerId, playerName, callback);
+        // Should a listen function be used to listen to changes in lobby status?
+    }
+
+    public void leaveLobby() {
+        // lobbyCode = lobbyId?
+        dbs.leaveLobby(lobbyCode, playerId);
+        // gsm.set(new PlayState());
+    }
 
 }
