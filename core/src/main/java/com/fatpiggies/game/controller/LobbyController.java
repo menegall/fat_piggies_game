@@ -6,45 +6,60 @@ import com.fatpiggies.game.view.states.LobbyState;
 
 public class LobbyController {
     private boolean isHost;
-    private String playerId;
-    private String playerName;
-    private String lobbyCode;
+    private final String playerId;
+    private final String playerName;
+    private String lobbyId;
 
     private DatabaseService dbs;
     private GameStateManager gsm;
+    private MainController mc;
 
-    // Is this the right way to get callback?
-    private DatabaseService.LobbyCallback callback;
-
-    public LobbyController(MainController main) {
-        gsm = GameStateManager.getInstance();
-        gsm.set(new LobbyState(isHost));
+    public LobbyController(MainController main, String playerId, String playerName) {
+        this.gsm = GameStateManager.getInstance();
+        this.gsm.set(new LobbyState(isHost));
+        this.mc = main;
+        this.playerId = playerId;
+        this.playerName = playerName;
     }
 
-    // TODO: Could host- and createLobby be joined together -> startGame()?
     public void hostLobby(String lobbyCode) {
-
+      // TODO: Could host- and createLobby be joined together -> startGame()?
     }
 
     public void createLobby() {
         isHost = true;
-
-        // TODO: This will be implemented in gsm according to view?
-        // gsm.setLobbyScreen();
-        dbs.createLobby(playerId, playerName, callback);
-        // Should a listen function be used to listen to changes in lobby status?
+        gsm.setLobbyScreen();
+        dbs.createLobby(playerId, playerName, lobby -> {
+            this.lobbyId = lobby.getLobbyId();
+            listen();
+        });
     }
 
     public void joinLobby(String playerId) {
         isHost = false;
-        dbs.joinLobby(lobbyCode, playerId, playerName, callback);
-        // Should a listen function be used to listen to changes in lobby status?
+        dbs.joinLobby(lobbyCode, playerId, playerName, lobby -> {
+            lobbyId = lobby.getLobbyId();
+            listen();
+        });
     }
 
     public void leaveLobby() {
-        // lobbyCode = lobbyId?
-        dbs.leaveLobby(lobbyCode, playerId);
-        // gsm.set(new PlayState());
+        if(lobbyId != null) dbs.leaveLobby(lobbyId, playerId);
+        dbs.stopListening();
     }
 
+    public void startGame() {
+        if (isHost) {
+            dbs.startGame(lobbyId);
+            gsm.set(new PlayState());
+        };
+    }
+
+    private void listen() {
+        dbs.listenToLobbyInfo(lobbyId, lobby -> {
+            if (lobby.isStarted()) {
+                mc.startGame(isHost);
+            }
+        });
+    }
 }
