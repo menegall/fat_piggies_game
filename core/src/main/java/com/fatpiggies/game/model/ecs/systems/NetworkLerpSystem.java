@@ -1,5 +1,7 @@
 package com.fatpiggies.game.model.ecs.systems;
 
+import static com.fatpiggies.game.utils.GameConstants.LERP_FACTOR;
+
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
@@ -45,7 +47,7 @@ public class NetworkLerpSystem extends IteratingSystem {
     private final ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
     private final ComponentMapper<NetworkSyncComponent> nsm = ComponentMapper.getFor(NetworkSyncComponent.class);
     // Variable for fluidity of interpolation. lower value = smoother interpolation
-    private final float LERP_FACTOR = 10f;
+
 
     public NetworkLerpSystem() {
         // We take all with TransformComponent and NetworkSyncComponent but
@@ -60,9 +62,9 @@ public class NetworkLerpSystem extends IteratingSystem {
         NetworkSyncComponent sync = nsm.get(entity);
         // We limit the alpha value to be between 0 and 1 to avoid bigger movements
         float lerpAlpha = MathUtils.clamp(LERP_FACTOR * deltaTime, 0f, 1f);
-        double deltaX = sync.targetX - transform.x;
-        double deltaY = sync.targetY - transform.y;
-        float targetAngle = (float) transform.angle;
+        float deltaX = sync.targetX - transform.x;
+        float deltaY = sync.targetY - transform.y;
+        float targetAngle = transform.angle;
 
         // Linear interpolation for x and y
         transform.x += (deltaX) * lerpAlpha;

@@ -1,5 +1,7 @@
 package com.fatpiggies.game.model.ecs.systems;
 
+import static com.fatpiggies.game.utils.GameConstants.GROUND_FRICTION;
+
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
@@ -54,7 +56,7 @@ public class MovementSystem extends IteratingSystem {
 
     // Ground friction value.
     // Higher = pigs stop faster. Lower = they slide around like on ice.
-    private final float GROUND_FRICTION = 5.0f;
+
 
     public MovementSystem() {
         // Iterate over EVERYTHING that has Position and Velocity.
@@ -79,6 +81,10 @@ public class MovementSystem extends IteratingSystem {
 
             // Calculate the directional thrust from the joystick
             inputForce.set(playerInput.joystickPourcentageX, playerInput.joystickPourcentageY);
+
+            if (!inputForce.isZero()) {
+                transform.angle = inputForce.angleDeg();
+            }
 
             // Limit to 1f so diagonal movement isn't faster than straight movement
             inputForce.limit(1f).scl(acc.currentMaxAcceleration);
