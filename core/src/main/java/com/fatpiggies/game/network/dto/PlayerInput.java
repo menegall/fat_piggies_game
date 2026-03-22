@@ -1,17 +1,15 @@
 package com.fatpiggies.game.network.dto;
 
 public class PlayerInput {
-    public float vx;
-    public float vy;
-    public boolean atk;
+    public float jx;
+    public float jy;
     public long ts; // Timestamp
 
     public PlayerInput() {}
 
-    public PlayerInput(float vx, float vy, boolean atk, long ts) {
-        this.vx = vx;
-        this.vy = vy;
-        this.atk = atk;
+    public PlayerInput(float jx, float jy, long ts) {
+        this.jx = jx;
+        this.jy = jy;
         this.ts = ts;
     }
 }

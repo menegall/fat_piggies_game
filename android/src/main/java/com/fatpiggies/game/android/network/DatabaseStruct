@@ -12,15 +12,13 @@
             },
             "inputs": {
                 "user_uid_1": {
-                    "vx": 0,
-                    "vy": 0,
-                    "atk": false,
+                    "jx": 0,
+                    "jy": 0,
                     "ts": 147  //Server Reconciliation
                 },
                 "user_uid_2": {
-                    "vx": 0.5,
-                    "vy": 0,
-                    "atk": true,
+                    "jx": 0.5,
+                    "jy": 0,
                     "ts": 146
                 }
             },
@@ -30,6 +28,8 @@
                     "user_uid_1": {
                         "x": 100.5,
                         "y": 50.2,
+                        "vx": 0.5,
+                        "vy": 0,
                         "hp": 4,     // Health points
                         "fx": {
                             "spd": 50, // used to modify maxVelocityComp by the Controller
