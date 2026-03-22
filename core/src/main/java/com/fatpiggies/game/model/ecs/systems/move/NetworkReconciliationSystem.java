@@ -1,18 +1,18 @@
-package com.fatpiggies.game.model.ecs.systems;
+package com.fatpiggies.game.model.ecs.systems.move;
 
-import static com.fatpiggies.game.utils.GameConstants.CORRECTION_LERP;
-import static com.fatpiggies.game.utils.GameConstants.IGNORE_THRESHOLD;
-import static com.fatpiggies.game.utils.GameConstants.SNAP_THRESHOLD;
+import static com.fatpiggies.game.model.utils.GameConstants.CORRECTION_LERP;
+import static com.fatpiggies.game.model.utils.GameConstants.IGNORE_THRESHOLD;
+import static com.fatpiggies.game.model.utils.GameConstants.SNAP_THRESHOLD;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
-import com.fatpiggies.game.model.ecs.components.NetworkSyncComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
-import com.fatpiggies.game.model.ecs.components.VelocityComponent;
+import com.fatpiggies.game.model.ecs.components.network.NetworkSyncComponent;
+import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 
 /**
  * Handles server reconciliation for the local player's entity in a Client-Side Prediction architecture.

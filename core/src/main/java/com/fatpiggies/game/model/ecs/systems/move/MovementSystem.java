@@ -1,18 +1,18 @@
-package com.fatpiggies.game.model.ecs.systems;
+package com.fatpiggies.game.model.ecs.systems.move;
 
-import static com.fatpiggies.game.utils.GameConstants.GROUND_FRICTION;
+import static com.fatpiggies.game.model.utils.GameConstants.GROUND_FRICTION;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
-import com.fatpiggies.game.model.ecs.components.AccelerationComponent;
-import com.fatpiggies.game.model.ecs.components.MassComponent;
-import com.fatpiggies.game.model.ecs.components.NetworkSyncComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
-import com.fatpiggies.game.model.ecs.components.VelocityComponent;
+import com.fatpiggies.game.model.ecs.components.network.NetworkSyncComponent;
+import com.fatpiggies.game.model.ecs.components.physics.AccelerationComponent;
+import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
+import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 
 /**
  * A physics-based movement system responsible for updating the positions of all local entities.

@@ -6,15 +6,15 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.fatpiggies.game.model.ecs.components.AccelerationComponent;
-import com.fatpiggies.game.model.ecs.components.AccelerationModifierComponent;
-import com.fatpiggies.game.model.ecs.components.AttachedComponent;
-import com.fatpiggies.game.model.ecs.components.InputModifierComponent;
-import com.fatpiggies.game.model.ecs.components.MassComponent;
-import com.fatpiggies.game.model.ecs.components.MassModifierComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
-import com.fatpiggies.game.model.ecs.components.VelocityComponent;
-import com.fatpiggies.game.model.ecs.components.VelocityModifierComponent;
+import com.fatpiggies.game.model.ecs.components.item.AttachedComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.AccelerationModifierComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.InputModifierComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.MassModifierComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.VelocityModifierComponent;
+import com.fatpiggies.game.model.ecs.components.physics.AccelerationComponent;
+import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
+import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 
 /**
  * A pure ECS system responsible for dynamically calculating the current stats

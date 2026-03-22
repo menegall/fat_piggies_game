@@ -1,23 +1,23 @@
 package com.fatpiggies.game.model.ecs.systems;
 
-import static com.fatpiggies.game.utils.GameConstants.POWERUP_COLLISION_RADIUS;
-import static com.fatpiggies.game.utils.GameConstants.POWER_ACCELERATION_MODIFIER;
-import static com.fatpiggies.game.utils.GameConstants.POWER_MASS_MODIFIER;
-import static com.fatpiggies.game.utils.GameConstants.POWER_VELOCITY_MODIFIER;
+import static com.fatpiggies.game.model.utils.GameConstants.POWERUP_COLLISION_RADIUS;
+import static com.fatpiggies.game.model.utils.GameConstants.POWER_ACCELERATION_MODIFIER;
+import static com.fatpiggies.game.model.utils.GameConstants.POWER_MASS_MODIFIER;
+import static com.fatpiggies.game.model.utils.GameConstants.POWER_VELOCITY_MODIFIER;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.systems.IntervalSystem;
 import com.badlogic.gdx.math.MathUtils;
-import com.fatpiggies.game.model.ecs.components.AccelerationModifierComponent;
-import com.fatpiggies.game.model.ecs.components.CollectibleComponent;
-import com.fatpiggies.game.model.ecs.components.ColliderComponent;
-import com.fatpiggies.game.model.ecs.components.LifetimeComponent;
-import com.fatpiggies.game.model.ecs.components.MassModifierComponent;
 import com.fatpiggies.game.model.ecs.components.RenderComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
-import com.fatpiggies.game.model.ecs.components.VelocityModifierComponent;
-import com.fatpiggies.game.utils.GameConstants;
+import com.fatpiggies.game.model.ecs.components.collision.ColliderComponent;
+import com.fatpiggies.game.model.ecs.components.item.CollectibleComponent;
+import com.fatpiggies.game.model.ecs.components.item.LifetimeComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.AccelerationModifierComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.MassModifierComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.VelocityModifierComponent;
+import com.fatpiggies.game.model.utils.GameConstants;
 
 /**
  *  !!! <b>DON'T USE THIS SYSTEM</b> !!!

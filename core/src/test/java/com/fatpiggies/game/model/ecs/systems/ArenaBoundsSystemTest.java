@@ -7,9 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.fatpiggies.game.model.ecs.components.HealthComponent;
-import com.fatpiggies.game.model.ecs.components.NeedsRespawnComponent;
 import com.fatpiggies.game.model.ecs.components.RenderComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
+import com.fatpiggies.game.model.ecs.components.collision.NeedsRespawnComponent;
+import com.fatpiggies.game.model.ecs.systems.collision.ArenaBoundsSystem;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.fatpiggies.game.model.ecs.components.LifetimeComponent;
+import com.fatpiggies.game.model.ecs.components.item.LifetimeComponent;
 
 /**
  * A utility system that manages the duration of temporary entities, such as

@@ -1,9 +1,9 @@
-package com.fatpiggies.game.model.ecs.systems;
+package com.fatpiggies.game.model.ecs.systems.collision;
 
-import static com.fatpiggies.game.utils.GameConstants.BOTTOM_BOUND;
-import static com.fatpiggies.game.utils.GameConstants.LEFT_BOUND;
-import static com.fatpiggies.game.utils.GameConstants.RIGHT_BOUND;
-import static com.fatpiggies.game.utils.GameConstants.TOP_BOUND;
+import static com.fatpiggies.game.model.utils.GameConstants.BOTTOM_BOUND;
+import static com.fatpiggies.game.model.utils.GameConstants.LEFT_BOUND;
+import static com.fatpiggies.game.model.utils.GameConstants.RIGHT_BOUND;
+import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
@@ -12,9 +12,10 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.fatpiggies.game.model.ecs.components.HealthComponent;
-import com.fatpiggies.game.model.ecs.components.NeedsRespawnComponent;
 import com.fatpiggies.game.model.ecs.components.RenderComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
+import com.fatpiggies.game.model.ecs.components.collision.NeedsRespawnComponent;
+import com.fatpiggies.game.model.ecs.systems.move.RespawnSystem;
 
 /**
  * System responsible for monitoring entity positions and enforcing the game's arena boundaries.

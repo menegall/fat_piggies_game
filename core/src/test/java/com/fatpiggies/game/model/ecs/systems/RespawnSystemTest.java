@@ -6,11 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.fatpiggies.game.model.ecs.components.AccelerationComponent;
-import com.fatpiggies.game.model.ecs.components.MassComponent;
-import com.fatpiggies.game.model.ecs.components.NeedsRespawnComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
-import com.fatpiggies.game.model.ecs.components.VelocityComponent;
+import com.fatpiggies.game.model.ecs.components.collision.NeedsRespawnComponent;
+import com.fatpiggies.game.model.ecs.components.physics.AccelerationComponent;
+import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
+import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
+import com.fatpiggies.game.model.ecs.systems.move.RespawnSystem;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

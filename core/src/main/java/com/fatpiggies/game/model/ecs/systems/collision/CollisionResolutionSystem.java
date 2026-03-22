@@ -1,20 +1,20 @@
-package com.fatpiggies.game.model.ecs.systems;
+package com.fatpiggies.game.model.ecs.systems.collision;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
-import com.fatpiggies.game.model.ecs.components.AccelerationModifierComponent;
-import com.fatpiggies.game.model.ecs.components.AttachedComponent;
-import com.fatpiggies.game.model.ecs.components.CollectibleComponent;
-import com.fatpiggies.game.model.ecs.components.CollisionEventComponent;
-import com.fatpiggies.game.model.ecs.components.LifetimeComponent;
-import com.fatpiggies.game.model.ecs.components.MassComponent;
-import com.fatpiggies.game.model.ecs.components.MassModifierComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
-import com.fatpiggies.game.model.ecs.components.VelocityComponent;
-import com.fatpiggies.game.model.ecs.components.VelocityModifierComponent;
+import com.fatpiggies.game.model.ecs.components.collision.CollisionEventComponent;
+import com.fatpiggies.game.model.ecs.components.item.AttachedComponent;
+import com.fatpiggies.game.model.ecs.components.item.CollectibleComponent;
+import com.fatpiggies.game.model.ecs.components.item.LifetimeComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.AccelerationModifierComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.MassModifierComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.VelocityModifierComponent;
+import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
+import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 /**
  * A system responsible for resolving collisions and handling collectibles
  * in the ECS architecture.

@@ -1,15 +1,15 @@
-package com.fatpiggies.game.model.ecs.systems;
+package com.fatpiggies.game.model.ecs.systems.move;
 
-import static com.fatpiggies.game.utils.GameConstants.LERP_FACTOR;
+import static com.fatpiggies.game.model.utils.GameConstants.LERP_FACTOR;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
-import com.fatpiggies.game.model.ecs.components.NetworkSyncComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
+import com.fatpiggies.game.model.ecs.components.network.NetworkSyncComponent;
 
 /**
  * An interpolation system designed exclusively for remote entities (other players)

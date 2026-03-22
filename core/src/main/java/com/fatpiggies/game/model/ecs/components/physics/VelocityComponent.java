@@ -1,4 +1,4 @@
-package com.fatpiggies.game.model.ecs.components;
+package com.fatpiggies.game.model.ecs.components.physics;
 
 import com.badlogic.ashley.core.Component;
 

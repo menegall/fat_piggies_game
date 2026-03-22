@@ -1,4 +1,4 @@
-package com.fatpiggies.game.utils;
+package com.fatpiggies.game.model.utils;
 
 public enum PowerUpType {
     BEER,

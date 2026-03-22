@@ -4,10 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.fatpiggies.game.model.ecs.components.NetworkSyncComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
-import com.fatpiggies.game.model.ecs.components.VelocityComponent;
+import com.fatpiggies.game.model.ecs.components.network.NetworkSyncComponent;
+import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
+import com.fatpiggies.game.model.ecs.systems.move.NetworkReconciliationSystem;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

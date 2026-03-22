@@ -1,9 +1,14 @@
-package com.fatpiggies.game.model.ecs.systems;
+package com.fatpiggies.game.model.ecs.systems.collision;
 
-import com.badlogic.ashley.core.*;
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.fatpiggies.game.model.ecs.components.*;
+import com.fatpiggies.game.model.ecs.components.TransformComponent;
+import com.fatpiggies.game.model.ecs.components.collision.ColliderComponent;
+import com.fatpiggies.game.model.ecs.components.collision.CollisionEventComponent;
 
 
 public class CollisionDetectionSystem extends IteratingSystem {
