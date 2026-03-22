@@ -25,6 +25,16 @@ public final class GameConstants {
     public static final int POWER_ACCELERATION_MODIFIER = 20;
     public static final int POWER_MASS_MODIFIER = 20;
 
+    // --- RECONCILIATION THRESHOLDS (Tune these values during playtesting) ---
+    // Under this distance (in pixels), we trust the client to avoid micro-stutters.
+    public static final float IGNORE_THRESHOLD = 30f;
+
+    // Over this distance, a major desync happened (e.g., unpredicted knockback). Force an instant snap!
+    public static final float SNAP_THRESHOLD = 150f;
+
+    // The interpolation factor for medium errors (Rubber-banding effect)
+    public static final float CORRECTION_LERP = 5.0f;
+
     private GameConstants() {
     }
 }
