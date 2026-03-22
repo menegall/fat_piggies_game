@@ -1,5 +1,6 @@
 package com.fatpiggies.game.model.ecs.systems;
 
+import static com.fatpiggies.game.utils.GameConstants.POWERUP_COLLISION_RADIUS;
 import static com.fatpiggies.game.utils.GameConstants.POWER_ACCELERATION_MODIFIER;
 import static com.fatpiggies.game.utils.GameConstants.POWER_MASS_MODIFIER;
 import static com.fatpiggies.game.utils.GameConstants.POWER_VELOCITY_MODIFIER;
@@ -19,6 +20,8 @@ import com.fatpiggies.game.model.ecs.components.VelocityModifierComponent;
 import com.fatpiggies.game.utils.GameConstants;
 
 /**
+ *  !!! <b>DON'T USE THIS SYSTEM</b> !!!
+ *
  * System responsible for spawning collectible power-ups at regular intervals.
  * <p>
  * <b>Behavior:</b>
@@ -66,10 +69,11 @@ public class PowerUpSpawnerSystem extends IntervalSystem {
         RenderComponent render = new RenderComponent();
         CollectibleComponent collectible = new CollectibleComponent();
         ColliderComponent collider = new ColliderComponent();
+        collider.radius = POWERUP_COLLISION_RADIUS;
 
+        // TODO create a function in entity factory for powerup spawn.
         // You might want to set collider radius or bounds here depending on your collision logic
         render.textureId = "201";
-        collider.radius = 20f;
 
         // Attach base components
         powerUpEntity.add(transform);

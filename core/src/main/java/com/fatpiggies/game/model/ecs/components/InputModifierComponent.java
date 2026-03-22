@@ -2,6 +2,6 @@ package com.fatpiggies.game.model.ecs.components;
 
 import com.badlogic.ashley.core.Component;
 
-public class NetworkIdentityComponent implements Component {
-    public String playerId;
+public class InputModifierComponent implements Component {
+    public float power = -1.0f;
 }

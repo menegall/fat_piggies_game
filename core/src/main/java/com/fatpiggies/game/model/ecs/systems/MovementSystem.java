@@ -73,14 +73,15 @@ public class MovementSystem extends IteratingSystem {
         currentVelocity.set(velocity.vx, velocity.vy);
 
         // 1. PLAYER INPUT (Acceleration and Mass)
-        // Calculated ONLY if the entity has input, acceleration, and mass components
         if (pim.has(entity) && am.has(entity) && mm.has(entity)) {
             PlayerInputComponent playerInput = pim.get(entity);
             AccelerationComponent acc = am.get(entity);
             MassComponent mass = mm.get(entity);
 
             // Calculate the directional thrust from the joystick
-            inputForce.set(playerInput.joystickPourcentageX, playerInput.joystickPourcentageY);
+            // *multiplier => for inverse command
+            inputForce.set(playerInput.joystickPourcentageX * playerInput.multiplier,
+                playerInput.joystickPourcentageY * playerInput.multiplier);
 
             if (!inputForce.isZero()) {
                 transform.angle = inputForce.angleDeg();

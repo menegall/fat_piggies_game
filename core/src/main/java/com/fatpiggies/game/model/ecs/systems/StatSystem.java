@@ -9,8 +9,10 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.fatpiggies.game.model.ecs.components.AccelerationComponent;
 import com.fatpiggies.game.model.ecs.components.AccelerationModifierComponent;
 import com.fatpiggies.game.model.ecs.components.AttachedComponent;
+import com.fatpiggies.game.model.ecs.components.InputModifierComponent;
 import com.fatpiggies.game.model.ecs.components.MassComponent;
 import com.fatpiggies.game.model.ecs.components.MassModifierComponent;
+import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.VelocityComponent;
 import com.fatpiggies.game.model.ecs.components.VelocityModifierComponent;
 
@@ -53,11 +55,14 @@ public class StatSystem extends EntitySystem {
     private final ComponentMapper<AccelerationComponent> am = ComponentMapper.getFor(AccelerationComponent.class);
     private final ComponentMapper<MassComponent> mm = ComponentMapper.getFor(MassComponent.class);
 
+    private final ComponentMapper<PlayerInputComponent> inputMapper = ComponentMapper.getFor(PlayerInputComponent.class);
+
     // Mappers for Modifiers & Attachments
     private final ComponentMapper<AttachedComponent> attachedMapper = ComponentMapper.getFor(AttachedComponent.class);
     private final ComponentMapper<VelocityModifierComponent> vModMapper = ComponentMapper.getFor(VelocityModifierComponent.class);
     private final ComponentMapper<AccelerationModifierComponent> aModMapper = ComponentMapper.getFor(AccelerationModifierComponent.class);
     private final ComponentMapper<MassModifierComponent> mModMapper = ComponentMapper.getFor(MassModifierComponent.class);
+    private final ComponentMapper<InputModifierComponent> iModMapper = ComponentMapper.getFor(InputModifierComponent.class);
 
     // Arrays to hold the entities we care about
     private ImmutableArray<Entity> entitiesWithStats;
@@ -93,6 +98,9 @@ public class StatSystem extends EntitySystem {
             vel.currentMaxVelocity = vel.baseMaxVelocity;
             acc.currentMaxAcceleration = acc.baseMaxAcceleration;
             mass.currentMass = mass.baseMass;
+            if (inputMapper.has(pig)) {
+                inputMapper.get(pig).multiplier = 1.0f;
+            }
         }
 
         // Step 2: Apply the modifiers from active power-ups
@@ -122,6 +130,12 @@ public class StatSystem extends EntitySystem {
                     MassComponent targetMass = mm.get(targetPig);
                     MassModifierComponent massMod = mModMapper.get(powerup);
                     targetMass.currentMass += massMod.power;
+                }
+                // Apply Input Modifier
+                if (iModMapper.has(powerup) && inputMapper.has(targetPig)) {
+                    PlayerInputComponent targetInput = inputMapper.get(targetPig);
+                    InputModifierComponent inputMod = iModMapper.get(powerup);
+                    targetInput.multiplier *= inputMod.power;
                 }
             }
         }
