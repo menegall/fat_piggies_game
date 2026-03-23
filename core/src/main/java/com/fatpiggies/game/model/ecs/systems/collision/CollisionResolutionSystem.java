@@ -50,7 +50,7 @@ import com.fatpiggies.game.model.utils.GameConstants;
  * engine.addSystem(new CollisionResolutionSystem());
  * }
  * </pre>
- *
+ * <p>
  * The system automatically processes collisions each frame for all entities
  * with
  * {@link CollisionEventComponent}.
@@ -68,18 +68,18 @@ public class CollisionResolutionSystem extends IteratingSystem {
     private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private final ComponentMapper<MassComponent> mm = ComponentMapper.getFor(MassComponent.class);
     private final ComponentMapper<CollectibleComponent> cmCollectible = ComponentMapper
-            .getFor(CollectibleComponent.class);
+        .getFor(CollectibleComponent.class);
     private final ComponentMapper<CollisionEventComponent> cem = ComponentMapper.getFor(CollisionEventComponent.class);
     private final ComponentMapper<AccelerationModifierComponent> am = ComponentMapper
-            .getFor(AccelerationModifierComponent.class);
+        .getFor(AccelerationModifierComponent.class);
     private final ComponentMapper<VelocityModifierComponent> vmMod = ComponentMapper
-            .getFor(VelocityModifierComponent.class);
+        .getFor(VelocityModifierComponent.class);
     private final ComponentMapper<MassModifierComponent> mmMod = ComponentMapper.getFor(MassModifierComponent.class);
     private final ComponentMapper<ColliderComponent> cm = ComponentMapper.getFor(ColliderComponent.class);
 
-    private Vector2 normal = new Vector2();
-    private Vector2 relativeVelocity = new Vector2();
-    private Vector2 impulse = new Vector2();
+    private final Vector2 normal = new Vector2();
+    private final Vector2 relativeVelocity = new Vector2();
+    private final Vector2 impulse = new Vector2();
 
     public CollisionResolutionSystem() {
         super(Family.all(CollisionEventComponent.class).get());
@@ -175,6 +175,10 @@ public class CollisionResolutionSystem extends IteratingSystem {
     }
 
     private void collect(Entity collector, Entity item) {
+        // Avoid double collection
+        if (item.isScheduledForRemoval()) {
+            return;
+        }
 
         Entity buff = getEngine().createEntity();
 
