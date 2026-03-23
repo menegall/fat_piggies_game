@@ -72,8 +72,8 @@ public class NetworkLerpSystem extends IteratingSystem {
 
         // Spherical interpolation for angle
         if (Math.abs(deltaX) > 0.01f || Math.abs(deltaY) > 0.01f) {
-            targetAngle = MathUtils.atan2((float) (deltaY), (float) (deltaX)) * MathUtils.radiansToDegrees;
+            targetAngle = MathUtils.atan2(deltaY, deltaX) * MathUtils.radiansToDegrees;
         }
-        transform.angle = MathUtils.lerpAngleDeg((float) transform.angle, targetAngle, lerpAlpha);
+        transform.angle = MathUtils.lerpAngleDeg(transform.angle, targetAngle, lerpAlpha);
     }
 }

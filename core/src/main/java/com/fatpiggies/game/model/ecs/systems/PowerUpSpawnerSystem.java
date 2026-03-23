@@ -21,7 +21,7 @@ import com.fatpiggies.game.model.utils.GameConstants;
 
 /**
  *  !!! <b>DON'T USE THIS SYSTEM</b> !!!
- *
+ * <p>
  * System responsible for spawning collectible power-ups at regular intervals.
  * <p>
  * <b>Behavior:</b>
@@ -71,8 +71,6 @@ public class PowerUpSpawnerSystem extends IntervalSystem {
         ColliderComponent collider = new ColliderComponent();
         collider.radius = POWERUP_COLLISION_RADIUS;
 
-        // TODO create a function in entity factory for powerup spawn.
-        // You might want to set collider radius or bounds here depending on your collision logic
         render.textureId = "201";
 
         // Attach base components

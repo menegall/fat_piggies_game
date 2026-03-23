@@ -7,5 +7,5 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CollisionEventComponent implements Component {
-    public List<Entity> collidedWith = new ArrayList<>();
+    public final List<Entity> collidedWith = new ArrayList<>();
 }

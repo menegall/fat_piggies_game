@@ -67,7 +67,6 @@ public class EntityFactory {
 
         ColliderComponent collider = new ColliderComponent();
         collider.radius = PLAYER_COLLISION_RADIUS;
-        // TODO finish that after collision system is finished
         CollisionEventComponent collisions = new CollisionEventComponent();
 
         RenderComponent render = new RenderComponent();
