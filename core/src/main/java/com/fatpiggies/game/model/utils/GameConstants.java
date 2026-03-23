@@ -20,6 +20,7 @@ public final class GameConstants {
     public static final int BASE_LIFE = 4;
     public static final float LERP_FACTOR = 10f;
     public static final int PLAYER_COLLISION_RADIUS = 15;
+    public static final float PLAYER_BOUNCINESS = 0.8f;
 
 
     // --- POWERUP SETTINGS ---

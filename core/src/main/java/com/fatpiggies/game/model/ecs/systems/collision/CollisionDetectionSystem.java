@@ -3,6 +3,7 @@ package com.fatpiggies.game.model.ecs.systems.collision;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
@@ -10,65 +11,61 @@ import com.fatpiggies.game.model.ecs.components.TransformComponent;
 import com.fatpiggies.game.model.ecs.components.collision.ColliderComponent;
 import com.fatpiggies.game.model.ecs.components.collision.CollisionEventComponent;
 
+public class CollisionDetectionSystem extends EntitySystem {
 
-public class CollisionDetectionSystem extends IteratingSystem {
-
-    private final ComponentMapper<TransformComponent> tm =
-            ComponentMapper.getFor(TransformComponent.class);
-    private final ComponentMapper<ColliderComponent> cm =
-            ComponentMapper.getFor(ColliderComponent.class);
-    private final ComponentMapper<CollisionEventComponent> cem =
-            ComponentMapper.getFor(CollisionEventComponent.class);
+    private final ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
+    private final ComponentMapper<ColliderComponent> cm = ComponentMapper.getFor(ColliderComponent.class);
+    private final ComponentMapper<CollisionEventComponent> cem = ComponentMapper.getFor(CollisionEventComponent.class);
 
     private ImmutableArray<Entity> entities;
 
-    public CollisionDetectionSystem() {
-        super(Family.all(
-                TransformComponent.class,
-                ColliderComponent.class,
-                CollisionEventComponent.class
-        ).get());
-    }
-
     @Override
     public void addedToEngine(Engine engine) {
-        entities = engine.getEntitiesFor(getFamily());
+        entities = engine.getEntitiesFor(
+                Family.all(
+                        TransformComponent.class,
+                        ColliderComponent.class,
+                        CollisionEventComponent.class).get());
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
-        CollisionEventComponent events = cem.get(entity);
-        events.collidedWith.clear(); // reset every frame
+    public void update(float deltaTime) {
 
-        TransformComponent ta = tm.get(entity);
-        ColliderComponent ca = cm.get(entity);
-
+        // reset
         for (int i = 0; i < entities.size(); i++) {
-            Entity other = entities.get(i);
+            cem.get(entities.get(i)).collidedWith.clear();
+        }
 
-            if (other == entity || entity.hashCode() >= other.hashCode()) continue;
+        // pairwise collision
+        for (int i = 0; i < entities.size(); i++) {
+            Entity a = entities.get(i);
 
-            TransformComponent tb = tm.get(other);
-            ColliderComponent cb = cm.get(other);
+            TransformComponent ta = tm.get(a);
+            ColliderComponent ca = cm.get(a);
+            CollisionEventComponent ea = cem.get(a);
 
-            if (circlesOverlap(ta, ca, tb, cb)) {
-                events.collidedWith.add(other);
+            for (int j = i + 1; j < entities.size(); j++) {
+                Entity b = entities.get(j);
 
-                // also add reverse (important!)
-                CollisionEventComponent otherEvents = cem.get(other);
-                otherEvents.collidedWith.add(entity);
+                TransformComponent tb = tm.get(b);
+                ColliderComponent cb = cm.get(b);
+                CollisionEventComponent eb = cem.get(b);
+
+                if (circlesOverlap(ta, ca, tb, cb)) {
+                    ea.collidedWith.add(b);
+                }
             }
         }
     }
 
     private boolean circlesOverlap(TransformComponent ta, ColliderComponent ca,
-                                   TransformComponent tb, ColliderComponent cb) {
+            TransformComponent tb, ColliderComponent cb) {
 
-        float dx = (float)(ta.x - tb.x);
-        float dy = (float)(ta.y - tb.y);
+        float dx = ta.x - tb.x;
+        float dy = ta.y - tb.y;
 
         float distanceSquared = dx * dx + dy * dy;
-        float radiusSum = (float)(ca.radius + cb.radius);
+        float radiusSum = ca.radius + cb.radius;
 
         return distanceSquared <= radiusSum * radiusSum;
     }
