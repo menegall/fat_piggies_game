@@ -47,8 +47,9 @@ public class MovementSystemTest {
         mass.currentMass = massValue;
 
         PlayerInputComponent input = new PlayerInputComponent();
-        input.joystickPourcentageX = 0f;
-        input.joystickPourcentageY = 0f;
+        input.joystickPercentageX = 0f;
+        input.joystickPercentageY = 0f;
+        input.multiplier = 1f;
 
         entity.add(transform);
         entity.add(velocity);
@@ -85,8 +86,8 @@ public class MovementSystemTest {
         PlayerInputComponent input = entity.getComponent(PlayerInputComponent.class);
 
         // Simulate joystick completely to the right
-        input.joystickPourcentageX = 1f;
-        input.joystickPourcentageY = 0f;
+        input.joystickPercentageX = 1f;
+        input.joystickPercentageY = 0f;
 
         // Execution: update engine for 0.1 seconds
         engine.update(0.1f);

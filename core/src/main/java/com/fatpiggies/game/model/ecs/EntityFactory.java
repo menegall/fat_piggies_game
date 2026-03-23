@@ -208,6 +208,7 @@ public class EntityFactory {
             }
 
             case LIFE: {
+                // TODO Implement modifier for life
 //                MassModifierComponent massMod = new MassModifierComponent();
 //                massMod.power = POWER_MASS_MODIFIER;
 //                entity.add(massMod);
