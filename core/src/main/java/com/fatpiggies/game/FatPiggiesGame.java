@@ -5,15 +5,16 @@ import static com.fatpiggies.game.utils.Config.TAG_APP;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.SkinManager;
 import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.states.GameStateManager;
+
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
@@ -44,6 +45,10 @@ public class FatPiggiesGame extends ApplicationAdapter {
             }
         });
         batch = new SpriteBatch();
+
+
+        MainController main = new MainController(authService, databaseService);
+        // main.gsm.setMenuScreen();
 
         // FOR TESTING
         TextureManager.loadAll();

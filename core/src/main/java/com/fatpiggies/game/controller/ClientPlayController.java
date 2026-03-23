@@ -7,16 +7,17 @@ public class ClientPlayController implements IPlayController{
     }
     @Override
     public void startGame(String lobbyId) {
-        throw new java.lang.Error("User is client and cannot start the game.");
+        main.gsm.setPlayScreen();
     }
 
     @Override
     public void endGame(String lobbyId) {
-
+        main.gsm.setOverScreen();
     }
 
     @Override
     public void movePig(int x, int y) {
-
+        // TODO: how to move pig/give input into ecs
+        main.world.engine.update();
     }
 }

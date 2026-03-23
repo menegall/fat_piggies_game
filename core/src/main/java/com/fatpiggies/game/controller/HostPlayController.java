@@ -1,5 +1,7 @@
 package com.fatpiggies.game.controller;
 
+import com.fatpiggies.game.network.dto.GameState;
+
 public class HostPlayController implements IPlayController {
     private MainController main;
 
@@ -10,14 +12,20 @@ public class HostPlayController implements IPlayController {
     @Override
     public void startGame(String lobbyId) {
         // TODO specify information that is available here
-        main.gameWorld = new GameWorld();
-        main.db.startGame(lobbyId);
+        main.world = new GameWorld();
+        main.dbs.startGame(lobbyId);
+        main.dbs.pushGameState(lobbyId, new GameState());
+        main.world.startWorld();
         main.gsm.setPlayScreen();
     }
 
     @Override
     public void endGame(String lobbyId) {
-        // TODO
+        main.dbs.endGame(lobbyId);
+        // TODO: determine winner
+        main.gsm.setOverScreen();
+        main.world = null;
+
     }
 
     @Override
