@@ -6,9 +6,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.fatpiggies.game.model.ecs.components.HealthComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.item.AttachedComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.AccelerationModifierComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.HealthModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.InputModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.MassModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.VelocityModifierComponent;
@@ -66,6 +68,7 @@ public class StatSystem extends EntitySystem {
     private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private final ComponentMapper<AccelerationComponent> am = ComponentMapper.getFor(AccelerationComponent.class);
     private final ComponentMapper<MassComponent> mm = ComponentMapper.getFor(MassComponent.class);
+    private final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
     private final ComponentMapper<PlayerInputComponent> inputMapper = ComponentMapper
             .getFor(PlayerInputComponent.class);
@@ -80,6 +83,9 @@ public class StatSystem extends EntitySystem {
             .getFor(MassModifierComponent.class);
     private final ComponentMapper<InputModifierComponent> iModMapper = ComponentMapper
             .getFor(InputModifierComponent.class);
+    private final ComponentMapper<HealthModifierComponent> hModMapper = ComponentMapper
+        .getFor(HealthModifierComponent.class);
+
 
     // Arrays to hold the entities we care about
     private ImmutableArray<Entity> entitiesWithStats;
@@ -126,7 +132,7 @@ public class StatSystem extends EntitySystem {
             AttachedComponent attached = attachedMapper.get(powerup);
 
             // Grab the target directly from the component
-            Entity targetPig = attached.targetEntityId;
+            Entity targetPig = attached.targetEntity;
 
             // Make sure the pig hasn't been removed from the engine
             if (targetPig != null && !targetPig.isScheduledForRemoval()) {
@@ -153,6 +159,12 @@ public class StatSystem extends EntitySystem {
                     PlayerInputComponent targetInput = inputMapper.get(targetPig);
                     InputModifierComponent inputMod = iModMapper.get(powerup);
                     targetInput.multiplier *= inputMod.power;
+                }
+                // Apply Health Modifier
+                if (hModMapper.has(powerup)) {
+                    HealthComponent targetHealth = hm.get(targetPig);
+                    targetHealth.currentLife += 1;
+                    getEngine().removeEntity(powerup);
                 }
             }
         }

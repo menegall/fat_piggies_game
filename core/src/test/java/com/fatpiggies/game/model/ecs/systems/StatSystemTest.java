@@ -1,10 +1,13 @@
 package com.fatpiggies.game.model.ecs.systems;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.fatpiggies.game.model.ecs.components.HealthComponent;
 import com.fatpiggies.game.model.ecs.components.item.AttachedComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.HealthModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.VelocityModifierComponent;
 import com.fatpiggies.game.model.ecs.components.physics.AccelerationComponent;
 import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
@@ -29,7 +32,7 @@ class StatSystemTest {
     // --- HELPER METHODS ---
 
     /**
-     * Creates a dummy pig with base stats and adds it to the engine.
+     * Creates a dummy pig with base stats (including health) and adds it to the engine.
      */
     private Entity createPig(float baseVel, float baseAcc, float baseMass) {
         Entity pig = new Entity();
@@ -46,26 +49,45 @@ class StatSystemTest {
         mass.baseMass = baseMass;
         mass.currentMass = 0f;
 
-        pig.add(vel).add(acc).add(mass);
+        HealthComponent health = new HealthComponent();
+        health.currentLife = 3; // Default starting life for the tests
+
+        pig.add(vel).add(acc).add(mass).add(health);
         engine.addEntity(pig);
         return pig;
     }
 
     /**
-     * Creates a power-up attached to a specific pig.
+     * Creates a velocity power-up attached to a specific pig.
      */
     private Entity createVelocityPowerup(Entity targetPig, int power) {
         Entity powerup = new Entity();
 
         // 1. Attach it to the pig
         AttachedComponent attached = new AttachedComponent();
-        attached.targetEntityId = targetPig;
+        attached.targetEntity = targetPig;
 
         // 2. Give it the modifier
         VelocityModifierComponent velMod = new VelocityModifierComponent();
         velMod.power = power;
 
         powerup.add(attached).add(velMod);
+        engine.addEntity(powerup);
+        return powerup;
+    }
+
+    /**
+     * Creates a health power-up attached to a specific pig.
+     */
+    private Entity createHealthPowerup(Entity targetPig) {
+        Entity powerup = new Entity();
+
+        AttachedComponent attached = new AttachedComponent();
+        attached.targetEntity = targetPig;
+
+        HealthModifierComponent healthMod = new HealthModifierComponent();
+
+        powerup.add(attached).add(healthMod);
         engine.addEntity(powerup);
         return powerup;
     }
@@ -131,5 +153,22 @@ class StatSystemTest {
 
         // 4. Verify: Stats must snap back down to the base value
         assertEquals(100f, vel.currentMaxVelocity, 0.001f, "Stats did not reset after power-up removal.");
+    }
+
+    @Test
+    void testSystem_WithHealthModifier_IncreasesLifeAndRemovesPowerup() {
+        // 1. Setup: Create a pig (starts with 3 life) and attach a health powerup
+        Entity pig = createPig(100f, 50f, 10f);
+        Entity healthPowerup = createHealthPowerup(pig);
+
+        // 2. Execute
+        engine.update(0.016f);
+
+        // 3. Verify: Health should be incremented from 3 to 4
+        HealthComponent health = pig.getComponent(HealthComponent.class);
+        assertEquals(4, health.currentLife, "Health should have incremented by 1.");
+
+        // 4. Verify: The health powerup should be instantly consumed and removed from the engine
+        assertFalse(engine.getEntities().contains(healthPowerup, true), "Health powerup must be removed after consumption.");
     }
 }
