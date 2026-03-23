@@ -12,6 +12,7 @@ import com.fatpiggies.game.model.ecs.components.item.AttachedComponent;
 import com.fatpiggies.game.model.ecs.components.item.CollectibleComponent;
 import com.fatpiggies.game.model.ecs.components.item.LifetimeComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.AccelerationModifierComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.HealthModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.MassModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.VelocityModifierComponent;
 import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
@@ -75,6 +76,7 @@ public class CollisionResolutionSystem extends IteratingSystem {
     private final ComponentMapper<VelocityModifierComponent> vmMod = ComponentMapper
         .getFor(VelocityModifierComponent.class);
     private final ComponentMapper<MassModifierComponent> mmMod = ComponentMapper.getFor(MassModifierComponent.class);
+    private final ComponentMapper<HealthModifierComponent> hmMod = ComponentMapper.getFor(HealthModifierComponent.class);
     private final ComponentMapper<ColliderComponent> cm = ComponentMapper.getFor(ColliderComponent.class);
 
     private final Vector2 normal = new Vector2();
@@ -183,7 +185,7 @@ public class CollisionResolutionSystem extends IteratingSystem {
         Entity buff = getEngine().createEntity();
 
         AttachedComponent attached = getEngine().createComponent(AttachedComponent.class);
-        attached.targetEntityId = collector;
+        attached.targetEntity = collector;
         buff.add(attached);
 
         // Copy acceleration modifier
@@ -209,6 +211,13 @@ public class CollisionResolutionSystem extends IteratingSystem {
             newMod.power = modifier.power;
             buff.add(newMod);
         }
+
+        // Copy health modifier
+        if (hmMod.has(item)) {
+            HealthModifierComponent newMod = getEngine().createComponent(HealthModifierComponent.class);
+            buff.add(newMod);
+        }
+
 
         // Copy lifetime (temporary effect)
         LifetimeComponent lifetime = getEngine().createComponent(LifetimeComponent.class);

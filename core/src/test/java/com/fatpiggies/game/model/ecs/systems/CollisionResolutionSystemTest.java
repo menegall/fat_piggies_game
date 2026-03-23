@@ -141,7 +141,7 @@ public class CollisionResolutionSystemTest {
 
         // 3. Verify Buff Data
         AttachedComponent attached = buff.getComponent(AttachedComponent.class);
-        assertEquals(pig, attached.targetEntityId, "Buff must be attached to the Pig that collected it");
+        assertEquals(pig, attached.targetEntity, "Buff must be attached to the Pig that collected it");
 
         VelocityModifierComponent vMod = buff.getComponent(VelocityModifierComponent.class);
         assertNotNull(vMod, "Buff must have copied the VelocityModifier");

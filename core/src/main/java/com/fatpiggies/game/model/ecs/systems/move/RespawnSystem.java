@@ -133,7 +133,7 @@ public class RespawnSystem extends IteratingSystem {
         ImmutableArray<Entity> powerUpEntities = getEngine().getEntitiesFor(Family.all(AttachedComponent.class).get());
         for (Entity powerUp : powerUpEntities) {
             AttachedComponent attached = powerUp.getComponent(AttachedComponent.class);
-            if (attached.targetEntityId == pigEntity) {
+            if (attached.targetEntity == pigEntity) {
                 getEngine().removeEntity(powerUp);
             }
         }
