@@ -15,18 +15,15 @@ public class LobbyController {
     private MainController mc;
 
     public LobbyController(MainController main, String playerId, String playerName) {
-        this.gsm = GameStateManager.getInstance();
-        this.gsm.set(new LobbyState(isHost));
         this.mc = main;
+        this.gsm = mc.gsm;
+        // TODO: Should this still be included?
+        this.gsm.set(new LobbyState(isHost));
         this.playerId = playerId;
         this.playerName = playerName;
     }
 
-    public void hostLobby(String lobbyCode) {
-      // TODO: Could host- and createLobby be joined together -> startGame()?
-    }
-
-    public void createLobby() {
+    public void startGame() {
         isHost = true;
         gsm.setLobbyScreen();
         dbs.createLobby(playerId, playerName, lobby -> {
