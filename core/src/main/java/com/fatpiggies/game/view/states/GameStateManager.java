@@ -7,7 +7,7 @@ import com.fatpiggies.game.view.TextureManager;
 import java.util.Stack;
 
 public class GameStateManager {
-    private static GameStateManager gsm = null;
+    private static GameStateManager gsm;
     private Stack<State> states;
 
     private GameStateManager() {
@@ -36,10 +36,6 @@ public class GameStateManager {
     public void render(SpriteBatch sb, Snapshot snapshot) {
         states.peek().render(sb, snapshot);
     }
-
-    public void pushMenuState(){push(new MenuState());}
-
-    public void pushLobbyState(boolean isHost){push(new LobbyState(isHost));}
 
     public void setMenuScreen() {
         pop();
