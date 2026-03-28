@@ -18,12 +18,11 @@ public class LobbyController {
         this.mc = main;
         this.gsm = mc.gsm;
         // TODO: Should this still be included?
-        this.gsm.set(new LobbyState(isHost));
         this.playerId = playerId;
         this.playerName = playerName;
     }
 
-    public void startGame() {
+    public void hostLobby() {
         isHost = true;
         gsm.setLobbyScreen();
         dbs.createLobby(playerId, playerName, lobby -> {

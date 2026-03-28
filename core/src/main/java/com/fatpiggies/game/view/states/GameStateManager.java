@@ -38,7 +38,24 @@ public class GameStateManager {
     }
 
     public void pushMenuState(){push(new MenuState());}
+
     public void pushLobbyState(boolean isHost){push(new LobbyState(isHost));}
 
+    public void setMenuScreen() {
+        pop();
+        push(new MenuState());
+    }
+
+    public void setLobbyScreen() {
+
+    }
+
+    public void setPlayScreen() {
+
+    }
+
+    public void setOverScreen() {
+
+    }
 
 }
