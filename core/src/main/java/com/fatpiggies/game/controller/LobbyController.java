@@ -4,31 +4,31 @@ import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.view.states.GameStateManager;
 import com.fatpiggies.game.view.states.LobbyState;
 
-public class LobbyController {
+public class LobbyController implements IGameStateObserver {
     private boolean isHost;
     private final String playerId;
-    private final String playerName;
     private String lobbyId;
 
     private DatabaseService dbs;
     private GameStateManager gsm;
     private MainController mc;
 
-    public LobbyController(MainController main, String playerId, String playerName) {
+    public LobbyController(MainController main, String playerId) {
         this.mc = main;
         this.gsm = mc.gsm;
         // TODO: Should this still be included?
         this.playerId = playerId;
-        this.playerName = playerName;
     }
 
-    public void hostLobby() {
+    public void hostLobby(String playerName) {
         isHost = true;
         gsm.setLobbyScreen();
         dbs.createLobby(playerId, playerName, lobby -> {
             this.lobbyId = lobby.getLobbyId();
             listen();
         });
+        // create play controller as host
+        mc.playController = new HostPlayController(mc);
     }
 
     public void joinLobby(String playerId) {
@@ -37,18 +37,16 @@ public class LobbyController {
             lobbyId = lobby.getLobbyId();
             listen();
         });
+
+        // create playcontroller as client
+        mc.playController = new ClientPlayController(mc);
     }
 
     public void leaveLobby() {
         if(lobbyId != null) dbs.leaveLobby(lobbyId, playerId);
         dbs.stopListening();
-    }
 
-    public void startGame() {
-        if (isHost) {
-            dbs.startGame(lobbyId);
-            gsm.set(new PlayState());
-        };
+        mc.playController = null;
     }
 
     private void listen() {
@@ -57,5 +55,11 @@ public class LobbyController {
                 mc.startGame(isHost);
             }
         });
+    }
+
+    @Override
+    public void update() {
+        //
+        System.out.println("start Lobby");
     }
 }

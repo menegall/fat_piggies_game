@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.SkinManager;
 import com.fatpiggies.game.view.TextureId;
@@ -33,6 +34,8 @@ public class LobbyState extends State {
     private Texture background;
     private List<String> lastNames = new ArrayList<>();
     private Label lobbyIdLabel;
+
+    private MainController mc;
 
     public LobbyState(boolean isHost) {
         this.isHost = isHost;

@@ -18,8 +18,8 @@ public class MainController {
     public GameStateManager gsm;
     // TODO: add AuthService and DBService into constructor, when firebase is merged
     public MainController(AuthService auth, DatabaseService db) {
-        lobbyController = new LobbyController(this);
-        gsm = GameStateManager.getInstance();
+        lobbyController = new LobbyController(this, auth.getCurrentUserId());
+        gsm = GameStateManager.getInstance(this);
     }
 
 
