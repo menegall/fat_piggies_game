@@ -40,6 +40,10 @@ import java.util.ArrayList;
 public class GameWorld {
     ArrayList<Entity> entities;
 
+    public void startWorld(){
+
+    }
+
     /**
      * Creates a pig for the Host. It contains ALL physics and collision logic.
      *

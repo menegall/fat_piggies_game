@@ -4,42 +4,30 @@ import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.view.states.GameStateManager;
 import com.fatpiggies.game.view.states.LobbyState;
 
-public class LobbyController implements IGameStateObserver {
+public class LobbyController {
     private boolean isHost;
     private final String playerId;
     private String lobbyId;
 
     private DatabaseService dbs;
-    private GameStateManager gsm;
     private MainController mc;
 
     public LobbyController(MainController main, String playerId) {
         this.mc = main;
-        this.gsm = mc.gsm;
         // TODO: Should this still be included?
         this.playerId = playerId;
     }
 
-    public void hostLobby(String playerName) {
+    public void hostLobby(String playerId) {
         isHost = true;
-        gsm.setLobbyScreen();
-        dbs.createLobby(playerId, playerName, lobby -> {
-            this.lobbyId = lobby.getLobbyId();
-            listen();
-        });
-        // create play controller as host
-        mc.playController = new HostPlayController(mc);
+        mc.gsm.set(new LobbyState(isHost));
+        mc.gsm.setLobbyScreen();
     }
 
     public void joinLobby(String playerId) {
         isHost = false;
-        dbs.joinLobby(lobbyCode, playerId, playerName, lobby -> {
-            lobbyId = lobby.getLobbyId();
-            listen();
-        });
-
-        // create playcontroller as client
-        mc.playController = new ClientPlayController(mc);
+        mc.gsm.set(new LobbyState(isHost));
+        mc.gsm.setLobbyScreen();
     }
 
     public void leaveLobby() {
@@ -49,17 +37,12 @@ public class LobbyController implements IGameStateObserver {
         mc.playController = null;
     }
 
-    private void listen() {
-        dbs.listenToLobbyInfo(lobbyId, lobby -> {
-            if (lobby.isStarted()) {
-                mc.startGame(isHost);
-            }
-        });
+    public boolean getIsHost(){
+        return this.isHost;
     }
 
-    @Override
-    public void update() {
-        //
-        System.out.println("start Lobby");
+    public String getLobbyId(){
+        return this.lobbyId;
     }
+
 }
