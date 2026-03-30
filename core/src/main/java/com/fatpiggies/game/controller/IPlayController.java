@@ -1,7 +1,9 @@
 package com.fatpiggies.game.controller;
 
+import java.util.ArrayList;
+
 public interface IPlayController {
-    void startGame(String lobbyId);
+    void startGame(String lobbyId, ArrayList<String> playerIds, ArrayList<String> textureIds);
     void endGame(String lobbyId);
-    void movePig(double x, double y);
+    void movePig(int x, int y);
 }
