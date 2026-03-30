@@ -95,7 +95,6 @@ public class GameWorld {
      * @param textureId Texture ID of the pig
      * @param startX    Initial X position
      * @param startY    Initial Y position
-     * @return The created Entity
      */
     public void createHostPig(String networkId, String textureId, float startX, float startY) {
         Entity entity = engine.createEntity();
@@ -139,7 +138,6 @@ public class GameWorld {
      * @param textureId Texture ID of the pig
      * @param startX    Initial X position
      * @param startY    Initial Y position
-     * @return The created Entity
      */
     public void createLocalPig(String playerId, String textureId, float startX, float startY) {
         Entity entity = engine.createEntity();
@@ -179,7 +177,6 @@ public class GameWorld {
      * @param textureId Texture ID of the pig
      * @param startX    Initial X position
      * @param startY    Initial Y position
-     * @return The created Entity
      */
     public void createRemotePig(String playerId, String textureId, float startX, float startY) {
         Entity entity = engine.createEntity();
@@ -206,7 +203,6 @@ public class GameWorld {
      * Randomizes position and lifetime.
      *
      * @param type The type of power-up to create, follow the PowerUpType enum.
-     * @return The fully constructed Power-up Entity.
      */
     public void createPowerUp(PowerUpType type) {
         Entity entity = engine.createEntity();
