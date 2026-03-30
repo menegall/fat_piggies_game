@@ -1,47 +1,50 @@
 package com.fatpiggies.game.model;
 
-import static com.fatpiggies.game.model.utils.GameConstants.BASE_LIFE;
-import static com.fatpiggies.game.model.utils.GameConstants.BOTTOM_BOUND;
-import static com.fatpiggies.game.model.utils.GameConstants.LEFT_BOUND;
-import static com.fatpiggies.game.model.utils.GameConstants.PLAYER_BASE_ACCELERATION;
-import static com.fatpiggies.game.model.utils.GameConstants.PLAYER_BASE_MASS;
-import static com.fatpiggies.game.model.utils.GameConstants.PLAYER_BASE_VELOCITY;
-import static com.fatpiggies.game.model.utils.GameConstants.PLAYER_COLLISION_RADIUS;
-import static com.fatpiggies.game.model.utils.GameConstants.POWERUP_COLLISION_RADIUS;
-import static com.fatpiggies.game.model.utils.GameConstants.POWERUP_MAX_LIFETIME;
-import static com.fatpiggies.game.model.utils.GameConstants.POWERUP_MIN_LIFETIME;
-import static com.fatpiggies.game.model.utils.GameConstants.POWER_MASS_MODIFIER;
-import static com.fatpiggies.game.model.utils.GameConstants.POWER_VELOCITY_MODIFIER;
-import static com.fatpiggies.game.model.utils.GameConstants.RIGHT_BOUND;
-import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
-
+import static com.fatpiggies.game.model.;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
-import com.fatpiggies.game.model.ecs.components.HealthComponent;
-import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
-import com.fatpiggies.game.model.ecs.components.RenderComponent;
-import com.fatpiggies.game.model.ecs.components.TransformComponent;
-import com.fatpiggies.game.model.ecs.components.collision.ColliderComponent;
-import com.fatpiggies.game.model.ecs.components.collision.CollisionEventComponent;
-import com.fatpiggies.game.model.ecs.components.item.CollectibleComponent;
-import com.fatpiggies.game.model.ecs.components.item.LifetimeComponent;
-import com.fatpiggies.game.model.ecs.components.modifier.InputModifierComponent;
-import com.fatpiggies.game.model.ecs.components.modifier.MassModifierComponent;
-import com.fatpiggies.game.model.ecs.components.modifier.VelocityModifierComponent;
-import com.fatpiggies.game.model.ecs.components.network.NetworkIdentityComponent;
-import com.fatpiggies.game.model.ecs.components.network.NetworkSyncComponent;
-import com.fatpiggies.game.model.ecs.components.physics.AccelerationComponent;
-import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
-import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
-import com.fatpiggies.game.model.utils.PowerUpType;
 
 import java.util.ArrayList;
 
 public class GameWorld {
-    ArrayList<Entity> entities;
+    private final Engine engine;
+    private Entity localPlayer;
 
-    public void startWorld(){
+    public GameWorld(Engine engine) {
+        this.engine = engine;
 
+        // add all systems to engine
+        engine.addSystem(new ArenaBoundsSystem());
+        engine.addSystem(new CollisionDetectionSystem());
+        engine.addSystem(new CollisionResolutionSystem());
+        engine.addSystem(new MovementSystem());
+        engine.addSystem(new NetworkLerpSystem());
+        engine.addSystem(new NetworkReconciliationSystem());
+        engine.addSystem(new RespawnSystem());
+        engine.addSystem(new LifetimeSystem());
+        engine.addSystem(new PowerUpSpawnerSystem());
+        engine.addSystem(new StatSystem());
+    }
+
+    /**
+     * Calls update function of engine to update all systems in the order they were added.
+     * @param dt time passed since the last frame
+     */
+    public void update(float dt) {
+        engine.update(dt);
+    }
+
+    /**
+     * Updates the local players pigs position.
+     * @param x x direction
+     * @param y y direction
+     */
+    public void movePlayerPig(int x, int y) {
+        PlayerInputComponent input = localPlayer.getComponent(PlayerInputComponent.class);
+        if(input != null) {
+            input.joystickPercentageX = x;
+            input.joystickPercentageY = y;
+        }
     }
 
     /**
@@ -53,8 +56,8 @@ public class GameWorld {
      * @param startY    Initial Y position
      * @return The created Entity
      */
-    public Entity createHostPig(String networkId, String textureId, float startX, float startY) {
-        Entity entity = new Entity();
+    public void createHostPig(String networkId, String textureId, float startX, float startY) {
+        Entity entity = engine.createEntity();
 
         // Identity and Base Data
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
@@ -82,7 +85,8 @@ public class GameWorld {
         entity.add(netId).add(transform).add(health).add(render)
             .add(input).add(collider).add(collisions);
 
-        return entity;
+        localPlayer = entity;
+        this.engine.addEntity(entity);
     }
 
 
@@ -96,8 +100,8 @@ public class GameWorld {
      * @param startY    Initial Y position
      * @return The created Entity
      */
-    public Entity createLocalPig(String playerId, String textureId, float startX, float startY) {
-        Entity entity = new Entity();
+    public void createLocalPig(String playerId, String textureId, float startX, float startY) {
+        Entity entity = engine.createEntity();
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
         netId.playerId = playerId;
@@ -122,7 +126,8 @@ public class GameWorld {
         entity.add(netId).add(transform).add(health)
             .add(input).add(sync).add(graphic);
 
-        return entity;
+        localPlayer = entity;
+        this.engine.addEntity(entity);
     }
 
     /**
@@ -135,8 +140,8 @@ public class GameWorld {
      * @param startY    Initial Y position
      * @return The created Entity
      */
-    public Entity createRemotePig(String playerId, String textureId, float startX, float startY) {
-        Entity entity = new Entity();
+    public void createRemotePig(String playerId, String textureId, float startX, float startY) {
+        Entity entity = engine.createEntity();
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
         netId.playerId = playerId;
@@ -152,7 +157,7 @@ public class GameWorld {
 
         entity.add(netId).add(transform).add(sync).add(graphic);
 
-        return entity;
+        this.engine.addEntity(entity);
     }
 
     /**
@@ -162,8 +167,8 @@ public class GameWorld {
      * @param type The type of power-up to create, follow the PowerUpType enum.
      * @return The fully constructed Power-up Entity.
      */
-    public Entity createPowerUp(PowerUpType type) {
-        Entity entity = new Entity();
+    public void createPowerUp(PowerUpType type) {
+        Entity entity = engine.createEntity();
 
         TransformComponent transform = new TransformComponent();
         transform.x = MathUtils.random(LEFT_BOUND, RIGHT_BOUND);
@@ -183,7 +188,7 @@ public class GameWorld {
             .add(collisions).add(collectible);
 
         attachModifierAndRender(entity, type);
-        return entity;
+        this.engine.addEntity(entity);
     }
 
     /**
