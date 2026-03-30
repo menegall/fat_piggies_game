@@ -1,7 +1,7 @@
 package com.fatpiggies.game.view.states;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.fatpiggies.game.controller.IGameStateObserver;
+import com.fatpiggies.game.controller.IViewActions;
 import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.model.Snapshot;
 
@@ -12,7 +12,7 @@ public class GameStateManager {
     private static GameStateManager gsm;
     private Stack<State> currentState;
     private MainController mc;
-    private ArrayList<IGameStateObserver> observers;
+    private ArrayList<IViewActions> observers;
 
     private GameStateManager(MainController mc) {
         currentState = new Stack<State>();
@@ -52,16 +52,16 @@ public class GameStateManager {
 
     }
 
-    public void addObserver(IGameStateObserver observer) {
+    public void addObserver(IViewActions observer) {
         observers.add(observer);
     }
 
-    public void removeObserver(IGameStateObserver observer) {
+    public void removeObserver(IViewActions observer) {
         observers.remove(observer);
     }
 
     public void notifAllObservers() {
-        for(IGameStateObserver observer : observers) {
+        for(IViewActions observer : observers) {
             observer.update();
         }
     }
