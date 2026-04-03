@@ -9,11 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.fatpiggies.game.model.Snapshot;
-import com.fatpiggies.game.view.SkinManager;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
@@ -21,16 +19,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyState extends State {
-    private boolean isHost;
+    private final boolean isHost;
 
-    private Stage stage;
-    private Skin skin;
+    private final Stage stage;
+    private final Skin skin;
+
+    private final float screenWidth = Gdx.graphics.getWidth();
+    private final float screenHeight = Gdx.graphics.getHeight();
 
     private Table playersTable;
     private TextButton startButton;
     private TextButton leaveButton;
 
-    private Texture background;
+    private final Texture menuBackground;
+    private final Texture playBackground;
+
     private List<String> lastNames = new ArrayList<>();
     private Label lobbyIdLabel;
 
@@ -40,8 +43,9 @@ public class LobbyState extends State {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        skin = SkinManager.getSkin();
-        background = TextureManager.getTexture(TextureId.MAIN_BACKGROUND);
+        skin = TextureManager.getSkin();
+        menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
+        playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
 
         createUI();
     }
@@ -49,6 +53,12 @@ public class LobbyState extends State {
     private void createUI() {
 
         leaveButton = new TextButton("Leave", skin);
+        leaveButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                onLeaveClicked();
+            }
+        });
 
         startButton = new TextButton("Start", skin);
         startButton.setDisabled(true);
@@ -65,29 +75,32 @@ public class LobbyState extends State {
 
         Table root = new Table();
         root.setFillParent(true);
-        root.defaults().pad(20);
+        root.defaults().pad(screenHeight*0.015f);
 
-        root.add(new Label("Players", skin)).row();
+        Label playerLabel = new Label("Players", skin);
+        playerLabel.setFontScale(2f);
+
+        root.add(playerLabel).row();
         root.add(playersTable).row();
 
         if(isHost) {
             root.add(startButton)
-                .width(500)
-                .height(120)
-                .padTop(40)
+                .width(screenWidth*0.2f)
+                .height(screenHeight*0.12f)
+                .padTop(screenHeight*0.05f)
                 .row();
         }
 
         root.add(leaveButton)
-            .width(500)
-            .height(120);
+            .width(screenWidth*0.2f)
+            .height(screenHeight*0.12f);
 
         stage.addActor(root);
 
         lobbyIdLabel = new Label("ID : ----", skin);
-        lobbyIdLabel.setFontScale(2f);
+        lobbyIdLabel.setFontScale(3f);
         lobbyIdLabel.setPosition(
-            Gdx.graphics.getWidth()*3/4f,
+            Gdx.graphics.getWidth()*2.85f/4f,
             Gdx.graphics.getHeight()/2f
         );
         stage.addActor(lobbyIdLabel);
@@ -99,26 +112,42 @@ public class LobbyState extends State {
         System.out.println("Start");
     }
 
+    private void onLeaveClicked() {
+
+        System.out.println("Leave");
+    }
+
     @Override
-    public void render(SpriteBatch sb, Snapshot snapshot) {
-
-        sb.begin();
-        sb.draw(background, 0, 0,
-            Gdx.graphics.getWidth(),
-            Gdx.graphics.getHeight());
-        sb.end();
-
+    public void update(Snapshot snapshot, float dt){
         if (snapshot != null) {
             updatePlayers(snapshot);
             lobbyIdLabel.setText("ID : " + snapshot.getId());
         }
 
-        stage.act();
-        stage.draw();
+        stage.act(dt); // update UI
+    }
+
+    @Override
+    public void render(SpriteBatch sb) {
+
+        sb.begin();
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+
+        float size = Math.min(screenWidth, screenHeight) * 0.75f;
+
+        float x = (screenWidth - size) / 2f;
+        float y = (screenHeight - size) / 2f;
+
+        sb.draw(playBackground, 0, 0, screenWidth, screenHeight);
+        sb.draw(menuBackground, x, y, size, size);
+        sb.end();
+
+        stage.draw();  // draw UI
     }
 
     private void updatePlayers(Snapshot snapshot) {
-        if(!snapshot.getNames().equals(lastNames)){
+        if (!lastNames.equals(snapshot.getNames())){
             rebuildPlayers(snapshot);
             lastNames = new ArrayList<>(snapshot.getNames());
         }
@@ -130,9 +159,13 @@ public class LobbyState extends State {
 
     private void rebuildPlayers(Snapshot snapshot) {
         playersTable.clear();
+        Label playerListLabel;
 
         for (String name : snapshot.getNames()) {
-            playersTable.add(new Label(name, skin)).row();
+            playerListLabel = new Label(name, skin);
+            playerListLabel.setFontScale(1.5f);
+
+            playersTable.add(playerListLabel).row();
         }
     }
 

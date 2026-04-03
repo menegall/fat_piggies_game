@@ -2,22 +2,22 @@ package com.fatpiggies.game.view.states;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.fatpiggies.game.model.Snapshot;
-import com.fatpiggies.game.view.TextureManager;
 
 import java.util.Stack;
 
 public class GameStateManager {
-    private static GameStateManager gsm = null;
-    private Stack<State> states;
+    private static GameStateManager instance;
+    private final Stack<State> states;
 
     private GameStateManager() {
         states = new Stack<State>();
     }
 
     public static GameStateManager getInstance() {
-        if (gsm == null)
-            gsm = new GameStateManager();
-        return gsm;
+        if (instance == null) {
+            instance = new GameStateManager();
+        }
+        return instance;
     }
 
     public void push(State state) {
@@ -29,16 +29,20 @@ public class GameStateManager {
     }
 
     public void set(State state) {
-        states.pop().dispose();
+        if (!states.empty()) states.pop().dispose();
         states.push(state);
     }
 
-    public void render(SpriteBatch sb, Snapshot snapshot) {
-        states.peek().render(sb, snapshot);
+    public void render(SpriteBatch sb, Snapshot snapshot, float dt) {
+        states.peek().update(snapshot, dt);
+        states.peek().render(sb);
     }
 
-    public void pushMenuState(){push(new MenuState());}
-    public void pushLobbyState(boolean isHost){push(new LobbyState(isHost));}
+    // The functions to change states
+    public void setMenuState(){set(new MenuState());}
+    public void setLobbyState(boolean isHost){set(new LobbyState(isHost));}
+    public void setPlayState(){set(new PlayState());}
+    public void setOverState(boolean isHost){set(new OverState(isHost));}
 
 
 }

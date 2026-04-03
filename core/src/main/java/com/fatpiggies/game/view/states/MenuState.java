@@ -1,26 +1,32 @@
 package com.fatpiggies.game.view.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.fatpiggies.game.model.Snapshot;
-import com.fatpiggies.game.view.SkinManager;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
 public class MenuState extends State {
 
-    private Stage stage;
-    private Skin skin;
+    private final Stage stage;
+    private final Skin skin;
+
+    private final float screenWidth = Gdx.graphics.getWidth();
+    private final float screenHeight = Gdx.graphics.getHeight();
 
     private TextField nameField;
     private TextField lobbyField;
@@ -28,15 +34,21 @@ public class MenuState extends State {
     private TextButton joinButton;
     private TextButton hostButton;
 
-    private Texture background;
+    private Texture logo;
+    private final Texture menuBackground;
+    private final Texture playBackground;
+
+    // Manage errors
+    private Label errorLabel;
 
     public MenuState() {
 
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        skin = SkinManager.getSkin();
-        background = TextureManager.getTexture(TextureId.MAIN_BACKGROUND);
+        skin = TextureManager.getSkin();
+        menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
+        playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
 
         createUI();
     }
@@ -52,13 +64,23 @@ public class MenuState extends State {
         // Join button
         joinButton = new TextButton("Join", skin);
         joinButton.setDisabled(true);
-        nameField.setTextFieldListener((textField, c) -> updateJoinButton());
-        lobbyField.setTextFieldListener((textField, c) -> updateJoinButton());
+        nameField.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                updateJoinButton();
+                updateHostButton();
+            }
+        });
 
         // Host button
         hostButton = new TextButton("Host", skin);
         hostButton.setDisabled(true);
-        nameField.setTextFieldListener((textField, c) -> updateHostButton());
+        lobbyField.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                updateJoinButton();
+            }
+        });
 
         joinButton.addListener(new ChangeListener() {
             @Override
@@ -74,35 +96,50 @@ public class MenuState extends State {
             }
         });
 
+        // Errors
+        errorLabel = new Label("", skin);
+        errorLabel.setColor(Color.RED);
+        errorLabel.setAlignment(Align.center);
+        errorLabel.setVisible(false);
+
+        // Initial position out of window
+        errorLabel.setPosition(
+            screenWidth*0.4f,
+            -screenHeight
+        );
+        errorLabel.setSize(screenWidth*0.2f, screenHeight*0.05f);
+
+        stage.addActor(errorLabel);
+
         Table table = new Table();
         table.setFillParent(true);
 
-        table.defaults().pad(20);
+        table.defaults().pad(screenHeight*0.00f);
 
         table.add(new Label("Name", skin)).left();
         table.add(nameField)
-            .width(400)
-            .height(70)
+            .width(screenWidth*0.18f)
+            .height(screenHeight*0.18f)
             .row();
 
         table.add(new Label("Lobby ID", skin)).left();
         table.add(lobbyField)
-            .width(400)
-            .height(70)
+            .width(screenWidth*0.18f)
+            .height(screenHeight*0.18f)
             .row();
 
         table.add(joinButton)
-            .width(500)
-            .height(120)
+            .width(screenWidth*0.2f)
+            .height(screenHeight*0.12f)
             .colspan(2)
-            .padTop(40)
+            .padTop(screenHeight*0.02f)
             .row();
 
         table.add(hostButton)
-            .width(500)
-            .height(120)
+            .width(screenWidth*0.2f)
+            .height(screenHeight*0.12f)
             .colspan(2)
-            .padTop(20);
+            .padTop(screenHeight*0.02f);
 
         stage.addActor(table);
     }
@@ -135,16 +172,45 @@ public class MenuState extends State {
         System.out.println("Host lobby as " + name);
     }
 
+    private void showError(String message) {
+        errorLabel.clearActions();
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+
+        float targetY = screenHeight * 0.06f;
+
+        errorLabel.addAction(Actions.sequence(
+            Actions.moveTo(screenWidth*0.4f, targetY, 1f, Interpolation.swingIn),
+            Actions.delay(2.5f),
+            Actions.moveTo(screenWidth*0.4f, -screenHeight, 0.1f, Interpolation.swingOut),
+            Actions.run(() -> errorLabel.setVisible(false))
+        ));
+    }
+
+    private int c = 0;
     @Override
-    public void render(SpriteBatch sb, Snapshot snapshot) {
+    public void update(Snapshot snapshot, float dt){
+        stage.act(dt);   // update UI
+        c++;
+        if (c ==10) showError("Name already used");
+    }
+
+    @Override
+    public void render(SpriteBatch sb) {
 
         sb.begin();
-        sb.draw(background, 0, 0,
-            Gdx.graphics.getWidth(),
-            Gdx.graphics.getHeight());
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+
+        float size = Math.min(screenWidth, screenHeight) * 0.75f;
+
+        float x = (screenWidth - size) / 2f;
+        float y = (screenHeight - size) / 2f;
+
+        sb.draw(playBackground, 0, 0, screenWidth, screenHeight);
+        sb.draw(menuBackground, x, y, size, size);
         sb.end();
 
-        stage.act();   // update UI
         stage.draw();  // draw UI
     }
 

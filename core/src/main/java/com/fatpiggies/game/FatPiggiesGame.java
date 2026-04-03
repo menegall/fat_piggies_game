@@ -2,11 +2,9 @@ package com.fatpiggies.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.fatpiggies.game.model.Snapshot;
-import com.fatpiggies.game.view.SkinManager;
 import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.states.GameStateManager;
 
@@ -20,9 +18,14 @@ public class FatPiggiesGame extends ApplicationAdapter {
         batch = new SpriteBatch();
 
         // FOR TESTING
-        TextureManager.loadAll();
-        SkinManager.load();
-        GameStateManager.getInstance().pushLobbyState(false);
+        TextureManager.loadTextures();
+        TextureManager.loadSkin();
+
+
+        GameStateManager.getInstance().setMenuState();
+        GameStateManager.getInstance().setLobbyState(true);
+        GameStateManager.getInstance().setPlayState();
+        GameStateManager.getInstance().setOverState(true);
     }
 
     @Override
@@ -32,13 +35,12 @@ public class FatPiggiesGame extends ApplicationAdapter {
 
         // FOR TESTING
         Snapshot snapshot = new Snapshot();
-        GameStateManager.getInstance().render(batch, snapshot);
+        GameStateManager.getInstance().render(batch, snapshot, dt);
     }
 
     @Override
     public void dispose() {
         TextureManager.dispose();
-        SkinManager.dispose();
         batch.dispose();
     }
 }
