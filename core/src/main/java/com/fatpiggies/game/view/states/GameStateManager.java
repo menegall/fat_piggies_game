@@ -20,15 +20,15 @@ public class GameStateManager {
         return instance;
     }
 
-    public void push(State state) {
+    private void push(State state) {
         states.push(state);
     }
 
-    public void pop() {
+    private void pop() {
         states.pop().dispose();
     }
 
-    public void set(State state) {
+    private void set(State state) {
         if (!states.empty()) states.pop().dispose();
         states.push(state);
     }
