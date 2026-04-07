@@ -44,13 +44,13 @@ public class HostPlayController implements IPlayController {
         main.dbs.startGame(lobbyId);
         main.dbs.pushGameState(lobbyId, new GameState());
         // create entities in gameworld
-      
+
         // TODO change positions when view is implemented
         main.world.createHostPig(main.auth.getCurrentUserId(), textureIds.get(0),0,0);
         for(int i = 0; i < playerIds.size(); i++) {
             main.world.createRemotePig(playerIds.get(i), textureIds.get(i+1), 0,0);
         }
-      
+
         main.gsm.setPlayState(main);
     }
 
@@ -64,7 +64,7 @@ public class HostPlayController implements IPlayController {
     }
 
     @Override
-    public void updatePlayerInput(int x, int y) {
+    public void updatePlayerInput(float x, float y) {
         main.world.updatePlayerInput(x,y);
     }
 

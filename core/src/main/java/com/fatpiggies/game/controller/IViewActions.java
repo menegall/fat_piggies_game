@@ -13,5 +13,5 @@ public interface IViewActions {
     void onLeaveClicked();
 
     // Play
-    void onJoystickMoved(double x, double y);
+    void onJoystickMoved(float x, float y);
 }

@@ -41,7 +41,7 @@ public class MainController implements IViewActions {
         else {
             playController = new ClientPlayController(this);
         }
-        playController.startGame(lobbyController.getLobbyId(), playerIds, textureIds);
+        //playController.startGame(lobbyController.getLobbyId(), playerIds, textureIds);
         lobbyController.leaveLobby();
     }
 
@@ -52,7 +52,7 @@ public class MainController implements IViewActions {
     }
 
     @Override
-    public void onJoystickMoved(int x, int y) {
+    public void onJoystickMoved(float x, float y){
         if(playController != null){
             playController.updatePlayerInput(x, y);
         }
