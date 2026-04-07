@@ -11,7 +11,6 @@ import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.model.Snapshot;
-import com.fatpiggies.game.view.SkinManager;
 import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.states.GameStateManager;
 
@@ -46,14 +45,14 @@ public class FatPiggiesGame extends ApplicationAdapter {
         });
         batch = new SpriteBatch();
 
+        TextureManager.loadTextures();
+        TextureManager.loadSkin();
 
-        MainController main = new MainController(authService, databaseService);
-        // main.gsm.setMenuScreen();
-
-        // FOR TESTING
-        TextureManager.loadAll();
-        SkinManager.load();
-        GameStateManager.getInstance().pushLobbyState(false);
+        // TODO FOR TESTING
+        GameStateManager.getInstance().setMenuState();
+        GameStateManager.getInstance().setLobbyState(true);
+        GameStateManager.getInstance().setPlayState();
+        GameStateManager.getInstance().setOverState(true);
     }
 
     @Override
@@ -63,14 +62,13 @@ public class FatPiggiesGame extends ApplicationAdapter {
 
         // FOR TESTING
         Snapshot snapshot = new Snapshot();
-        GameStateManager.getInstance().render(batch, snapshot);
+        GameStateManager.getInstance().render(batch, snapshot, dt);
     }
 
     @Override
     public void dispose() {
         Gdx.app.log(TAG_APP, "Dispose App");
         TextureManager.dispose();
-        SkinManager.dispose();
         batch.dispose();
         // TODO implement leaveLobby() if user is in a lobby
         databaseService.stopListening();
