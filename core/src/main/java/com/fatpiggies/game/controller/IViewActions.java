@@ -1,5 +1,7 @@
 package com.fatpiggies.game.controller;
 
+import java.util.ArrayList;
+
 public interface IViewActions {
 
     // Menu

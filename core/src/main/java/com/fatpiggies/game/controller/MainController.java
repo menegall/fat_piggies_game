@@ -41,8 +41,7 @@ public class MainController implements IViewActions {
         else {
             playController = new ClientPlayController(this);
         }
-
-        playController.startGame(lobbyController.getLobbyId());
+        playController.startGame(lobbyController.getLobbyId(), playerIds, textureIds);
         lobbyController.leaveLobby();
     }
 
@@ -53,9 +52,9 @@ public class MainController implements IViewActions {
     }
 
     @Override
-    public void onJoystickMoved(double x, double y) {
+    public void onJoystickMoved(int x, int y) {
         if(playController != null){
-            playController.movePig(x, y);
+            playController.updatePlayerInput(x, y);
         }
     }
 }
