@@ -12,7 +12,6 @@ import com.fatpiggies.game.model.ecs.systems.collision.CollisionResolutionSystem
 import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
 import com.fatpiggies.game.model.ecs.systems.move.RespawnSystem;
 import com.fatpiggies.game.network.dto.GameState;
-import com.fatpiggies.game.view.states.PlayState;
 
 import java.util.ArrayList;
 
@@ -44,13 +43,13 @@ public class HostPlayController implements IPlayController {
         main.dbs.startGame(lobbyId);
         main.dbs.pushGameState(lobbyId, new GameState());
         // create entities in gameworld
-      
+
         // TODO change positions when view is implemented
         main.world.createHostPig(main.auth.getCurrentUserId(), textureIds.get(0),0,0);
         for(int i = 0; i < playerIds.size(); i++) {
             main.world.createRemotePig(playerIds.get(i), textureIds.get(i+1), 0,0);
         }
-      
+
         main.gsm.setPlayState(main);
     }
 
