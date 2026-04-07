@@ -7,11 +7,10 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.fatpiggies.game.model.Snapshot;
+import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.view.TextureManager;
-import com.fatpiggies.game.view.states.GameStateManager;
 
 
 /**
@@ -21,6 +20,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
     AuthService authService;
     DatabaseService databaseService;
     private SpriteBatch batch;
+    private MainController mc;
 
     public FatPiggiesGame(AuthService authService, DatabaseService databaseService) {
         this.authService = authService;
@@ -43,12 +43,14 @@ public class FatPiggiesGame extends ApplicationAdapter {
             }
         });
 
-        // To draw
-        batch = new SpriteBatch();
-
         // Load only once
         TextureManager.loadTextures();
         TextureManager.loadSkin();
+
+        // To draw
+        batch = new SpriteBatch();
+        mc = new MainController(authService, databaseService);
+
     }
 
     @Override
@@ -57,8 +59,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
         // FOR TESTING
-        Snapshot snapshot = new Snapshot();
-        GameStateManager.getInstance().render(batch, snapshot, dt);
+        mc.update(batch, dt);
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.fatpiggies.game.network.dto.PlayerInput;
 import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 
 import java.util.Map;
 import java.util.Random;
@@ -170,9 +171,10 @@ public class AndroidDatabase implements DatabaseService {
         playersSetupListener = new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
-                // TODO Check if the follows work
                 if (snapshot.exists()) {
-                    Map<String, PlayerSetup> playersSetup = snapshot.getValue(Map.class);
+                    GenericTypeIndicator<Map<String, PlayerSetup>> typeIndicator = new GenericTypeIndicator<Map<String, PlayerSetup>>() {
+                    };
+                    Map<String, PlayerSetup> playersSetup = snapshot.getValue(typeIndicator);
                     if (playersSetup != null) {
                         callback.onPlayersSetupUpdated(playersSetup);
                     }

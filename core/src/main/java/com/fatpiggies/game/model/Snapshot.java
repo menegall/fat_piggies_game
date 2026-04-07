@@ -28,7 +28,10 @@ public class Snapshot {
     }
 
     public List<String> getNames() {return names; }
-    public String getId() {return id; }
+
+    public String getCode() {
+        return id;
+    }
 
 
 
