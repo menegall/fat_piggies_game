@@ -44,6 +44,8 @@ public class LobbyController {
 
     public void joinLobby(String playerName, String lobbyCode) {
         isHost = false;
+
+        // TODO : FIX Lobby Id not returned when joinLobby
         dbs.joinLobby(lobbyCode, playerId, playerName, new DatabaseService.LobbyCallback() {
             @Override
             public void onSuccess(String lobbyId) {
@@ -51,7 +53,6 @@ public class LobbyController {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        setLobbyId(lobbyId);
                         changeToLobbyState();
                     }
                 });
@@ -102,7 +103,6 @@ public class LobbyController {
                 // TODO something with this maybe
             }
         });
-
     }
 
     private void showErrorInMainThread(String message){
