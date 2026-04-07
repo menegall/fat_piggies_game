@@ -15,6 +15,7 @@ import static com.fatpiggies.game.model.utils.GameConstants.POWER_VELOCITY_MODIF
 import static com.fatpiggies.game.model.utils.GameConstants.RIGHT_BOUND;
 import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
 import com.fatpiggies.game.model.ecs.components.HealthComponent;
@@ -36,13 +37,37 @@ import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 import com.fatpiggies.game.model.utils.PowerUpType;
 
-import java.util.ArrayList;
 
 public class GameWorld {
-    ArrayList<Entity> entities;
+    private final Engine engine;
+    private Entity localPlayer;
 
-    public void startWorld(){
+    public GameWorld(Engine engine) {
+        this.engine = engine;
+    }
 
+    /**
+     * Calls update function of engine to update all systems in the order they were added.
+     *
+     * @param dt time passed since the last frame
+     */
+    //TODO: move update function into maincontroller
+    public void update(float dt) {
+        engine.update(dt);
+    }
+
+    /**
+     * Updates the local players pigs position.
+     *
+     * @param x x direction
+     * @param y y direction
+     */
+    public void updatePlayerInput(float x, float y) {
+        PlayerInputComponent input = localPlayer.getComponent(PlayerInputComponent.class);
+        if (input != null) {
+            input.joystickPercentageX = x;
+            input.joystickPercentageY = y;
+        }
     }
 
     /**
@@ -52,10 +77,9 @@ public class GameWorld {
      * @param textureId Texture ID of the pig
      * @param startX    Initial X position
      * @param startY    Initial Y position
-     * @return The created Entity
      */
-    public Entity createHostPig(String networkId, String textureId, float startX, float startY) {
-        Entity entity = new Entity();
+    public void createHostPig(String networkId, String textureId, float startX, float startY) {
+        Entity entity = engine.createEntity();
 
         // Identity and Base Data
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
@@ -83,7 +107,8 @@ public class GameWorld {
         entity.add(netId).add(transform).add(health).add(render)
             .add(input).add(collider).add(collisions);
 
-        return entity;
+        localPlayer = entity;
+        this.engine.addEntity(entity);
     }
 
 
@@ -95,10 +120,9 @@ public class GameWorld {
      * @param textureId Texture ID of the pig
      * @param startX    Initial X position
      * @param startY    Initial Y position
-     * @return The created Entity
      */
-    public Entity createLocalPig(String playerId, String textureId, float startX, float startY) {
-        Entity entity = new Entity();
+    public void createLocalPig(String playerId, String textureId, float startX, float startY) {
+        Entity entity = engine.createEntity();
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
         netId.playerId = playerId;
@@ -123,7 +147,8 @@ public class GameWorld {
         entity.add(netId).add(transform).add(health)
             .add(input).add(sync).add(graphic);
 
-        return entity;
+        localPlayer = entity;
+        this.engine.addEntity(entity);
     }
 
     /**
@@ -134,10 +159,9 @@ public class GameWorld {
      * @param textureId Texture ID of the pig
      * @param startX    Initial X position
      * @param startY    Initial Y position
-     * @return The created Entity
      */
-    public Entity createRemotePig(String playerId, String textureId, float startX, float startY) {
-        Entity entity = new Entity();
+    public void createRemotePig(String playerId, String textureId, float startX, float startY) {
+        Entity entity = engine.createEntity();
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
         netId.playerId = playerId;
@@ -153,7 +177,7 @@ public class GameWorld {
 
         entity.add(netId).add(transform).add(sync).add(graphic);
 
-        return entity;
+        this.engine.addEntity(entity);
     }
 
     /**
@@ -161,10 +185,9 @@ public class GameWorld {
      * Randomizes position and lifetime.
      *
      * @param type The type of power-up to create, follow the PowerUpType enum.
-     * @return The fully constructed Power-up Entity.
      */
-    public Entity createPowerUp(PowerUpType type) {
-        Entity entity = new Entity();
+    public void createPowerUp(PowerUpType type) {
+        Entity entity = engine.createEntity();
 
         TransformComponent transform = new TransformComponent();
         transform.x = MathUtils.random(LEFT_BOUND, RIGHT_BOUND);
@@ -184,7 +207,7 @@ public class GameWorld {
             .add(collisions).add(collectible);
 
         attachModifierAndRender(entity, type);
-        return entity;
+        this.engine.addEntity(entity);
     }
 
     /**

@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.fatpiggies.game.controller.MainController;
+import com.fatpiggies.game.controller.IViewActions;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
@@ -29,9 +29,8 @@ public class LobbyState extends State {
     private List<String> lastNames = new ArrayList<>();
     private Label lobbyIdLabel;
 
-    private MainController mc;
-
-    public LobbyState(boolean isHost) {
+    public LobbyState(IViewActions viewActions, boolean isHost) {
+        super(viewActions);
         this.isHost = isHost;
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
@@ -97,20 +96,18 @@ public class LobbyState extends State {
 
     // FOR NOW WITHOUT CONTROLLER
     private void onStartClicked() {
-
-        System.out.println("Start");
+        viewActions.onStartClicked();
     }
 
     private void onLeaveClicked() {
-
-        System.out.println("Leave");
+        viewActions.onLeaveClicked();
     }
 
     @Override
     public void update(Snapshot snapshot, float dt){
         if (snapshot != null) {
             updatePlayers(snapshot);
-            lobbyIdLabel.setText("ID : " + snapshot.getId());
+            lobbyIdLabel.setText("CODE : " + snapshot.getCode());
         }
 
         stage.act(dt); // update UI

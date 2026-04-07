@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.fatpiggies.game.controller.IViewActions;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
@@ -31,7 +32,8 @@ public class MenuState extends State {
     // Manage errors
     private Label errorLabel;
 
-    public MenuState() {
+    public MenuState(IViewActions viewActions) {
+        super(viewActions);
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
 
@@ -148,13 +150,13 @@ public class MenuState extends State {
         String name = nameField.getText();
         String lobbyId = lobbyField.getText();
 
-        System.out.println("Join lobby " + lobbyId + " as " + name);
+        viewActions.onJoinLobbyClicked(name, lobbyId);
     }
 
     private void onHostClicked() {
         String name = nameField.getText();
 
-        System.out.println("Host lobby as " + name);
+        viewActions.onHostLobbyClicked(name);
     }
 
     @Override

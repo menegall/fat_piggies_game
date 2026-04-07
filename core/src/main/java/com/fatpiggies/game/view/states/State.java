@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.fatpiggies.game.controller.IViewActions;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.TextureManager;
 
@@ -17,11 +18,13 @@ public abstract class State {
     protected final float screenHeight = Gdx.graphics.getHeight();
     protected Stage stage;
     protected Skin skin;
+    protected IViewActions viewActions;
 
 
-    protected State() {
+    protected State(IViewActions viewActions) {
         cam = new OrthographicCamera();
         touchPoint = new Vector3();
+        this.viewActions = viewActions;
 
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);

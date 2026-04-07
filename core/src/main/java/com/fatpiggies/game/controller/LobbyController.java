@@ -25,7 +25,6 @@ public class LobbyController {
         dbs.createLobby(playerId, playerName, new DatabaseService.LobbyCallback() {
             @Override
             public void onSuccess(String lobbyId) {
-
                 // This post the state change back to the main thread
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
@@ -43,7 +42,7 @@ public class LobbyController {
         });
     }
 
-    public void joinLobby(String playerName, String lobbyCode, String lobbyId) {
+    public void joinLobby(String playerName, String lobbyCode) {
         isHost = false;
         dbs.joinLobby(lobbyCode, playerId, playerName, new DatabaseService.LobbyCallback() {
             @Override
@@ -68,19 +67,19 @@ public class LobbyController {
     public void leaveLobby() {
         if(lobbyId != null) dbs.leaveLobby(lobbyId, playerId);
         dbs.stopListening();
-        mc.gsm.setMenuState();
+        mc.gsm.setMenuState(mc);
     }
 
-    public boolean getIsHost(){
-        return this.isHost;
+    public boolean getIsHost() {
+        return isHost;
     }
 
-    public String getLobbyId(){
-        return this.lobbyId;
+    public String getLobbyId() {
+        return lobbyId;
     }
 
     private void changeToLobbyState(){
-        mc.gsm.setLobbyState(isHost);
+        mc.gsm.setLobbyState(mc, isHost);
         dbs.getLobbyCodeOnce(lobbyId, new DatabaseService.CodeCallback() {
             @Override
             public void onCodeRetrieved(String code) {

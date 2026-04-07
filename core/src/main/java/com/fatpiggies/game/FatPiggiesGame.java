@@ -7,10 +7,9 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.fatpiggies.game.controller.MainController;
+import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
-import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.states.GameStateManager;
 
@@ -43,16 +42,13 @@ public class FatPiggiesGame extends ApplicationAdapter {
                 // TODO handle error
             }
         });
+
+        // To draw
         batch = new SpriteBatch();
 
+        // Load only once
         TextureManager.loadTextures();
         TextureManager.loadSkin();
-
-        // TODO FOR TESTING
-        GameStateManager.getInstance().setMenuState();
-        GameStateManager.getInstance().setLobbyState(true);
-        GameStateManager.getInstance().setPlayState();
-        GameStateManager.getInstance().setOverState(true);
     }
 
     @Override
@@ -68,8 +64,10 @@ public class FatPiggiesGame extends ApplicationAdapter {
     @Override
     public void dispose() {
         Gdx.app.log(TAG_APP, "Dispose App");
-        TextureManager.dispose();
+
         batch.dispose();
+        TextureManager.dispose();
+
         // TODO implement leaveLobby() if user is in a lobby
         databaseService.stopListening();
         authService.signOut();
