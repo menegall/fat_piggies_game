@@ -216,6 +216,29 @@ public class AndroidDatabase implements DatabaseService {
     }
 
     @Override
+    public void getLobbyCodeOnce(String lobbyId, CodeCallback callback) {
+        DatabaseReference codeRef = lobbiesRef.child(lobbyId).child("info/code");
+
+        // .get() fetches the value exactly once and returns a Task
+        codeRef.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.e(TAG_DATABASE, "Error getting lobby code", task.getException());
+                callback.onError(task.getException().getMessage());
+                return;
+            }
+
+            // Task successful, extract the snapshot
+            com.google.firebase.database.DataSnapshot snapshot = task.getResult();
+            if (snapshot.exists()) {
+                String code = snapshot.getValue(String.class);
+                callback.onCodeRetrieved(code);
+            } else {
+                callback.onError("Code node does not exist.");
+            }
+        });
+    }
+
+    @Override
     public void pushGameState(String lobbyId, GameState state) {
         gameStateRef = lobbiesRef.child(lobbyId).child("game_state");
         // Write the game state data to the database

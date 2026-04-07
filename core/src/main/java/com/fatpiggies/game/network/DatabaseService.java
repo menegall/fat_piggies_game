@@ -90,6 +90,14 @@ public interface DatabaseService {
      */
     void listenToPlayersSetup(String lobbyId, PlayersSetupCallback callback);
 
+    /**
+     * Fetches the lobby code once and returns it via a callback.
+     * * @param lobbyId The unique ID of the lobby.
+     *
+     * @param callback A simple interface to handle the result asynchronously.
+     */
+    void getLobbyCodeOnce(String lobbyId, CodeCallback callback);
+
     // ======================================
     // ---- Game State Management (Host) ----
     // ======================================
@@ -179,4 +187,12 @@ public interface DatabaseService {
         void onError(NetworkError error, String errorMessage);
 
     }
+
+    interface CodeCallback {
+        void onCodeRetrieved(String code);
+
+        void onError(String errorMessage);
+    }
+
+
 }
