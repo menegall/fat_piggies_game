@@ -22,10 +22,10 @@ In a world where size matters, players take control of round, bouncy pigs. Using
 ## 🛠️ Tech Stack
 
 * **Language:** Java
-* **Framework:** [LibGDX](https://libgdx.com/)
+* **Framework:** [LibGDX](https://libgdx.com/), [Ashley](https://github.com/libgdx/ashley)
 * **IDE:** Android Studio
 * **Physics:** Box2D
-* **Networking:** Firebase *(Update based on your choice)*
+* **Networking:** Firebase & Auth
 
 ---
 

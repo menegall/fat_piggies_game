@@ -1,16 +1,20 @@
 package com.fatpiggies.game.view.states;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.fatpiggies.game.controller.IViewActions;
+import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.model.Snapshot;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 public class GameStateManager {
     private static GameStateManager instance;
     private final Stack<State> states;
 
-    private GameStateManager() {
-        states = new Stack<State>();
+    private GameStateManager(MainController mc) {
+        currentState = new Stack<State>();
+        this.mc = mc;
     }
 
     public static GameStateManager getInstance() {
@@ -49,5 +53,24 @@ public class GameStateManager {
         states.peek().showError(message);
     }
 
+    }
+
+    public void addObserver(IViewActions observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(IViewActions observer) {
+        observers.remove(observer);
+    }
+
+    public void notifAllObservers() {
+        for(IViewActions observer : observers) {
+            observer.update();
+        }
+    }
+//
+//    public void notify() {
+//
+//    }
 
 }

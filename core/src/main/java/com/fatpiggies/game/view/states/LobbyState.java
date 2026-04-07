@@ -28,6 +28,8 @@ public class LobbyState extends State {
     private List<String> lastNames = new ArrayList<>();
     private Label lobbyIdLabel;
 
+    private MainController mc;
+
     public LobbyState(boolean isHost) {
         this.isHost = isHost;
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
