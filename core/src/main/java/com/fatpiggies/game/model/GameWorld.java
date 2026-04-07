@@ -26,6 +26,7 @@ import com.fatpiggies.game.model.ecs.components.collision.ColliderComponent;
 import com.fatpiggies.game.model.ecs.components.collision.CollisionEventComponent;
 import com.fatpiggies.game.model.ecs.components.item.CollectibleComponent;
 import com.fatpiggies.game.model.ecs.components.item.LifetimeComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.HealthModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.InputModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.MassModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.VelocityModifierComponent;
@@ -236,10 +237,8 @@ public class GameWorld {
             }
 
             case LIFE: {
-                // TODO Implement modifier for life
-//                MassModifierComponent massMod = new MassModifierComponent();
-//                massMod.power = POWER_MASS_MODIFIER;
-//                entity.add(massMod);
+                HealthModifierComponent healthMod = new HealthModifierComponent();
+                entity.add(healthMod);
                 // TODO: use enum from view for render: render.textureId = "201";
                 break;
             }

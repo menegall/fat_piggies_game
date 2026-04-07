@@ -37,6 +37,9 @@ public final class GameConstants {
     public static final float SNAP_THRESHOLD = 150f;
     public static final float CORRECTION_LERP = 5.0f;
 
+    // --- INPUT SETTINGS ---
+    public static final float JOYSTICK_DEADZONE = 10f;
+
     private GameConstants() {
     }
 }

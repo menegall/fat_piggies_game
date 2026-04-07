@@ -66,6 +66,7 @@ dependencies {
   implementation "com.badlogicgames.gdx-controllers:gdx-controllers-android:$gdxControllersVersion"
   implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
   implementation project(':core')
+  implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
   implementation platform('com.google.firebase:firebase-bom:34.10.0')
   // When using the BoM, don't specify versions in Firebase dependencies
@@ -82,6 +83,10 @@ dependencies {
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
 
+  natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+  natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+  natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+  natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
   testImplementation 'junit:junit:4.13.2'
   testImplementation 'org.mockito:mockito-core:5.11.0'
   testImplementation 'org.mockito:mockito-inline:5.2.0'
