@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.network.dto.PlayerSetup;
-import com.fatpiggies.game.view.states.GameStateManager;
-import com.fatpiggies.game.view.states.LobbyState;
 
 import java.util.Map;
 
@@ -83,7 +81,17 @@ public class LobbyController {
 
     private void changeToLobbyState(){
         mc.gsm.setLobbyState(isHost);
-        // TODO put reading lobby code and give to view. PATRICK
+        dbs.getLobbyCodeOnce(lobbyId, new DatabaseService.CodeCallback() {
+            @Override
+            public void onCodeRetrieved(String code) {
+                // TODO Pass the lobby code to the view. GABIN
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                // TODO something with this maybe
+            }
+        });
         dbs.listenToPlayersSetup(lobbyId, new DatabaseService.PlayersSetupCallback() {
             @Override
             public void onPlayersSetupUpdated(Map<String, PlayerSetup> playersSetup) {
