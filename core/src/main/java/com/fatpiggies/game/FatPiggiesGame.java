@@ -17,11 +17,10 @@ public class FatPiggiesGame extends ApplicationAdapter {
     public void create() {
         batch = new SpriteBatch();
 
-        // FOR TESTING
         TextureManager.loadTextures();
         TextureManager.loadSkin();
 
-
+        // TODO FOR TESTING
         GameStateManager.getInstance().setMenuState();
         GameStateManager.getInstance().setLobbyState(true);
         GameStateManager.getInstance().setPlayState();
