@@ -53,7 +53,7 @@ public class GameStateManager {
         states.peek().showError(message);
     }
 
-    }
+
 
     public void addObserver(IViewActions observer) {
         observers.add(observer);
