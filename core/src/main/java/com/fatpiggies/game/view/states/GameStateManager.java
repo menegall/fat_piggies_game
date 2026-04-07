@@ -20,15 +20,15 @@ public class GameStateManager {
         return instance;
     }
 
-    public void push(State state) {
+    private void push(State state) {
         states.push(state);
     }
 
-    public void pop() {
+    private void pop() {
         states.pop().dispose();
     }
 
-    public void set(State state) {
+    private void set(State state) {
         if (!states.empty()) states.pop().dispose();
         states.push(state);
     }
@@ -43,6 +43,11 @@ public class GameStateManager {
     public void setLobbyState(boolean isHost){set(new LobbyState(isHost));}
     public void setPlayState(){set(new PlayState());}
     public void setOverState(boolean isHost){set(new OverState(isHost));}
+
+    // Error Handling
+    public void showError(String message) {
+        states.peek().showError(message);
+    }
 
 
 }

@@ -134,4 +134,9 @@ public class PlayState extends State {
     public void dispose() {
         stage.dispose();
     }
+
+    @Override
+    public void showError(String message) {
+
+    }
 }
