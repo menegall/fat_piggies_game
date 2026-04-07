@@ -172,7 +172,8 @@ public class MenuState extends State {
         System.out.println("Host lobby as " + name);
     }
 
-    private void showError(String message) {
+    @Override
+    public void showError(String message) {
         errorLabel.clearActions();
         errorLabel.setText(message);
         errorLabel.setVisible(true);
@@ -187,12 +188,9 @@ public class MenuState extends State {
         ));
     }
 
-    private int c = 0;
     @Override
     public void update(Snapshot snapshot, float dt){
         stage.act(dt);   // update UI
-        c++;
-        if (c ==10) showError("Name already used");
     }
 
     @Override

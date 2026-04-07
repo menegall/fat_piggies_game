@@ -227,5 +227,10 @@ public class OverState extends State {
 
     }
 
+    @Override
+    public void showError(String message) {
+
+    }
+
 
 }

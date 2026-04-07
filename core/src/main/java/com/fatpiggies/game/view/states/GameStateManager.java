@@ -44,5 +44,10 @@ public class GameStateManager {
     public void setPlayState(){set(new PlayState());}
     public void setOverState(boolean isHost){set(new OverState(isHost));}
 
+    // Error Handling
+    public void showError(String message) {
+        states.peek().showError(message);
+    }
+
 
 }
