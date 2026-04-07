@@ -18,16 +18,15 @@ public class LobbyController {
         this.playerId = playerId;
     }
 
-    public void hostLobby(String playerId) {
+    public void hostLobby(String name) {
         isHost = true;
-        mc.gsm.set(new LobbyState(isHost));
-        mc.gsm.setLobbyScreen();
+        mc.gsm.setLobbyState(mc, getIsHost());
     }
 
-    public void joinLobby(String playerId) {
+    public void joinLobby(String name, String lobbyId) {
         isHost = false;
-        mc.gsm.set(new LobbyState(isHost));
-        mc.gsm.setLobbyScreen();
+        this.lobbyId = lobbyId;
+        mc.gsm.setLobbyState(mc, getIsHost());
     }
 
     public void leaveLobby() {
@@ -37,12 +36,8 @@ public class LobbyController {
         mc.playController = null;
     }
 
-    public boolean getIsHost(){
-        return this.isHost;
-    }
+    public boolean getIsHost(){return isHost;}
 
-    public String getLobbyId(){
-        return this.lobbyId;
-    }
+    public String getLobbyId(){return lobbyId;}
 
 }

@@ -43,16 +43,13 @@ public class FatPiggiesGame extends ApplicationAdapter {
                 // TODO handle error
             }
         });
+
+        // To draw
         batch = new SpriteBatch();
 
+        // Load only once
         TextureManager.loadTextures();
         TextureManager.loadSkin();
-
-        // TODO FOR TESTING
-        GameStateManager.getInstance().setMenuState();
-        GameStateManager.getInstance().setLobbyState(true);
-        GameStateManager.getInstance().setPlayState();
-        GameStateManager.getInstance().setOverState(true);
     }
 
     @Override
@@ -68,8 +65,10 @@ public class FatPiggiesGame extends ApplicationAdapter {
     @Override
     public void dispose() {
         Gdx.app.log(TAG_APP, "Dispose App");
-        TextureManager.dispose();
+
         batch.dispose();
+        TextureManager.dispose();
+
         // TODO implement leaveLobby() if user is in a lobby
         databaseService.stopListening();
         authService.signOut();

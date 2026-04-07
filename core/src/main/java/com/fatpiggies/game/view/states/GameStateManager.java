@@ -12,9 +12,8 @@ public class GameStateManager {
     private static GameStateManager instance;
     private final Stack<State> states;
 
-    private GameStateManager(MainController mc) {
-        currentState = new Stack<State>();
-        this.mc = mc;
+    private GameStateManager() {
+        states = new Stack<State>();
     }
 
     public static GameStateManager getInstance() {
@@ -43,34 +42,13 @@ public class GameStateManager {
     }
 
     // The functions to change states
-    public void setMenuState(){set(new MenuState());}
-    public void setLobbyState(boolean isHost){set(new LobbyState(isHost));}
-    public void setPlayState(){set(new PlayState());}
-    public void setOverState(boolean isHost){set(new OverState(isHost));}
+    public void setMenuState(IViewActions viewActions){set(new MenuState(viewActions));}
+    public void setLobbyState(IViewActions viewActions, boolean isHost){set(new LobbyState(viewActions, isHost));}
+    public void setPlayState(IViewActions viewActions){set(new PlayState(viewActions));}
+    public void setOverState(IViewActions viewActions, boolean isHost){set(new OverState(viewActions, isHost));}
 
     // Error Handling
     public void showError(String message) {
         states.peek().showError(message);
     }
-
-    }
-
-    public void addObserver(IViewActions observer) {
-        observers.add(observer);
-    }
-
-    public void removeObserver(IViewActions observer) {
-        observers.remove(observer);
-    }
-
-    public void notifAllObservers() {
-        for(IViewActions observer : observers) {
-            observer.update();
-        }
-    }
-//
-//    public void notify() {
-//
-//    }
-
 }

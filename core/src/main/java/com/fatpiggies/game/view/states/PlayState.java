@@ -1,9 +1,12 @@
 package com.fatpiggies.game.view.states;
 
+import static com.fatpiggies.game.model.utils.GameConstants.JOYSTICK_DEADZONE;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.fatpiggies.game.controller.IViewActions;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.Animation;
 import com.fatpiggies.game.view.TextureId;
@@ -13,12 +16,10 @@ public class PlayState extends State {
     private Touchpad touchpad;
     private final Texture playBackground;
 
-    // TODO: use game cst
-    private final float DEADZONE = 10;
-
     private final Animation life;
 
-    public PlayState() {
+    public PlayState(IViewActions viewActions) {
+        super(viewActions);
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
         life = new Animation(TextureManager.getTexture(TextureId.LIFE_BLUE_PIG), 2, 2, 3, 2f);
 
@@ -26,7 +27,7 @@ public class PlayState extends State {
     }
 
     private void createUI() {
-        touchpad = new Touchpad(DEADZONE, skin.get("touchpad", Touchpad.TouchpadStyle.class));
+        touchpad = new Touchpad(JOYSTICK_DEADZONE, skin.get("touchpad", Touchpad.TouchpadStyle.class));
 
         // Position
         touchpad.setBounds(screenWidth*0.125f, screenHeight*0.1f, screenWidth*0.15f, screenWidth*0.15f);
@@ -46,12 +47,7 @@ public class PlayState extends State {
         float joyPower = (float)Math.sqrt(joyX * joyX + joyY * joyY);
 
         if (joyPower > 0.01f) {
-            // TODO println remove
-            System.out.println(
-                "Dir: (" + String.format("%.2f", joyX) + ", " +
-                    String.format("%.2f", joyY) + ") | Power: " +
-                    String.format("%.2f", joyPower)
-            );
+            viewActions.onJoystickMoved(joyX, joyY);
         }
 
 

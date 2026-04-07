@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.fatpiggies.game.controller.IViewActions;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.Animation;
 import com.fatpiggies.game.view.TextureId;
@@ -38,7 +39,8 @@ public class OverState extends State {
     private List<String> lastNames = new ArrayList<>();
 
 
-    public OverState(boolean isHost) {
+    public OverState(IViewActions viewActions, boolean isHost) {
+        super(viewActions);
         this.isHost = isHost;
 
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
@@ -105,13 +107,11 @@ public class OverState extends State {
 
     // FOR NOW WITHOUT CONTROLLER
     private void onLobbyClicked() {
-
-        System.out.println("Lobby");
+        // TODO: add this feature
     }
 
     private void onLeaveClicked() {
-
-        System.out.println("Leave");
+        viewActions.onLeaveClicked();
     }
 
     private void updateScoreBoard(List<String> players) {
