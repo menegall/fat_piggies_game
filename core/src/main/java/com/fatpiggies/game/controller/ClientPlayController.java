@@ -10,15 +10,9 @@ import java.util.ArrayList;
 
 public class ClientPlayController implements IPlayController{
     private MainController main;
-    private Engine engine;
 
     public ClientPlayController(MainController main) {
         this.main = main;
-        engine = new PooledEngine();
-        // add all systems for client
-        engine.addSystem(new MovementSystem());
-        engine.addSystem(new NetworkLerpSystem());
-        engine.addSystem(new NetworkReconciliationSystem());
     }
 
     @Override
@@ -37,7 +31,8 @@ public class ClientPlayController implements IPlayController{
     }
 
     @Override
-    public void updatePlayerInput(int x, int y) {
-        main.world.updatePlayerInput(x,y);
+    public void movePig(double x, double y) {
+        // TODO: how to move pig/give input into ecs
+        main.world.engine.update();
     }
 }
