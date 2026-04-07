@@ -5,5 +5,5 @@ import java.util.ArrayList;
 public interface IPlayController {
     void startGame(String lobbyId, ArrayList<String> playerIds, ArrayList<String> textureIds);
     void endGame(String lobbyId);
-    void movePig(int x, int y);
+    void updatePlayerInput(int x, int y);
 }

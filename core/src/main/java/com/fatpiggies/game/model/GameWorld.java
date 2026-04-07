@@ -53,18 +53,6 @@ public class GameWorld {
 
     public GameWorld(Engine engine) {
         this.engine = engine;
-
-        // add all systems to engine
-        engine.addSystem(new ArenaBoundsSystem());
-        engine.addSystem(new CollisionDetectionSystem());
-        engine.addSystem(new CollisionResolutionSystem());
-        engine.addSystem(new MovementSystem());
-        engine.addSystem(new NetworkLerpSystem());
-        engine.addSystem(new NetworkReconciliationSystem());
-        engine.addSystem(new RespawnSystem());
-        engine.addSystem(new LifetimeSystem());
-        engine.addSystem(new PowerUpSpawnerSystem());
-        engine.addSystem(new StatSystem());
     }
 
     /**
@@ -80,7 +68,7 @@ public class GameWorld {
      * @param x x direction
      * @param y y direction
      */
-    public void movePlayerPig(int x, int y) {
+    public void updatePlayerInput(int x, int y) {
         PlayerInputComponent input = localPlayer.getComponent(PlayerInputComponent.class);
         if(input != null) {
             input.joystickPercentageX = x;

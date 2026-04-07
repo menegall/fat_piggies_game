@@ -31,7 +31,7 @@ public class ClientPlayController implements IPlayController{
     }
 
     @Override
-    public void movePig(int x, int y) {
-        main.world.movePlayerPig(x,y);
+    public void updatePlayerInput(int x, int y) {
+        main.world.updatePlayerInput(x,y);
     }
 }
