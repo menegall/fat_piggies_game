@@ -31,7 +31,6 @@ public class MainController implements IViewActions {
         }
         playController.startGame(lobbyController.getLobbyId(), playerIds, textureIds);
         lobbyController.leaveLobby();
-
     }
 
     @Override

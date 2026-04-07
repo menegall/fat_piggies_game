@@ -49,6 +49,7 @@ public class GameWorld {
      * Calls update function of engine to update all systems in the order they were added.
      * @param dt time passed since the last frame
      */
+    //TODO: move update function into maincontroller
     public void update(float dt) {
         engine.update(dt);
     }
