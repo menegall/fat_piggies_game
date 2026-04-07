@@ -13,6 +13,7 @@ public class PlayState extends State {
     private Touchpad touchpad;
     private final Texture playBackground;
 
+    // TODO: use game cst
     private final float DEADZONE = 10;
 
     private final Animation life;
@@ -43,13 +44,6 @@ public class PlayState extends State {
         float joyX = touchpad.getKnobPercentX();
         float joyY = touchpad.getKnobPercentY();
         float joyPower = (float)Math.sqrt(joyX * joyX + joyY * joyY);
-
-        // Deadzone
-        if (joyPower < DEADZONE/100f) {
-            joyX = 0;
-            joyY = 0;
-            joyPower = 0;
-        }
 
         if (joyPower > 0.01f) {
             // TODO println remove
