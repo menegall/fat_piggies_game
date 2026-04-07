@@ -34,16 +34,6 @@ import com.fatpiggies.game.model.ecs.components.network.NetworkSyncComponent;
 import com.fatpiggies.game.model.ecs.components.physics.AccelerationComponent;
 import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
-import com.fatpiggies.game.model.ecs.systems.LifetimeSystem;
-import com.fatpiggies.game.model.ecs.systems.PowerUpSpawnerSystem;
-import com.fatpiggies.game.model.ecs.systems.StatSystem;
-import com.fatpiggies.game.model.ecs.systems.collision.ArenaBoundsSystem;
-import com.fatpiggies.game.model.ecs.systems.collision.CollisionDetectionSystem;
-import com.fatpiggies.game.model.ecs.systems.collision.CollisionResolutionSystem;
-import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
-import com.fatpiggies.game.model.ecs.systems.move.NetworkLerpSystem;
-import com.fatpiggies.game.model.ecs.systems.move.NetworkReconciliationSystem;
-import com.fatpiggies.game.model.ecs.systems.move.RespawnSystem;
 import com.fatpiggies.game.model.utils.PowerUpType;
 
 

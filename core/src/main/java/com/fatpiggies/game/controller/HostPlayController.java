@@ -3,6 +3,14 @@ package com.fatpiggies.game.controller;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.PooledEngine;
 import com.fatpiggies.game.model.GameWorld;
+import com.fatpiggies.game.model.ecs.systems.LifetimeSystem;
+import com.fatpiggies.game.model.ecs.systems.PowerUpSpawnerSystem;
+import com.fatpiggies.game.model.ecs.systems.StatSystem;
+import com.fatpiggies.game.model.ecs.systems.collision.ArenaBoundsSystem;
+import com.fatpiggies.game.model.ecs.systems.collision.CollisionDetectionSystem;
+import com.fatpiggies.game.model.ecs.systems.collision.CollisionResolutionSystem;
+import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
+import com.fatpiggies.game.model.ecs.systems.move.RespawnSystem;
 import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.view.states.GameOverState;
 import com.fatpiggies.game.view.states.PlayState;
@@ -11,9 +19,23 @@ import java.util.ArrayList;
 
 public class HostPlayController implements IPlayController {
     private MainController main;
+    private Engine engine;
 
     public HostPlayController(MainController main) {
         this.main = main;
+
+       engine = new PooledEngine();
+
+        // add all systems to engine
+        engine.addSystem(new MovementSystem());
+        engine.addSystem(new CollisionDetectionSystem());
+        engine.addSystem(new CollisionResolutionSystem());
+        engine.addSystem(new StatSystem());
+        engine.addSystem(new LifetimeSystem());
+        engine.addSystem(new ArenaBoundsSystem());
+        engine.addSystem(new RespawnSystem());
+
+        main.world = new GameWorld(engine);
     }
 
     @Override

@@ -53,7 +53,7 @@ public class MainController implements IViewActions {
     @Override
     public void onJoystickMoved(int x, int y) {
         if(playController != null){
-            playController.movePig(x, y);
+            playController.updatePlayerInput(x, y);
         }
     }
 }
