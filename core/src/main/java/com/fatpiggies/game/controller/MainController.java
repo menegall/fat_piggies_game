@@ -20,7 +20,8 @@ public class MainController implements IViewActions {
     public GameStateManager gsm;
     // TODO: add AuthService and DBService into constructor, when firebase is merged
     public MainController(AuthService auth, DatabaseService db) {
-        lobbyController = new LobbyController(this, auth.getCurrentUserId());
+        lobbyController = new LobbyController(this, auth.getCurrentUserId(), db);
+        this.dbs = db;
         gsm = GameStateManager.getInstance(this);
     }
 
@@ -35,23 +36,22 @@ public class MainController implements IViewActions {
 
         playController.startGame(lobbyController.getLobbyId());
         lobbyController.leaveLobby();
-
     }
 
     @Override
-    public void onHostLobbyClicked(String playerId) {
-        lobbyController.hostLobby(playerId);
+    public void onHostLobbyClicked(String playerName) {
+        lobbyController.hostLobby(playerName);
     }
 
     @Override
-    public void onJoinLobbyClicked(String playerId) {
-        lobbyController.joinLobby(playerId);
+    public void onJoinLobbyClicked(String playerName, String lobbyCode, String playerId) {
+        lobbyController.joinLobby(playerName, lobbyCode, playerId);
     }
 
     @Override
     public void onExitClicked() {
-        playController.endGame(lobbyController.getLobbyId());
-        gsm.set(new GameOverState());
+       // TODO: remove it? playController.endGame(lobbyController.getLobbyId());
+        lobbyController.leaveLobby();
     }
 
     @Override
