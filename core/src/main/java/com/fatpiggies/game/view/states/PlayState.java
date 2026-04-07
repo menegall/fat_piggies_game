@@ -1,38 +1,23 @@
 package com.fatpiggies.game.view.states;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.Animation;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
 public class PlayState extends State {
-
-    private final Stage stage;
-    private final Skin skin;
-
-    private final float screenWidth = Gdx.graphics.getWidth();
-    private final float screenHeight = Gdx.graphics.getHeight();
-
     private Touchpad touchpad;
     private final Texture playBackground;
 
     private final float DEADZONE = 10;
 
-    private Animation life;
+    private final Animation life;
 
     public PlayState() {
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
-
-        skin = TextureManager.getSkin();
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
         life = new Animation(TextureManager.getTexture(TextureId.LIFE_BLUE_PIG), 2, 2, 3, 2f);
 
@@ -67,6 +52,7 @@ public class PlayState extends State {
         }
 
         if (joyPower > 0.01f) {
+            // TODO println remove
             System.out.println(
                 "Dir: (" + String.format("%.2f", joyX) + ", " +
                     String.format("%.2f", joyY) + ") | Power: " +
@@ -128,11 +114,6 @@ public class PlayState extends State {
         sb.end();
 
         stage.draw();  // Draw UI
-    }
-
-    @Override
-    public void dispose() {
-        stage.dispose();
     }
 
     @Override

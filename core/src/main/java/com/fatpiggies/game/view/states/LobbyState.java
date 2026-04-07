@@ -4,13 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
@@ -20,12 +17,6 @@ import java.util.List;
 
 public class LobbyState extends State {
     private final boolean isHost;
-
-    private final Stage stage;
-    private final Skin skin;
-
-    private final float screenWidth = Gdx.graphics.getWidth();
-    private final float screenHeight = Gdx.graphics.getHeight();
 
     private Table playersTable;
     private TextButton startButton;
@@ -39,11 +30,6 @@ public class LobbyState extends State {
 
     public LobbyState(boolean isHost) {
         this.isHost = isHost;
-
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
-
-        skin = TextureManager.getSkin();
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
 
@@ -167,11 +153,6 @@ public class LobbyState extends State {
 
             playersTable.add(playerListLabel).row();
         }
-    }
-
-    @Override
-    public void dispose() {
-        stage.dispose();
     }
 
     @Override

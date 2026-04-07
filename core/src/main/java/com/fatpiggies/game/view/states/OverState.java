@@ -1,16 +1,12 @@
 package com.fatpiggies.game.view.states;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.Animation;
 import com.fatpiggies.game.view.TextureId;
@@ -21,9 +17,6 @@ import java.util.List;
 
 public class OverState extends State {
     private final boolean isHost;
-
-    private final Stage stage;
-    private final Skin skin;
 
     private TextButton lobbyButton;
     private TextButton leaveButton;
@@ -44,16 +37,10 @@ public class OverState extends State {
 
     private List<String> lastNames = new ArrayList<>();
 
-    private final float screenWidth = Gdx.graphics.getWidth();
-    private final float screenHeight = Gdx.graphics.getHeight();
 
     public OverState(boolean isHost) {
         this.isHost = isHost;
 
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
-
-        skin = TextureManager.getSkin();
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
         overBackground = TextureManager.getTexture(TextureId.OVER_BACKGROUND);
@@ -222,10 +209,6 @@ public class OverState extends State {
         stage.draw();
     }
 
-    @Override
-    public void dispose() {
-
-    }
 
     @Override
     public void showError(String message) {

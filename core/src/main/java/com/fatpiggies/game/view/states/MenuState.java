@@ -6,28 +6,18 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
 public class MenuState extends State {
-
-    private final Stage stage;
-    private final Skin skin;
-
-    private final float screenWidth = Gdx.graphics.getWidth();
-    private final float screenHeight = Gdx.graphics.getHeight();
-
     private TextField nameField;
     private TextField lobbyField;
 
@@ -42,11 +32,6 @@ public class MenuState extends State {
     private Label errorLabel;
 
     public MenuState() {
-
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
-
-        skin = TextureManager.getSkin();
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
 
@@ -210,10 +195,5 @@ public class MenuState extends State {
         sb.end();
 
         stage.draw();  // draw UI
-    }
-
-    @Override
-    public void dispose() {
-        stage.dispose();
     }
 }
