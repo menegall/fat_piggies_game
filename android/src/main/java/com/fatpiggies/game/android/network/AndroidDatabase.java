@@ -52,7 +52,7 @@ public class AndroidDatabase implements DatabaseService {
         String lobbyCode = generateRandomCode();
 
         LobbyInfo info = new LobbyInfo("waiting", lobbyCode, hostId);
-        PlayerSetup hostSetup = new PlayerSetup(100, playerName);
+        PlayerSetup hostSetup = new PlayerSetup(playerName);
 
         info.playersSetup.put(hostId, hostSetup); // Add host to playersSetup
 
@@ -100,7 +100,7 @@ public class AndroidDatabase implements DatabaseService {
                     // Prepare player setup
                     long numPlayers = lobbySnapshot.child("info")
                         .child("playersSetup").getChildrenCount();
-                    PlayerSetup setup = new PlayerSetup(100 + Math.toIntExact(numPlayers), playerName);
+                    PlayerSetup setup = new PlayerSetup(playerName);
 
                     // Write player setup to the database
                     playerSetupRef.setValue(setup)
