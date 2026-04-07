@@ -2,6 +2,7 @@ package com.fatpiggies.game.controller;
 
 import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.network.dto.GameState;
+import com.fatpiggies.game.view.states.GameOverState;
 import com.fatpiggies.game.view.states.PlayState;
 
 public class HostPlayController implements IPlayController {
@@ -21,14 +22,16 @@ public class HostPlayController implements IPlayController {
 
         main.world.startWorld();
 
-        main.gsm.setPlayState(main);
+        main.gsm.set(new PlayState());
+        main.gsm.setPlayScreen();
     }
 
     @Override
     public void endGame(String lobbyId) {
         main.dbs.endGame(lobbyId);
         // TODO: determine winner
-        main.gsm.setOverState(main, true); // it is the host controller
+        main.gsm.set(new GameOverState());
+        main.gsm.setOverScreen();
         main.world = null;
 
     }

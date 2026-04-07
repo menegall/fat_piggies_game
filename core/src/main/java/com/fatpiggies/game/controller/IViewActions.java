@@ -2,14 +2,9 @@ package com.fatpiggies.game.controller;
 
 public interface IViewActions {
 
-    // Menu
-    void onHostLobbyClicked(String name);
-    void onJoinLobbyClicked(String name, String lobbyId);
-
-    // Lobby
-    void onStartClicked();
-    void onLeaveClicked();
-
-    // Play
+    void onPlayClicked();
+    void onHostLobbyClicked(String playerId);
+    void onJoinLobbyClicked(String playerId);
+    void onExitClicked();
     void onJoystickMoved(double x, double y);
 }

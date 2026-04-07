@@ -1,10 +1,14 @@
 package com.fatpiggies.game.controller;
 
+import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.network.dto.GameState;
+import com.fatpiggies.game.view.states.GameOverState;
 import com.fatpiggies.game.view.states.GameStateManager;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.model.GameWorld;
+import com.fatpiggies.game.view.states.GameStateManager;
+import com.fatpiggies.game.view.states.PlayState;
 
 public class MainController implements IViewActions {
 
@@ -14,42 +18,40 @@ public class MainController implements IViewActions {
     public AuthService auth;
     public DatabaseService dbs;
     public GameStateManager gsm;
-
     // TODO: add AuthService and DBService into constructor, when firebase is merged
     public MainController(AuthService auth, DatabaseService db) {
         lobbyController = new LobbyController(this, auth.getCurrentUserId());
-        gsm = GameStateManager.getInstance();
-    }
-
-
-    @Override
-    public void onHostLobbyClicked(String name) {
-        lobbyController.hostLobby(name);
+        gsm = GameStateManager.getInstance(this);
     }
 
     @Override
-    public void onJoinLobbyClicked(String name, String lobbyId) {
-        lobbyController.joinLobby(name, lobbyId);
-    }
-
-    @Override
-    public void onStartClicked() {
+    public void onPlayClicked() {
 
         if(lobbyController.getIsHost()){
             playController = new HostPlayController(this);
-        }
-        else {
+        }else {
             playController = new ClientPlayController(this);
         }
 
         playController.startGame(lobbyController.getLobbyId());
         lobbyController.leaveLobby();
+
     }
 
     @Override
-    public void onLeaveClicked() {
+    public void onHostLobbyClicked(String playerId) {
+        lobbyController.hostLobby(playerId);
+    }
+
+    @Override
+    public void onJoinLobbyClicked(String playerId) {
+        lobbyController.joinLobby(playerId);
+    }
+
+    @Override
+    public void onExitClicked() {
         playController.endGame(lobbyController.getLobbyId());
-        gsm.setMenuState(this);
+        gsm.set(new GameOverState());
     }
 
     @Override

@@ -1,5 +1,8 @@
 package com.fatpiggies.game.controller;
 
+import com.fatpiggies.game.view.states.GameOverState;
+import com.fatpiggies.game.view.states.PlayState;
+
 public class ClientPlayController implements IPlayController{
     private MainController main;
 
@@ -9,12 +12,14 @@ public class ClientPlayController implements IPlayController{
 
     @Override
     public void startGame(String lobbyId) {
-        main.gsm.setPlayState(main);
+        main.gsm.set(new PlayState());
+        main.gsm.setPlayScreen();
     }
 
     @Override
     public void endGame(String lobbyId) {
-        main.gsm.setOverState(main, false); // it is the client controller
+        main.gsm.set(new GameOverState());
+        main.gsm.setOverScreen();
     }
 
     @Override
