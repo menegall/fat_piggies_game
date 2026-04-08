@@ -214,7 +214,8 @@ public class AndroidDatabase implements DatabaseService {
         };
 
         //  Attach the listener to the lobby info node
-        lobbyStatusRef.addValueEventListener(playersSetupListener);
+        lobbyStatusRef.addValueEventListener(lobbyStatusListener);
+        Log.d(TAG_DATABASE, "listenToLobbyStatus");
     }
 
     @Override

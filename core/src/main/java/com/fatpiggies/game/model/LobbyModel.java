@@ -10,6 +10,7 @@ public class LobbyModel implements IReadOnlyLobbyModel {
     private boolean isHost;
     private String lobbyId;
     private String lobbyCode;
+    private String playerId;
     private Map<String, PlayerSetup> playersSetup;
 
     @Override
@@ -20,6 +21,11 @@ public class LobbyModel implements IReadOnlyLobbyModel {
     @Override
     public String getLobbyCode() {
         return lobbyCode;
+    }
+
+
+    public String getPlayerId() {
+        return playerId;
     }
 
     @Override
@@ -47,6 +53,10 @@ public class LobbyModel implements IReadOnlyLobbyModel {
 
     public void setLobbyId(String lobbyId) {
         this.lobbyId = lobbyId;
+    }
+
+    public void setPlayerId(String playerId) {
+        this.playerId = playerId;
     }
 
     public void setLobbyCode(String lobbyCode) {

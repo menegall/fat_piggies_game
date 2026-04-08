@@ -20,6 +20,7 @@ public class MainController implements IViewActions {
         lobbyModel = new LobbyModel();
         lobbyController = new LobbyController(this, auth.getCurrentUserId(), db, lobbyModel);
         this.dbs = db;
+        this.auth = auth;
         gsm = GameStateManager.getInstance();
         gsm.setMenuState(this);
     }
@@ -31,14 +32,7 @@ public class MainController implements IViewActions {
 
     @Override
     public void onStartClicked() {
-        if(lobbyModel.getIsHost()){
-            playController = new HostPlayController(this, lobbyModel.getLobbyId());
-        }
-        else {
-            playController = new ClientPlayController(this, lobbyModel.getLobbyId());
-        }
-
-
+        playController = new HostPlayController(this, lobbyModel.getLobbyId());
         playController.startGame(lobbyModel.getLobbyId());
     }
 

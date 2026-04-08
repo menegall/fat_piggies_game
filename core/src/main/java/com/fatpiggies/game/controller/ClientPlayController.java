@@ -6,12 +6,11 @@ import static com.fatpiggies.game.view.TextureId.RED_PIG;
 import static com.fatpiggies.game.view.TextureId.YELLOW_PIG;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
 import com.fatpiggies.game.model.ecs.systems.move.NetworkLerpSystem;
 import com.fatpiggies.game.model.ecs.systems.move.NetworkReconciliationSystem;
-import com.fatpiggies.game.network.DatabaseService;
-import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.view.TextureId;
 
 
@@ -29,20 +28,6 @@ public class ClientPlayController implements IPlayController{
         engine.addSystem(new MovementSystem());
 
         main.world = new GameWorld(engine);
-
-        // Needed
-        main.dbs.listenToLobbyStatus(lobbyId, new DatabaseService.LobbyStatusCallback() {
-            @Override
-            public void onStatusUpdated(String status) {
-                if("playing".equals(status)) {
-                    startGame(lobbyId);
-                    main.gsm.setPlayState(main, main.world);
-                }
-            }
-
-            @Override
-            public void onError(NetworkError error, String errorMessage) {}
-        });
     }
 
     @Override
@@ -67,5 +52,9 @@ public class ClientPlayController implements IPlayController{
     @Override
     public void updatePlayerInput(float x, float y) {
         main.world.updatePlayerInput(x, y);
+    }
+
+    private void showErrorInMainThread(String message) {
+        Gdx.app.postRunnable(() -> main.gsm.showError(message));
     }
 }
