@@ -18,6 +18,7 @@ import com.fatpiggies.game.model.ecs.components.modifier.AccelerationModifierCom
 import com.fatpiggies.game.model.ecs.components.modifier.MassModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.VelocityModifierComponent;
 import com.fatpiggies.game.model.utils.GameConstants;
+import com.fatpiggies.game.view.TextureId;
 
 /**
  *  !!! <b>DON'T USE THIS SYSTEM</b> !!!
@@ -71,7 +72,8 @@ public class PowerUpSpawnerSystem extends IntervalSystem {
         ColliderComponent collider = new ColliderComponent();
         collider.radius = POWERUP_COLLISION_RADIUS;
 
-        render.textureId = "201";
+        // TODO : delete this system?
+        render.textureId = TextureId. BLUE_PIG;
 
         // Attach base components
         powerUpEntity.add(transform);

@@ -49,12 +49,12 @@ public class HostPlayController implements IPlayController {
         // create entities in gameworld
         TextureId[] textures = {BLUE_PIG, GREEN_PIG, RED_PIG,YELLOW_PIG};
         int count = 0;
-        for (String playerId : main.world.playersSetup.keySet()) {
+        for (String playerId : main.world.getPlayersSetup().keySet()) {
             if (count < textures.length) {
                 main.world.createHostPig(playerId, textures[count++], 0, 0);
             }
         }
-        main.gsm.setPlayState(main);
+        main.gsm.setPlayState(main, main.world);
 
         main.gsm.setPlayState(main, main.world);
     }

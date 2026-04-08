@@ -303,10 +303,12 @@ public class GameWorld implements IReadOnlyGameWorld{
     @Override
     public Array<String> getPlayerNames() {
         Array<String> playerNames = new Array<>();
-        playersSetup.forEach((id, setup)->{
-                playerNames.add(setup.name);
-            }
-        );
+        if(playersSetup != null) {
+            playersSetup.forEach((id, setup) -> {
+                    playerNames.add(setup.name);
+                }
+            );
+        }
         return playerNames;
     }
 
@@ -318,5 +320,30 @@ public class GameWorld implements IReadOnlyGameWorld{
     @Override
     public Entity getLocalPlayer() {
         return localPlayer;
+    }
+
+
+    public void setLocalPlayer(Entity localPlayer) {
+        this.localPlayer = localPlayer;
+    }
+
+    public void setLobbyId(String lobbyId) {
+        this.lobbyId = lobbyId;
+    }
+
+    public void setLobbyCode(String lobbyCode) {
+        this.lobbyCode = lobbyCode;
+    }
+
+    public void setPlayersSetup(Map<String, PlayerSetup> playersSetup) {
+        this.playersSetup = playersSetup;
+    }
+
+    public String getLobbyId() {
+        return lobbyId;
+    }
+
+    public Map<String, PlayerSetup> getPlayersSetup() {
+        return playersSetup;
     }
 }

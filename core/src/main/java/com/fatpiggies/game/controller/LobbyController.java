@@ -86,7 +86,7 @@ public class LobbyController {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        mc.world.lobbyCode = code;
+                        mc.world.setLobbyCode(code);
                     }
                 });
             }
@@ -100,7 +100,7 @@ public class LobbyController {
         dbs.listenToPlayersSetup(lobbyId, new DatabaseService.PlayersSetupCallback() {
             @Override
             public void onPlayersSetupUpdated(Map<String, PlayerSetup> playersSetup) {
-                mc.world.playersSetup = playersSetup;
+                mc.world.setPlayersSetup(playersSetup);
             }
 
             @Override
@@ -123,7 +123,7 @@ public class LobbyController {
 
     public void setLobbyId(String lobbyId){
         this.lobbyId=lobbyId;
-        mc.world.lobbyId = lobbyId;
+        mc.world.setLobbyId(lobbyId);
     }
 
 }

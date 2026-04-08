@@ -25,12 +25,12 @@ public class ClientPlayController implements IPlayController{
     public ClientPlayController(MainController main) {
         this.main = main;
 
-        main.dbs.listenToLobbyStatus(main.world.lobbyId, new DatabaseService.LobbyStatusCallback() {
+        main.dbs.listenToLobbyStatus(main.world.getLobbyId(), new DatabaseService.LobbyStatusCallback() {
             @Override
             public void onStatusUpdated(String status) {
                 if("playing".equals(status)) {
-                    startGame(main.world.lobbyId);
-                    main.gsm.setPlayState(main);
+                    startGame(main.world.getLobbyId());
+                    main.gsm.setPlayState(main, main.world);
                 }
             }
 
@@ -54,7 +54,7 @@ public class ClientPlayController implements IPlayController{
         TextureId[] textures = {BLUE_PIG, GREEN_PIG, RED_PIG,YELLOW_PIG};
         int count = 0;
         main.world.createLocalPig(main.auth.getCurrentUserId(), textures[count++], 0, 0);
-        for (String playerId : main.world.playersSetup.keySet()) {
+        for (String playerId : main.world.getPlayersSetup().keySet()) {
             if(!playerId.equals(main.auth.getCurrentUserId()))  {
                 if (count < textures.length) {
                     main.world.createRemotePig(playerId, textures[count++], 0, 0);
