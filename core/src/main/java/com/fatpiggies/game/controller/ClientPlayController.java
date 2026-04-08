@@ -22,31 +22,30 @@ public class ClientPlayController implements IPlayController{
     private MainController main;
     private Engine engine;
 
-    public ClientPlayController(MainController main) {
+    public ClientPlayController(MainController main, String lobbyId) {
         this.main = main;
 
-        main.dbs.listenToLobbyStatus(main.world.getLobbyId(), new DatabaseService.LobbyStatusCallback() {
-            @Override
-            public void onStatusUpdated(String status) {
-                if("playing".equals(status)) {
-                    startGame(main.world.getLobbyId());
-                    main.gsm.setPlayState(main, main.world);
-                }
-            }
-
-            @Override
-            public void onError(NetworkError error, String errorMessage) {
-
-            }
-        });
-
         engine = new PooledEngine();
-        // add all systems for client
+
         engine.addSystem(new MovementSystem());
         engine.addSystem(new NetworkLerpSystem());
         engine.addSystem(new NetworkReconciliationSystem());
 
         main.world = new GameWorld(engine);
+
+        // Needed
+        main.dbs.listenToLobbyStatus(lobbyId, new DatabaseService.LobbyStatusCallback() {
+            @Override
+            public void onStatusUpdated(String status) {
+                if("playing".equals(status)) {
+                    startGame(lobbyId);
+                    main.gsm.setPlayState(main, main.world);
+                }
+            }
+
+            @Override
+            public void onError(NetworkError error, String errorMessage) {}
+        });
     }
 
     @Override
@@ -54,19 +53,18 @@ public class ClientPlayController implements IPlayController{
         TextureId[] textures = {BLUE_PIG, GREEN_PIG, RED_PIG,YELLOW_PIG};
         int count = 0;
         main.world.createLocalPig(main.auth.getCurrentUserId(), textures[count++], 0, 0);
-        for (String playerId : main.world.getPlayersSetup().keySet()) {
+        for (String playerId : main.lobbyModel.getPlayersSetup().keySet()) {
             if(!playerId.equals(main.auth.getCurrentUserId()))  {
                 if (count < textures.length) {
                     main.world.createRemotePig(playerId, textures[count++], 0, 0);
                 }
             }
         }
-        main.gsm.setPlayState(main, main.world);
     }
 
     @Override
     public void endGame(String lobbyId) {
-        main.gsm.setOverState(main, main.world, false); // it is the client controller
+        main.gsm.setOverState(main, main.lobbyModel, false); // it is the client controller
     }
 
     @Override

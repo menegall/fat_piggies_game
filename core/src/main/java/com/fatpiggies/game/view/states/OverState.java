@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.controller.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyGameWorld;
+import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.view.Animation;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
@@ -34,14 +35,14 @@ public class OverState extends State {
 
     private final Animation crown;
 
-    private final IReadOnlyGameWorld gameWorld;
+    private final IReadOnlyLobbyModel lobbyModel;
     private Array<String> lastNames = new Array<>();
 
 
 
-    public OverState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, boolean isHost) {
+    public OverState(IViewActions viewActions, IReadOnlyLobbyModel lobbyModel, boolean isHost) {
         super(viewActions);
-        this.gameWorld =gameWorld;
+        this.lobbyModel = lobbyModel;
         this.isHost = isHost;
 
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
@@ -139,7 +140,7 @@ public class OverState extends State {
         bluePig.update(dt);
         crown.update(dt);
 
-        Array<String> currentNames = gameWorld.getPlayerNames();
+        Array<String> currentNames = lobbyModel.getPlayerNames();
 
         if (!currentNames.equals(lastNames)) {
             lastNames = new Array<>(currentNames);

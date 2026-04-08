@@ -8,11 +8,6 @@ import com.fatpiggies.game.network.dto.PlayerSetup;
 import java.util.Map;
 
 public interface IReadOnlyGameWorld {
-    // --- Lobby ---
-    //String getLobbyId();
-    String getLobbyCode();
-    Array<String> getPlayerNames();
-
     // --- Gameplay ---
     Engine getEngine();
     Entity getLocalPlayer();

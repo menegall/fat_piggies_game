@@ -14,9 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.fatpiggies.game.controller.IViewActions;
-import com.fatpiggies.game.model.GameWorld;
-import com.fatpiggies.game.model.IReadOnlyGameWorld;
-import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
@@ -105,13 +102,17 @@ public class MenuState extends State {
 
         table.defaults().pad(screenHeight*0.00f);
 
-        table.add(new Label("Name", skin)).left();
+        Label nameLabel = new Label("Name", skin);
+        nameLabel.setFontScale(1.8f);
+        table.add(nameLabel).left();
         table.add(nameField)
             .width(screenWidth*0.18f)
             .height(screenHeight*0.18f)
             .row();
 
-        table.add(new Label("Lobby ID", skin)).left();
+        Label lobbyCodeLabel = new Label("Lobby CODE", skin);
+        lobbyCodeLabel.setFontScale(1.8f);
+        table.add(lobbyCodeLabel).left();
         table.add(lobbyField)
             .width(screenWidth*0.18f)
             .height(screenHeight*0.18f)
@@ -146,8 +147,6 @@ public class MenuState extends State {
         hostButton.setDisabled(nameEmpty);
     }
 
-
-    // FOR NOW WITHOUT CONTROLLER
     private void onJoinClicked() {
         String name = nameField.getText();
         String lobbyId = lobbyField.getText();
@@ -166,11 +165,12 @@ public class MenuState extends State {
         errorLabel.clearActions();
         errorLabel.setText(message);
         errorLabel.setVisible(true);
+        errorLabel.setFontScale(3f);
 
-        float targetY = screenHeight * 0.06f;
+        float targetY = screenHeight * 0.93f;
 
         errorLabel.addAction(Actions.sequence(
-            Actions.moveTo(screenWidth*0.4f, targetY, 1f, Interpolation.swingIn),
+            Actions.moveTo(screenWidth*0.4f, targetY, 0.5f, Interpolation.swingIn),
             Actions.delay(2.5f),
             Actions.moveTo(screenWidth*0.4f, -screenHeight, 0.1f, Interpolation.swingOut),
             Actions.run(() -> errorLabel.setVisible(false))

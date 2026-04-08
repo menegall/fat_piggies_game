@@ -72,7 +72,10 @@ public class GameWorld implements IReadOnlyGameWorld{
      * @param x x direction
      * @param y y direction
      */
+
     public void updatePlayerInput(float x, float y) {
+        if (localPlayer == null) return;
+
         PlayerInputComponent input = localPlayer.getComponent(PlayerInputComponent.class);
         if (input != null) {
             input.joystickPercentageX = x;
@@ -290,28 +293,6 @@ public class GameWorld implements IReadOnlyGameWorld{
         entity.add(velocity).add(accel).add(mass);
     }
 
-//    @Override
-//    public String getLobbyId() {
-//        return lobbyId;
-//    }
-
-    @Override
-    public String getLobbyCode() {
-        return lobbyCode;
-    }
-
-    @Override
-    public Array<String> getPlayerNames() {
-        Array<String> playerNames = new Array<>();
-        if(playersSetup != null) {
-            playersSetup.forEach((id, setup) -> {
-                    playerNames.add(setup.name);
-                }
-            );
-        }
-        return playerNames;
-    }
-
     @Override
     public Engine getEngine() {
         return engine;
@@ -321,7 +302,6 @@ public class GameWorld implements IReadOnlyGameWorld{
     public Entity getLocalPlayer() {
         return localPlayer;
     }
-
 
     public void setLocalPlayer(Entity localPlayer) {
         this.localPlayer = localPlayer;
@@ -337,13 +317,5 @@ public class GameWorld implements IReadOnlyGameWorld{
 
     public void setPlayersSetup(Map<String, PlayerSetup> playersSetup) {
         this.playersSetup = playersSetup;
-    }
-
-    public String getLobbyId() {
-        return lobbyId;
-    }
-
-    public Map<String, PlayerSetup> getPlayersSetup() {
-        return playersSetup;
     }
 }

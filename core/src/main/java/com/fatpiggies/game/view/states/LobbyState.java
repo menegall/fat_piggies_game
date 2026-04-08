@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.controller.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyGameWorld;
+import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
@@ -24,13 +25,13 @@ public class LobbyState extends State {
     private final Texture menuBackground;
     private final Texture playBackground;
 
-    private final IReadOnlyGameWorld gameWorld;
+    private final IReadOnlyLobbyModel lobbyModel;
     private Array<String> lastNames = new Array<>();
-    private Label lobbyIdLabel;
+    private Label LobbyCodeLabel;
 
-    public LobbyState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, boolean isHost) {
+    public LobbyState(IViewActions viewActions, IReadOnlyLobbyModel lobbyModel, boolean isHost) {
         super(viewActions);
-        this.gameWorld =gameWorld;
+        this.lobbyModel =lobbyModel;
         this.isHost = isHost;
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
@@ -85,13 +86,13 @@ public class LobbyState extends State {
 
         stage.addActor(root);
 
-        lobbyIdLabel = new Label("ID : ----", skin);
-        lobbyIdLabel.setFontScale(3f);
-        lobbyIdLabel.setPosition(
+        LobbyCodeLabel = new Label("ID : ----", skin);
+        LobbyCodeLabel.setFontScale(3f);
+        LobbyCodeLabel.setPosition(
             Gdx.graphics.getWidth()*2.85f/4f,
             Gdx.graphics.getHeight()/2f
         );
-        stage.addActor(lobbyIdLabel);
+        stage.addActor(LobbyCodeLabel);
     }
 
     // FOR NOW WITHOUT CONTROLLER
@@ -105,9 +106,9 @@ public class LobbyState extends State {
 
     @Override
     public void update(float dt){
-        if (gameWorld != null) {
-            updatePlayers(gameWorld);
-            lobbyIdLabel.setText("CODE : " + gameWorld.getLobbyCode());
+        if (lobbyModel.getPlayerNames() != null) {
+            updatePlayers(lobbyModel.getPlayerNames());
+            LobbyCodeLabel.setText("CODE : " + lobbyModel.getLobbyCode());
         }
 
         stage.act(dt); // update UI
@@ -133,17 +134,14 @@ public class LobbyState extends State {
     }
 
 
-    private void updatePlayers(IReadOnlyGameWorld gameWorld) {
-
-        Array<String> currentNames = gameWorld.getPlayerNames();
-
+    private void updatePlayers(Array<String> currentNames) {
         if (!currentNames.equals(lastNames)) {
             rebuildPlayers(currentNames);
             lastNames = new Array<>(currentNames);
         }
 
         if (isHost) {
-            startButton.setDisabled(currentNames.size < 2);
+            startButton.setDisabled(currentNames.size < 1);
         }
     }
 

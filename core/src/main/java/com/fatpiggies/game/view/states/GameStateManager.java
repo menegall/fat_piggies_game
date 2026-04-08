@@ -3,7 +3,8 @@ package com.fatpiggies.game.view.states;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.fatpiggies.game.controller.IViewActions;
 import com.fatpiggies.game.model.GameWorld;
-import com.fatpiggies.game.model.Snapshot;
+import com.fatpiggies.game.model.IReadOnlyGameWorld;
+import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 
 import java.util.Stack;
 
@@ -45,16 +46,16 @@ public class GameStateManager {
         set(new MenuState(viewActions));
     }
 
-    public void setLobbyState(IViewActions viewActions, GameWorld gameWorld, boolean isHost) {
-        set(new LobbyState(viewActions, gameWorld, isHost));
+    public void setLobbyState(IViewActions viewActions, IReadOnlyLobbyModel lobbyModel, boolean isHost) {
+        set(new LobbyState(viewActions, lobbyModel, isHost));
     }
 
-    public void setPlayState(IViewActions viewActions, GameWorld gameWorld) {
+    public void setPlayState(IViewActions viewActions, IReadOnlyGameWorld gameWorld) {
         set(new PlayState(viewActions, gameWorld));
     }
 
-    public void setOverState(IViewActions viewActions, GameWorld gameWorld, boolean isHost) {
-        set(new OverState(viewActions, gameWorld, isHost));
+    public void setOverState(IViewActions viewActions, IReadOnlyLobbyModel lobbyModel, boolean isHost) {
+        set(new OverState(viewActions, lobbyModel, isHost));
     }
 
     // Error Handling
