@@ -107,6 +107,7 @@ public class LobbyController {
                 // TODO something with this maybe
             }
         });
+        mc.gsm.setLobbyState(mc, isHost);
     }
 
     private void showErrorInMainThread(String message){
