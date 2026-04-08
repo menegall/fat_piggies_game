@@ -39,9 +39,7 @@ public class MainController implements IViewActions {
         }
 
 
-        //playController.startGame(lobbyModel.getLobbyId(), playerIds, textureIds);
-
-        gsm.setPlayState(this, world); // world is initialized inside the play controller
+        playController.startGame(lobbyModel.getLobbyId());
     }
 
     @Override

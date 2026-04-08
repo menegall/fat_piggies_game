@@ -27,14 +27,14 @@ public class HostPlayController implements IPlayController {
     public HostPlayController(MainController main, String lobbyId) {
         this.main = main;
 
-        engine = new PooledEngine();
+        engine = new Engine();
 
+        engine.addSystem(new LifetimeSystem());
+        engine.addSystem(new StatSystem());
         engine.addSystem(new MovementSystem());
+        engine.addSystem(new ArenaBoundsSystem());
         engine.addSystem(new CollisionDetectionSystem());
         engine.addSystem(new CollisionResolutionSystem());
-        engine.addSystem(new StatSystem());
-        engine.addSystem(new LifetimeSystem());
-        engine.addSystem(new ArenaBoundsSystem());
         engine.addSystem(new RespawnSystem());
 
         main.world = new GameWorld(engine);
@@ -54,6 +54,8 @@ public class HostPlayController implements IPlayController {
                 main.world.createHostPig(playerId, textures[count++], 0, 0);
             }
         }
+
+        main.gsm.setPlayState(main, main.world);
     }
 
     @Override
@@ -62,7 +64,6 @@ public class HostPlayController implements IPlayController {
         // TODO: determine winner
         main.gsm.setOverState(main, main.lobbyModel, true); // it is the host controller
         main.world = null;
-
     }
 
     @Override

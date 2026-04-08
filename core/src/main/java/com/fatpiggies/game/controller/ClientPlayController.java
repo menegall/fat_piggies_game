@@ -25,11 +25,11 @@ public class ClientPlayController implements IPlayController{
     public ClientPlayController(MainController main, String lobbyId) {
         this.main = main;
 
-        engine = new PooledEngine();
+        engine = new Engine();
 
-        engine.addSystem(new MovementSystem());
-        engine.addSystem(new NetworkLerpSystem());
         engine.addSystem(new NetworkReconciliationSystem());
+        engine.addSystem(new NetworkLerpSystem());
+        engine.addSystem(new MovementSystem());
 
         main.world = new GameWorld(engine);
 
