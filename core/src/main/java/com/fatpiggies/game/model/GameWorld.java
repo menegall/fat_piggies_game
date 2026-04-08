@@ -37,6 +37,7 @@ import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 import com.fatpiggies.game.model.utils.PowerUpType;
 import com.fatpiggies.game.network.dto.PlayerSetup;
+import com.fatpiggies.game.view.TextureId;
 
 import java.util.Map;
 
@@ -84,7 +85,7 @@ public class GameWorld {
      * @param startX    Initial X position
      * @param startY    Initial Y position
      */
-    public void createHostPig(String networkId, String textureId, float startX, float startY) {
+    public void createHostPig(String networkId, TextureId textureId, float startX, float startY) {
         Entity entity = engine.createEntity();
 
         // Identity and Base Data
@@ -127,7 +128,7 @@ public class GameWorld {
      * @param startX    Initial X position
      * @param startY    Initial Y position
      */
-    public void createLocalPig(String playerId, String textureId, float startX, float startY) {
+    public void createLocalPig(String playerId, TextureId textureId, float startX, float startY) {
         Entity entity = engine.createEntity();
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
@@ -166,7 +167,7 @@ public class GameWorld {
      * @param startX    Initial X position
      * @param startY    Initial Y position
      */
-    public void createRemotePig(String playerId, String textureId, float startX, float startY) {
+    public void createRemotePig(String playerId, TextureId textureId, float startX, float startY) {
         Entity entity = engine.createEntity();
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
