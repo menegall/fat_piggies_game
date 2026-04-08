@@ -1,5 +1,10 @@
 package com.fatpiggies.game.controller;
 
+import static com.fatpiggies.game.view.TextureId.BLUE_PIG;
+import static com.fatpiggies.game.view.TextureId.GREEN_PIG;
+import static com.fatpiggies.game.view.TextureId.RED_PIG;
+import static com.fatpiggies.game.view.TextureId.YELLOW_PIG;
+
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.PooledEngine;
 import com.fatpiggies.game.model.GameWorld;
@@ -11,6 +16,7 @@ import com.fatpiggies.game.model.ecs.systems.collision.CollisionResolutionSystem
 import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
 import com.fatpiggies.game.model.ecs.systems.move.RespawnSystem;
 import com.fatpiggies.game.network.dto.GameState;
+import com.fatpiggies.game.view.TextureId;
 
 import java.util.ArrayList;
 
@@ -36,18 +42,19 @@ public class HostPlayController implements IPlayController {
     }
 
     @Override
-    public void startGame(String lobbyId, ArrayList<String> playerIds, ArrayList<String> textureIds) {
-        // TODO specify information that is available here
-        main.world = new GameWorld(new PooledEngine());
+    public void startGame(String lobbyId) {
+        // TODO specify information that is available here+
         main.dbs.startGame(lobbyId);
         main.dbs.pushGameState(lobbyId, new GameState());
         // create entities in gameworld
-
-        // TODO change positions when view is implemented
-        main.world.createHostPig(main.auth.getCurrentUserId(), textureIds.get(0), 0, 0);
-        for (int i = 0; i < playerIds.size(); i++) {
-            main.world.createRemotePig(playerIds.get(i), textureIds.get(i + 1), 0, 0);
+        TextureId[] textures = {BLUE_PIG, GREEN_PIG, RED_PIG,YELLOW_PIG};
+        int count = 0;
+        for (String playerId : main.world.playersSetup.keySet()) {
+            if (count < textures.length) {
+                main.world.createHostPig(playerId, textures[count++], 0, 0);
+            }
         }
+        main.gsm.setPlayState(main);
 
         main.gsm.setPlayState(main, main.world);
     }

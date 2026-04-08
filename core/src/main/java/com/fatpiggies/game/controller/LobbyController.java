@@ -44,8 +44,6 @@ public class LobbyController {
 
     public void joinLobby(String playerName, String lobbyCode) {
         isHost = false;
-
-        // TODO : FIX Lobby Id not returned when joinLobby
         dbs.joinLobby(lobbyCode, playerId, playerName, new DatabaseService.LobbyCallback() {
             @Override
             public void onSuccess(String lobbyId) {
@@ -53,6 +51,7 @@ public class LobbyController {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
+                        setLobbyId(lobbyId);
                         changeToLobbyState();
                     }
                 });
@@ -84,7 +83,12 @@ public class LobbyController {
         dbs.getLobbyCodeOnce(lobbyId, new DatabaseService.CodeCallback() {
             @Override
             public void onCodeRetrieved(String code) {
-                // TODO Pass the lobby code to the view. GABIN
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        mc.world.lobbyCode = code;
+                    }
+                });
             }
 
             @Override
@@ -92,10 +96,11 @@ public class LobbyController {
                 // TODO something with this maybe
             }
         });
+        mc.gsm.setLobbyState(mc, mc.world, isHost);
         dbs.listenToPlayersSetup(lobbyId, new DatabaseService.PlayersSetupCallback() {
             @Override
             public void onPlayersSetupUpdated(Map<String, PlayerSetup> playersSetup) {
-                // TODO Pass the player setup to the view. GABIN
+                mc.world.playersSetup = playersSetup;
             }
 
             @Override
@@ -103,6 +108,7 @@ public class LobbyController {
                 // TODO something with this maybe
             }
         });
+        mc.gsm.setLobbyState(mc, mc.world, isHost);
     }
 
     private void showErrorInMainThread(String message){
@@ -117,6 +123,7 @@ public class LobbyController {
 
     public void setLobbyId(String lobbyId){
         this.lobbyId=lobbyId;
+        mc.world.lobbyId = lobbyId;
     }
 
 }
