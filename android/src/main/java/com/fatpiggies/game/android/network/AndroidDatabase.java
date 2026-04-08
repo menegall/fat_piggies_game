@@ -124,10 +124,10 @@ public class AndroidDatabase implements DatabaseService {
 
     @Override
     public void leaveLobby(String lobbyId, String playerId) {
-        Log.i(TAG_DATABASE, "Player" + playerId + " leave the lobby " + lobbyId);
+        Log.i(TAG_DATABASE, "Player " + playerId + " leave the lobby " + lobbyId);
         DatabaseReference lobbyRef = lobbiesRef.child(lobbyId);
         // Check who is the host
-        lobbyRef.child("info/host_id").get().addOnCompleteListener(task -> {
+        lobbyRef.child("info/hostId").get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult().exists()) {
                 String hostId = task.getResult().getValue(String.class);
 
