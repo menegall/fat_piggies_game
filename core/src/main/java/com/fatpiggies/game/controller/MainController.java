@@ -1,20 +1,19 @@
 package com.fatpiggies.game.controller;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.model.LobbyModel;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.view.states.GameStateManager;
 
 public class MainController implements IViewActions {
-    public GameWorld world;
     public LobbyModel lobbyModel;
     public IPlayController playController;
     public LobbyController lobbyController;
     public AuthService auth;
     public DatabaseService dbs;
     public GameStateManager gsm;
+    private boolean gameIsPlaying = false;
 
     public MainController(AuthService auth, DatabaseService db) {
         lobbyModel = new LobbyModel();
@@ -26,8 +25,8 @@ public class MainController implements IViewActions {
     }
 
     public void update(SpriteBatch batch, float dt) {
+        if (gameIsPlaying) playController.updateWorld(dt);
         gsm.render(batch, dt);
-        //world.update(dt);
     }
 
     @Override
@@ -50,16 +49,21 @@ public class MainController implements IViewActions {
     public void onLeaveClicked() {
         if (playController != null) {
             playController.endGame(lobbyModel.getLobbyId());
-        } else {
-            lobbyController.leaveLobby();
         }
+        lobbyController.leaveLobby();
+
         gsm.setMenuState(this);
     }
 
     @Override
     public void onJoystickMoved(float x, float y) {
-        if(playController != null){
+        if (playController != null) {
             playController.updatePlayerInput(x, y);
         }
+    }
+
+
+    public void setGameIsPlaying(boolean gameIsPlaying) {
+        this.gameIsPlaying = gameIsPlaying;
     }
 }

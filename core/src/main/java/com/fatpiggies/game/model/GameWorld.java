@@ -18,13 +18,13 @@ import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.model.ecs.components.HealthComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.RenderComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
 import com.fatpiggies.game.model.ecs.components.collision.ColliderComponent;
 import com.fatpiggies.game.model.ecs.components.collision.CollisionEventComponent;
+import com.fatpiggies.game.model.ecs.components.collision.NeedsRespawnComponent;
 import com.fatpiggies.game.model.ecs.components.item.CollectibleComponent;
 import com.fatpiggies.game.model.ecs.components.item.LifetimeComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.HealthModifierComponent;
@@ -45,7 +45,7 @@ import java.util.Map;
 
 
 public class GameWorld implements IReadOnlyGameWorld{
-    private final Engine engine;
+    private Engine engine;
     private Entity localPlayer;
     private String lobbyId;
     private String lobbyCode;
@@ -60,17 +60,10 @@ public class GameWorld implements IReadOnlyGameWorld{
      *
      * @param dt time passed since the last frame
      */
-    //TODO: move update function into maincontroller
     public void update(float dt) {
         engine.update(dt);
     }
 
-    /**
-     * Updates the local player input Component with the new joystick values.
-     *
-     * @param x x joystick percentage
-     * @param y y joystick percentage
-     */
 
     public void updatePlayerInput(float x, float y) {
         if (localPlayer == null) return;
@@ -87,10 +80,8 @@ public class GameWorld implements IReadOnlyGameWorld{
      *
      * @param networkId Unique ID of the player
      * @param textureId Texture ID of the pig
-     * @param startX    Initial X position
-     * @param startY    Initial Y position
      */
-    public void createHostPig(String networkId, TextureId textureId, float startX, float startY) {
+    public void createHostPig(String networkId, TextureId textureId) {
         Entity entity = engine.createEntity();
 
         // Identity and Base Data
@@ -98,8 +89,7 @@ public class GameWorld implements IReadOnlyGameWorld{
         netId.playerId = networkId;
 
         TransformComponent transform = new TransformComponent();
-        transform.x = startX;
-        transform.y = startY;
+        NeedsRespawnComponent spawn = new NeedsRespawnComponent();
 
         HealthComponent health = new HealthComponent();
         health.currentLife = BASE_LIFE;
@@ -117,7 +107,7 @@ public class GameWorld implements IReadOnlyGameWorld{
         render.textureId = textureId;
 
         entity.add(netId).add(transform).add(health).add(render)
-            .add(input).add(collider).add(collisions);
+            .add(input).add(collider).add(collisions).add(spawn);
 
         localPlayer = entity;
         this.engine.addEntity(entity);
@@ -130,18 +120,14 @@ public class GameWorld implements IReadOnlyGameWorld{
      *
      * @param playerId  Unique ID of the player
      * @param textureId Texture ID of the pig
-     * @param startX    Initial X position
-     * @param startY    Initial Y position
      */
-    public void createLocalPig(String playerId, TextureId textureId, float startX, float startY) {
+    public void createLocalPig(String playerId, TextureId textureId) {
         Entity entity = engine.createEntity();
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
         netId.playerId = playerId;
 
         TransformComponent transform = new TransformComponent();
-        transform.x = startX;
-        transform.y = startY;
 
         HealthComponent health = new HealthComponent();
 
@@ -169,18 +155,14 @@ public class GameWorld implements IReadOnlyGameWorld{
      *
      * @param playerId  Unique ID of the player
      * @param textureId Texture ID of the pig
-     * @param startX    Initial X position
-     * @param startY    Initial Y position
      */
-    public void createRemotePig(String playerId, TextureId textureId, float startX, float startY) {
+    public void createRemotePig(String playerId, TextureId textureId) {
         Entity entity = engine.createEntity();
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
         netId.playerId = playerId;
 
         TransformComponent transform = new TransformComponent();
-        transform.x = startX;
-        transform.y = startY;
 
         NetworkSyncComponent sync = new NetworkSyncComponent();
 
@@ -317,4 +299,20 @@ public class GameWorld implements IReadOnlyGameWorld{
     public void setPlayersSetup(Map<String, PlayerSetup> playersSetup) {
         this.playersSetup = playersSetup;
     }
+
+    public void cleanUpWorld() {
+        if (engine != null) {
+            engine.removeAllEntities();
+            engine = null;
+        }
+    }
+
+    private int i = 0; // For testing
+
+    public boolean isThePlayFinish() {
+        // TODO Finish implementation of this method
+        i++;
+        return i >= 200;
+    }
+
 }
