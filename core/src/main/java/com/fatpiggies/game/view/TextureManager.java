@@ -5,14 +5,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -88,7 +87,7 @@ public class TextureManager {
         BitmapFont font = generator.generateFont(parameter);
         generator.dispose();*/
 
-        BitmapFont font = new BitmapFont(Gdx.files.internal("uiAssets/font.fnt"));
+        BitmapFont font = new BitmapFont(Gdx.files.internal("uiAssets/font_25.fnt"));
 
         Texture buttonUpTexture = new Texture(Gdx.files.internal("uiAssets/buttonUp.png"));
         Texture buttonDownTexture = new Texture(Gdx.files.internal("uiAssets/buttonDown.png"));
