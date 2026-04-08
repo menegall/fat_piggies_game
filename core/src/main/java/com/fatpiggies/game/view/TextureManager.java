@@ -87,7 +87,7 @@ public class TextureManager {
         BitmapFont font = generator.generateFont(parameter);
         generator.dispose();*/
 
-        BitmapFont font = new BitmapFont(Gdx.files.internal("uiAssets/font_25.fnt"));
+        BitmapFont font = new BitmapFont(Gdx.files.internal("uiAssets/font_35.fnt"));
 
         Texture buttonUpTexture = new Texture(Gdx.files.internal("uiAssets/buttonUp.png"));
         Texture buttonDownTexture = new Texture(Gdx.files.internal("uiAssets/buttonDown.png"));
