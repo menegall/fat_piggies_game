@@ -53,6 +53,7 @@ public class LobbyController {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
+                        setLobbyId(lobbyId);
                         changeToLobbyState();
                     }
                 });
@@ -84,7 +85,7 @@ public class LobbyController {
         dbs.getLobbyCodeOnce(lobbyId, new DatabaseService.CodeCallback() {
             @Override
             public void onCodeRetrieved(String code) {
-                // TODO Pass the lobby code to the view. GABIN
+                mc.world.lobbyCode = code;
             }
 
             @Override
@@ -95,7 +96,7 @@ public class LobbyController {
         dbs.listenToPlayersSetup(lobbyId, new DatabaseService.PlayersSetupCallback() {
             @Override
             public void onPlayersSetupUpdated(Map<String, PlayerSetup> playersSetup) {
-                // TODO Pass the player setup to the view. GABIN
+                mc.world.playersSetup = playersSetup;
             }
 
             @Override
@@ -117,6 +118,7 @@ public class LobbyController {
 
     public void setLobbyId(String lobbyId){
         this.lobbyId=lobbyId;
+        mc.world.lobbyId = lobbyId;
     }
 
 }

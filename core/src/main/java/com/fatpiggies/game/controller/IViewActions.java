@@ -1,5 +1,7 @@
 package com.fatpiggies.game.controller;
 
+import com.fatpiggies.game.model.GameWorld;
+
 public interface IViewActions {
 
     // Menu
