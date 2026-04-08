@@ -48,7 +48,7 @@ public class AndroidDatabase implements DatabaseService {
         String lobbyId = newLobbyRef.getKey();
         if (isLobbyIdNull(lobbyId, callback)) return;
 
-        // TODO newLobbyRef.onDisconnect().removeValue(); // If host disconnect remove lobby node
+        newLobbyRef.onDisconnect().removeValue(); // If host disconnect remove lobby node
 
         String lobbyCode = generateRandomCode();
 
