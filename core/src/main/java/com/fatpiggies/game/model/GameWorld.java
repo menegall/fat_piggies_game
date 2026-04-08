@@ -36,11 +36,17 @@ import com.fatpiggies.game.model.ecs.components.physics.AccelerationComponent;
 import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 import com.fatpiggies.game.model.utils.PowerUpType;
+import com.fatpiggies.game.network.dto.PlayerSetup;
+
+import java.util.Map;
 
 
 public class GameWorld {
     private final Engine engine;
     private Entity localPlayer;
+    public String lobbyId;
+    public String lobbyCode;
+    public Map<String, PlayerSetup> playersSetup;
 
     public GameWorld(Engine engine) {
         this.engine = engine;
