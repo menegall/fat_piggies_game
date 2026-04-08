@@ -48,7 +48,7 @@ public class AndroidDatabase implements DatabaseService {
         String lobbyId = newLobbyRef.getKey();
         if (isLobbyIdNull(lobbyId, callback)) return;
 
-        // TODO newLobbyRef.onDisconnect().removeValue(); // If host disconnect remove lobby node
+        newLobbyRef.onDisconnect().removeValue(); // If host disconnect remove lobby node
 
         String lobbyCode = generateRandomCode();
 
@@ -124,10 +124,10 @@ public class AndroidDatabase implements DatabaseService {
 
     @Override
     public void leaveLobby(String lobbyId, String playerId) {
-        Log.i(TAG_DATABASE, "Player" + playerId + " leave the lobby " + lobbyId);
+        Log.i(TAG_DATABASE, "Player " + playerId + " leave the lobby " + lobbyId);
         DatabaseReference lobbyRef = lobbiesRef.child(lobbyId);
         // Check who is the host
-        lobbyRef.child("info/host_id").get().addOnCompleteListener(task -> {
+        lobbyRef.child("info/hostId").get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult().exists()) {
                 String hostId = task.getResult().getValue(String.class);
 

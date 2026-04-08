@@ -1,10 +1,10 @@
 package com.fatpiggies.game.controller;
 
-import java.util.ArrayList;
-
 public interface IPlayController {
     public void startGame(String lobbyId);
     void endGame(String lobbyId);
+
+    void updateWorld(float dt);
 
     void updatePlayerInput(float x, float y);
 }

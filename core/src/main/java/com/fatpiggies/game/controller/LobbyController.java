@@ -63,15 +63,13 @@ public class LobbyController {
 
     public void leaveLobby() {
         if (lobbyModel.getLobbyId() != null) {
+            dbs.stopListening();
             dbs.leaveLobby(lobbyModel.getLobbyId(), playerId);
         }
-
-        dbs.stopListening();
         main.gsm.setMenuState(main);
     }
 
     private void changeToLobbyState() {
-
         dbs.getLobbyCodeOnce(lobbyModel.getLobbyId(), new DatabaseService.CodeCallback() {
             @Override
             public void onCodeRetrieved(String code) {
@@ -81,7 +79,8 @@ public class LobbyController {
             }
 
             @Override
-            public void onError(String errorMessage) {}
+            public void onError(String errorMessage) {
+            }
         });
 
         dbs.listenToPlayersSetup(lobbyModel.getLobbyId(), new DatabaseService.PlayersSetupCallback() {
@@ -91,20 +90,22 @@ public class LobbyController {
             }
 
             @Override
-            public void onError(NetworkError error, String errorMessage) {}
+            public void onError(NetworkError error, String errorMessage) {
+            }
         });
         if (!lobbyModel.getIsHost())
             main.dbs.listenToLobbyStatus(lobbyModel.getLobbyId(), new DatabaseService.LobbyStatusCallback() {
                 @Override
                 public void onStatusUpdated(String status) {
-                    if ("playing".equals(status)) {
-                        Gdx.app.postRunnable(() -> {
+                    Gdx.app.postRunnable(() -> {
+                        if ("playing".equals(status)) {
                             main.playController = new ClientPlayController(main, lobbyModel.getLobbyId());
                             main.playController.startGame(lobbyModel.getLobbyId());
-                            main.gsm.setPlayState(main, main.world);
-                        });
+                        } else if ("over".equals(status)) {
+                            main.playController.endGame(lobbyModel.getLobbyId());
+                        }
 
-                    }
+                    });
                 }
 
                 @Override
@@ -116,7 +117,7 @@ public class LobbyController {
         main.gsm.setLobbyState(main, lobbyModel, lobbyModel.getIsHost());
     }
 
-    private void showErrorInMainThread(String message){
+    private void showErrorInMainThread(String message) {
         Gdx.app.postRunnable(() -> main.gsm.showError(message));
     }
 }

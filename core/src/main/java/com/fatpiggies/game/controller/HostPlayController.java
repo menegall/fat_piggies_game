@@ -19,7 +19,8 @@ import com.fatpiggies.game.assets.TextureId;
 
 public class HostPlayController implements IPlayController {
     private final MainController main;
-    private final Engine engine;
+    private Engine engine;
+    private GameWorld world;
 
     public HostPlayController(MainController main, String lobbyId) {
         this.main = main;
@@ -34,38 +35,52 @@ public class HostPlayController implements IPlayController {
         engine.addSystem(new CollisionResolutionSystem());
         engine.addSystem(new RespawnSystem());
 
-        main.world = new GameWorld(engine);
-        main.world.setLobbyId(lobbyId);
+        world = new GameWorld(engine);
+        world.setLobbyId(lobbyId);
     }
 
     @Override
     public void startGame(String lobbyId) {
-        // TODO specify information that is available here+
         main.dbs.startGame(lobbyId);
-        main.dbs.pushGameState(lobbyId, new GameState());
         // create entities in gameworld
-        TextureId[] textures = {BLUE_PIG, GREEN_PIG, RED_PIG,YELLOW_PIG};
+        TextureId[] textures = {BLUE_PIG, GREEN_PIG, RED_PIG, YELLOW_PIG};
         int count = 0;
         for (String playerId : main.lobbyModel.getPlayersSetup().keySet()) {
             if (count < textures.length) {
-                main.world.createHostPig(playerId, textures[count++], 0, 0);
+                world.createHostPig(playerId, textures[count++]);
             }
         }
-
-        main.gsm.setPlayState(main, main.world);
+        main.gsm.setPlayState(main, world);
+        main.setGameIsPlaying(true);
     }
 
     @Override
     public void endGame(String lobbyId) {
+        main.setGameIsPlaying(false);
         main.dbs.endGame(lobbyId);
         // TODO: determine winner
         main.gsm.setOverState(main, main.lobbyModel, true); // it is the host controller
-        main.world = null;
+        // Clean up the Ashley engine and World
+        world.cleanUpWorld();
+        engine = null;
+        world = null;
+        // Destroy this controller
+        main.playController = null;
+    }
+
+    @Override
+    public void updateWorld(float dt) {
+        world.update(dt);
+        if (world.isThePlayFinish()) {
+            endGame(main.lobbyModel.getLobbyId());
+        }
+        ;
     }
 
     @Override
     public void updatePlayerInput(float x, float y) {
-        main.world.updatePlayerInput(x, y);
+        world.updatePlayerInput(x, y);
     }
+
 
 }
