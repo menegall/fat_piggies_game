@@ -37,8 +37,7 @@ public class HostPlayController implements IPlayController {
 
     @Override
     public void startGame(String lobbyId, ArrayList<String> playerIds, ArrayList<String> textureIds) {
-        // TODO specify information that is available here
-        main.world = new GameWorld(new PooledEngine());
+        // TODO specify information that is available here+
         main.dbs.startGame(lobbyId);
         main.dbs.pushGameState(lobbyId, new GameState());
         // create entities in gameworld

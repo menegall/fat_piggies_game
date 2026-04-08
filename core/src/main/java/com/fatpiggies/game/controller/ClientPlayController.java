@@ -20,11 +20,12 @@ public class ClientPlayController implements IPlayController{
         engine.addSystem(new MovementSystem());
         engine.addSystem(new NetworkLerpSystem());
         engine.addSystem(new NetworkReconciliationSystem());
+
+        main.world = new GameWorld(engine);
     }
 
     @Override
     public void startGame(String lobbyId, ArrayList<String> playerIds, ArrayList<String> textureIds) {
-        main.world = new GameWorld(new PooledEngine());
         main.world.createLocalPig(playerIds.get(0), textureIds.get(0), 0, 0);
 
         for (int i = 1; i < playerIds.size(); i++) {
