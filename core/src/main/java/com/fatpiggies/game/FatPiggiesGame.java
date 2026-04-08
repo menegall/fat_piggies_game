@@ -7,10 +7,12 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.fatpiggies.game.audio.MusicManager;
+import com.fatpiggies.game.audio.SoundsManager;
 import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
-import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.assets.TextureManager;
 
 
 /**
@@ -46,6 +48,10 @@ public class FatPiggiesGame extends ApplicationAdapter {
         // Load only once
         TextureManager.loadTextures();
         TextureManager.loadSkin();
+        SoundsManager.load();
+        MusicManager.load();
+
+        MusicManager.enable();
 
         // To draw
         batch = new SpriteBatch();

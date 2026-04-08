@@ -1,4 +1,4 @@
-package com.fatpiggies.game.view;
+package com.fatpiggies.game.assets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -75,19 +75,8 @@ public class TextureManager {
 
         skin = new Skin();
 
-        /*
-        FreeTypeFontGenerator generator =
-            new FreeTypeFontGenerator(Gdx.files.internal("uiAssets/font.ttf"));
-
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter =
-            new FreeTypeFontGenerator.FreeTypeFontParameter();
-
-        parameter.size = (int)(getScreenHeight() * 0.04f); // taille dynamique
-
-        BitmapFont font = generator.generateFont(parameter);
-        generator.dispose();*/
-
         BitmapFont font = new BitmapFont(Gdx.files.internal("uiAssets/font_35.fnt"));
+        font.getData().setScale(getScreenWidth()*0.0006f);
 
         Texture buttonUpTexture = new Texture(Gdx.files.internal("uiAssets/buttonUp.png"));
         Texture buttonDownTexture = new Texture(Gdx.files.internal("uiAssets/buttonDown.png"));
@@ -125,8 +114,8 @@ public class TextureManager {
 
         textFieldStyle.background.setLeftWidth(getScreenWidth()*0.04f);
         textFieldStyle.background.setRightWidth(getScreenWidth()*0.04f);
-        textFieldStyle.background.setTopHeight(getScreenHeight()*0.00f);
-        textFieldStyle.background.setBottomHeight(getScreenHeight()*0.01f);
+        textFieldStyle.background.setTopHeight(getScreenHeight()*0.02f);
+        textFieldStyle.background.setBottomHeight(getScreenHeight()*0.03f);
 
 
         // Joystick

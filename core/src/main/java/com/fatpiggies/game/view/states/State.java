@@ -8,8 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.fatpiggies.game.controller.IViewActions;
-import com.fatpiggies.game.model.Snapshot;
-import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.assets.TextureManager;
 
 public abstract class State {
     protected OrthographicCamera cam;

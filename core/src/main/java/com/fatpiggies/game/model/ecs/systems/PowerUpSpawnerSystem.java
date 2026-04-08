@@ -18,7 +18,7 @@ import com.fatpiggies.game.model.ecs.components.modifier.AccelerationModifierCom
 import com.fatpiggies.game.model.ecs.components.modifier.MassModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.VelocityModifierComponent;
 import com.fatpiggies.game.model.utils.GameConstants;
-import com.fatpiggies.game.view.TextureId;
+import com.fatpiggies.game.assets.TextureId;
 
 /**
  *  !!! <b>DON'T USE THIS SYSTEM</b> !!!

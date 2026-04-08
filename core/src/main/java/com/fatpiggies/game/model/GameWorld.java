@@ -18,7 +18,6 @@ import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.model.ecs.components.HealthComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.RenderComponent;
@@ -38,7 +37,7 @@ import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 import com.fatpiggies.game.model.utils.PowerUpType;
 import com.fatpiggies.game.network.dto.PlayerSetup;
-import com.fatpiggies.game.view.TextureId;
+import com.fatpiggies.game.assets.TextureId;
 
 import java.util.Map;
 

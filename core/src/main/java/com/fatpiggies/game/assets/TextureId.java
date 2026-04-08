@@ -1,4 +1,4 @@
-package com.fatpiggies.game.view;
+package com.fatpiggies.game.assets;
 
 public enum TextureId {
     LOGO,

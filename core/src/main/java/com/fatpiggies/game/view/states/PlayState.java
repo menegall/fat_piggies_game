@@ -9,8 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.fatpiggies.game.controller.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyGameWorld;
 import com.fatpiggies.game.view.Animation;
-import com.fatpiggies.game.view.TextureId;
-import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.assets.TextureId;
+import com.fatpiggies.game.assets.TextureManager;
 
 public class PlayState extends State {
     private Touchpad touchpad;

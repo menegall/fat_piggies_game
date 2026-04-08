@@ -13,9 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.fatpiggies.game.audio.SoundsManager;
 import com.fatpiggies.game.controller.IViewActions;
-import com.fatpiggies.game.view.TextureId;
-import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.assets.TextureId;
+import com.fatpiggies.game.assets.TextureManager;
 
 public class MenuState extends State {
     private TextField nameField;
@@ -45,10 +46,11 @@ public class MenuState extends State {
         nameField.setMessageText("Name");
 
         lobbyField = new TextField("", skin);
-        lobbyField.setMessageText("Lobby ID");
+        lobbyField.setMessageText("Code");
 
         // Join button
         joinButton = new TextButton("Join", skin);
+        joinButton.getLabel().setFontScale(screenHeight*0.0015f);
         joinButton.setDisabled(true);
         nameField.addListener(new ChangeListener() {
             @Override
@@ -58,20 +60,21 @@ public class MenuState extends State {
             }
         });
 
+        joinButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                onJoinClicked();
+            }
+        });
+
         // Host button
         hostButton = new TextButton("Host", skin);
+        hostButton.getLabel().setFontScale(screenHeight*0.0015f);
         hostButton.setDisabled(true);
         lobbyField.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 updateJoinButton();
-            }
-        });
-
-        joinButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                onJoinClicked();
             }
         });
 
@@ -103,19 +106,21 @@ public class MenuState extends State {
         table.defaults().pad(screenHeight*0.00f);
 
         Label nameLabel = new Label("Name", skin);
-        nameLabel.setFontScale(1.8f);
+        nameLabel.setFontScale(screenHeight*0.0015f);
         table.add(nameLabel).left();
         table.add(nameField)
             .width(screenWidth*0.18f)
             .height(screenHeight*0.18f)
+            .padTop(screenHeight*0.015f)
             .row();
 
-        Label lobbyCodeLabel = new Label("Lobby CODE", skin);
-        lobbyCodeLabel.setFontScale(1.8f);
+        Label lobbyCodeLabel = new Label("Lobby", skin);
+        lobbyCodeLabel.setFontScale(screenHeight*0.0015f);
         table.add(lobbyCodeLabel).left();
         table.add(lobbyField)
             .width(screenWidth*0.18f)
             .height(screenHeight*0.18f)
+            .padTop(screenHeight*0.015f)
             .row();
 
         table.add(joinButton)
@@ -152,12 +157,16 @@ public class MenuState extends State {
         String lobbyId = lobbyField.getText();
 
         viewActions.onJoinLobbyClicked(name, lobbyId);
+        Gdx.input.vibrate(200);
+        SoundsManager.playButton(1f);
     }
 
     private void onHostClicked() {
         String name = nameField.getText();
 
         viewActions.onHostLobbyClicked(name);
+        Gdx.input.vibrate(200);
+        SoundsManager.playButton(1f);
     }
 
     @Override
@@ -165,7 +174,7 @@ public class MenuState extends State {
         errorLabel.clearActions();
         errorLabel.setText(message);
         errorLabel.setVisible(true);
-        errorLabel.setFontScale(3f);
+        errorLabel.setFontScale(screenHeight*0.002f);
 
         float targetY = screenHeight * 0.93f;
 
@@ -189,10 +198,10 @@ public class MenuState extends State {
         float screenWidth = Gdx.graphics.getWidth();
         float screenHeight = Gdx.graphics.getHeight();
 
-        float size = Math.min(screenWidth, screenHeight) * 0.75f;
+        float size = Math.min(screenWidth, screenHeight) * 0.79f;
 
-        float x = (screenWidth - size) / 2f;
-        float y = (screenHeight - size) / 2f;
+        float x = (screenWidth - size)*0.5f;
+        float y = (screenHeight - size)*0.5f;
 
         sb.draw(playBackground, 0, 0, screenWidth, screenHeight);
         sb.draw(menuBackground, x, y, size, size);

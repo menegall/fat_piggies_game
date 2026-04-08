@@ -1,12 +1,11 @@
 package com.fatpiggies.game.controller;
 
-import static com.fatpiggies.game.view.TextureId.BLUE_PIG;
-import static com.fatpiggies.game.view.TextureId.GREEN_PIG;
-import static com.fatpiggies.game.view.TextureId.RED_PIG;
-import static com.fatpiggies.game.view.TextureId.YELLOW_PIG;
+import static com.fatpiggies.game.assets.TextureId.BLUE_PIG;
+import static com.fatpiggies.game.assets.TextureId.GREEN_PIG;
+import static com.fatpiggies.game.assets.TextureId.RED_PIG;
+import static com.fatpiggies.game.assets.TextureId.YELLOW_PIG;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.PooledEngine;
 import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.model.ecs.systems.LifetimeSystem;
 import com.fatpiggies.game.model.ecs.systems.StatSystem;
@@ -16,9 +15,7 @@ import com.fatpiggies.game.model.ecs.systems.collision.CollisionResolutionSystem
 import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
 import com.fatpiggies.game.model.ecs.systems.move.RespawnSystem;
 import com.fatpiggies.game.network.dto.GameState;
-import com.fatpiggies.game.view.TextureId;
-
-import java.util.ArrayList;
+import com.fatpiggies.game.assets.TextureId;
 
 public class HostPlayController implements IPlayController {
     private final MainController main;
