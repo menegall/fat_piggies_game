@@ -81,7 +81,6 @@ public class LobbyController {
     }
 
     private void changeToLobbyState(){
-        mc.gsm.setLobbyState(mc, isHost);
         dbs.getLobbyCodeOnce(lobbyId, new DatabaseService.CodeCallback() {
             @Override
             public void onCodeRetrieved(String code) {
@@ -104,6 +103,7 @@ public class LobbyController {
                 // TODO something with this maybe
             }
         });
+        mc.gsm.setLobbyState(mc, isHost);
     }
 
     private void showErrorInMainThread(String message){

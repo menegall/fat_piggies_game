@@ -30,24 +30,20 @@ public class MainController implements IViewActions {
 
     @Override
     public void onStartClicked() {
-
-        if(lobbyController.getIsHost()){
-            playController = new HostPlayController(this);
-        } else {
-            playController = new ClientPlayController(this);
-        }
         //playController.startGame(lobbyController.getLobbyId(), playerIds, textureIds);
         lobbyController.leaveLobby();
     }
 
     @Override
     public void onHostLobbyClicked(String playerName) {
+        playController = new HostPlayController(this);
         lobbyController.hostLobby(playerName);
     }
 
     @Override
     public void onJoinLobbyClicked(String playerName, String lobbyCode) {
         lobbyController.joinLobby(playerName, lobbyCode);
+        playController = new ClientPlayController(this);
     }
 
     @Override
