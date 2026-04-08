@@ -80,7 +80,7 @@ public class LobbyController {
     }
 
     private void changeToLobbyState(){
-        mc.gsm.setLobbyState(mc, isHost);
+        mc.gsm.setLobbyState(mc, mc.world, isHost);
         dbs.getLobbyCodeOnce(lobbyId, new DatabaseService.CodeCallback() {
             @Override
             public void onCodeRetrieved(String code) {

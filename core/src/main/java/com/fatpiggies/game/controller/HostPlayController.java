@@ -15,8 +15,8 @@ import com.fatpiggies.game.network.dto.GameState;
 import java.util.ArrayList;
 
 public class HostPlayController implements IPlayController {
-    private MainController main;
-    private Engine engine;
+    private final MainController main;
+    private final Engine engine;
 
     public HostPlayController(MainController main) {
         this.main = main;
@@ -49,14 +49,14 @@ public class HostPlayController implements IPlayController {
             main.world.createRemotePig(playerIds.get(i), textureIds.get(i + 1), 0, 0);
         }
 
-        main.gsm.setPlayState(main);
+        main.gsm.setPlayState(main, main.world);
     }
 
     @Override
     public void endGame(String lobbyId) {
         main.dbs.endGame(lobbyId);
         // TODO: determine winner
-        main.gsm.setOverState(main, true); // it is the host controller
+        main.gsm.setOverState(main, main.world, true); // it is the host controller
         main.world = null;
 
     }

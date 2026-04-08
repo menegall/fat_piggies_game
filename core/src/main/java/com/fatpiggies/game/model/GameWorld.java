@@ -18,6 +18,7 @@ import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.model.ecs.components.HealthComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.RenderComponent;
@@ -36,11 +37,19 @@ import com.fatpiggies.game.model.ecs.components.physics.AccelerationComponent;
 import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 import com.fatpiggies.game.model.utils.PowerUpType;
+import com.fatpiggies.game.network.dto.PlayerSetup;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
 
 
-public class GameWorld {
+public class GameWorld implements IReadOnlyGameWorld{
     private final Engine engine;
     private Entity localPlayer;
+    private String lobbyId;
+    private String lobbyCode;
+    private Map<String, PlayerSetup> playersSetup;
 
     public GameWorld(Engine engine) {
         this.engine = engine;
@@ -278,5 +287,35 @@ public class GameWorld {
         mass.currentMass = PLAYER_BASE_MASS;
 
         entity.add(velocity).add(accel).add(mass);
+    }
+
+//    @Override
+//    public String getLobbyId() {
+//        return lobbyId;
+//    }
+
+    @Override
+    public String getLobbyCode() {
+        return lobbyCode;
+    }
+
+    @Override
+    public Array<String> getPlayerNames() {
+        Array<String> playerNames = new Array<>();
+        playersSetup.forEach((id, setup)->{
+                playerNames.add(setup.name);
+            }
+        );
+        return playerNames;
+    }
+
+    @Override
+    public Engine getEngine() {
+        return engine;
+    }
+
+    @Override
+    public Entity getLocalPlayer() {
+        return localPlayer;
     }
 }

@@ -24,8 +24,8 @@ public class MainController implements IViewActions {
     }
 
     public void update(SpriteBatch batch, float dt) {
-        Snapshot snapshot = new Snapshot();
-        gsm.render(batch, snapshot, dt);
+        gsm.render(batch, dt);
+        //world.update(dt);
     }
 
     @Override

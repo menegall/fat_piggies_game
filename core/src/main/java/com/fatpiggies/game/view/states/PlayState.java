@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.fatpiggies.game.controller.IViewActions;
+import com.fatpiggies.game.model.GameWorld;
+import com.fatpiggies.game.model.IReadOnlyGameWorld;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.Animation;
 import com.fatpiggies.game.view.TextureId;
@@ -18,8 +20,12 @@ public class PlayState extends State {
 
     private final Animation life;
 
-    public PlayState(IViewActions viewActions) {
+    private final IReadOnlyGameWorld gameWorld;
+
+    public PlayState(IViewActions viewActions, IReadOnlyGameWorld gameWorld) {
         super(viewActions);
+        this.gameWorld =gameWorld;
+
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
         life = new Animation(TextureManager.getTexture(TextureId.LIFE_BLUE_PIG), 2, 2, 3, 2f);
 
@@ -39,7 +45,7 @@ public class PlayState extends State {
     // FOR NOW WITHOUT CONTROLLER
 
     @Override
-    public void update(Snapshot snapshot, float dt){
+    public void update(float dt){
 
         // JOYSTICK INPUT
         float joyX = touchpad.getKnobPercentX();

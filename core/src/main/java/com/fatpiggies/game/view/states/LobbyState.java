@@ -8,13 +8,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.controller.IViewActions;
-import com.fatpiggies.game.model.Snapshot;
+import com.fatpiggies.game.model.IReadOnlyGameWorld;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class LobbyState extends State {
     private final boolean isHost;
@@ -26,11 +24,13 @@ public class LobbyState extends State {
     private final Texture menuBackground;
     private final Texture playBackground;
 
-    private List<String> lastNames = new ArrayList<>();
+    private final IReadOnlyGameWorld gameWorld;
+    private Array<String> lastNames = new Array<>();
     private Label lobbyIdLabel;
 
-    public LobbyState(IViewActions viewActions, boolean isHost) {
+    public LobbyState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, boolean isHost) {
         super(viewActions);
+        this.gameWorld =gameWorld;
         this.isHost = isHost;
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
@@ -104,10 +104,10 @@ public class LobbyState extends State {
     }
 
     @Override
-    public void update(Snapshot snapshot, float dt){
-        if (snapshot != null) {
-            updatePlayers(snapshot);
-            lobbyIdLabel.setText("CODE : " + snapshot.getCode());
+    public void update(float dt){
+        if (gameWorld != null) {
+            updatePlayers(gameWorld);
+            lobbyIdLabel.setText("CODE : " + gameWorld.getLobbyCode());
         }
 
         stage.act(dt); // update UI
@@ -132,23 +132,26 @@ public class LobbyState extends State {
         stage.draw();  // draw UI
     }
 
-    private void updatePlayers(Snapshot snapshot) {
-        if (!lastNames.equals(snapshot.getNames())){
-            rebuildPlayers(snapshot);
-            lastNames = new ArrayList<>(snapshot.getNames());
+
+    private void updatePlayers(IReadOnlyGameWorld gameWorld) {
+
+        Array<String> currentNames = gameWorld.getPlayerNames();
+
+        if (!currentNames.equals(lastNames)) {
+            rebuildPlayers(currentNames);
+            lastNames = new Array<>(currentNames);
         }
 
         if (isHost) {
-            startButton.setDisabled(snapshot.getNames().size() < 2);
+            startButton.setDisabled(currentNames.size < 2);
         }
     }
 
-    private void rebuildPlayers(Snapshot snapshot) {
+    private void rebuildPlayers(Array<String> names) {
         playersTable.clear();
-        Label playerListLabel;
 
-        for (String name : snapshot.getNames()) {
-            playerListLabel = new Label(name, skin);
+        for (String name : names) {
+            Label playerListLabel = new Label(name, skin);
             playerListLabel.setFontScale(1.5f);
 
             playersTable.add(playerListLabel).row();

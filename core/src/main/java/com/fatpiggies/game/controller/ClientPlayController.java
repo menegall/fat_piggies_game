@@ -30,12 +30,12 @@ public class ClientPlayController implements IPlayController{
         for (int i = 1; i < playerIds.size(); i++) {
             main.world.createRemotePig(playerIds.get(i), textureIds.get(i), 0, 0);
         }
-        main.gsm.setPlayState(main);
+        main.gsm.setPlayState(main, main.world);
     }
 
     @Override
     public void endGame(String lobbyId) {
-        main.gsm.setOverState(main, false); // it is the client controller
+        main.gsm.setOverState(main, main.world, false); // it is the client controller
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.fatpiggies.game.view.states;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.fatpiggies.game.controller.IViewActions;
+import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.model.Snapshot;
 
 import java.util.Stack;
@@ -34,8 +35,8 @@ public class GameStateManager {
         states.push(state);
     }
 
-    public void render(SpriteBatch sb, Snapshot snapshot, float dt) {
-        states.peek().update(snapshot, dt);
+    public void render(SpriteBatch sb, float dt) {
+        states.peek().update(dt);
         states.peek().render(sb);
     }
 
@@ -44,16 +45,16 @@ public class GameStateManager {
         set(new MenuState(viewActions));
     }
 
-    public void setLobbyState(IViewActions viewActions, boolean isHost) {
-        set(new LobbyState(viewActions, isHost));
+    public void setLobbyState(IViewActions viewActions, GameWorld gameWorld, boolean isHost) {
+        set(new LobbyState(viewActions, gameWorld, isHost));
     }
 
-    public void setPlayState(IViewActions viewActions) {
-        set(new PlayState(viewActions));
+    public void setPlayState(IViewActions viewActions, GameWorld gameWorld) {
+        set(new PlayState(viewActions, gameWorld));
     }
 
-    public void setOverState(IViewActions viewActions, boolean isHost) {
-        set(new OverState(viewActions, isHost));
+    public void setOverState(IViewActions viewActions, GameWorld gameWorld, boolean isHost) {
+        set(new OverState(viewActions, gameWorld, isHost));
     }
 
     // Error Handling

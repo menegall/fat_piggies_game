@@ -31,7 +31,7 @@ public abstract class State {
         skin = TextureManager.getSkin();
     }
 
-    public abstract void update(Snapshot snapshot, float dt);
+    public abstract void update(float dt);
 
     public abstract void render(SpriteBatch sb);
 

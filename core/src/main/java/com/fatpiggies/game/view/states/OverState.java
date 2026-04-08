@@ -7,14 +7,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.controller.IViewActions;
-import com.fatpiggies.game.model.Snapshot;
+import com.fatpiggies.game.model.IReadOnlyGameWorld;
 import com.fatpiggies.game.view.Animation;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class OverState extends State {
     private final boolean isHost;
@@ -36,11 +34,14 @@ public class OverState extends State {
 
     private final Animation crown;
 
-    private List<String> lastNames = new ArrayList<>();
+    private final IReadOnlyGameWorld gameWorld;
+    private Array<String> lastNames = new Array<>();
 
 
-    public OverState(IViewActions viewActions, boolean isHost) {
+
+    public OverState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, boolean isHost) {
         super(viewActions);
+        this.gameWorld =gameWorld;
         this.isHost = isHost;
 
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
@@ -114,10 +115,10 @@ public class OverState extends State {
         viewActions.onLeaveClicked();
     }
 
-    private void updateScoreBoard(List<String> players) {
+    private void updateScoreBoard(Array<String> currentNames) {
         scoreTable.clear(); // reset
-
-        for (int i = 0; i < players.size(); i++) {
+        // TODO : manage the rank
+        for (int i = 0; i < currentNames.size; i++) {
             String rank = (i + 1) + "th.";
 
             if (i == 0) rank = "1st.";
@@ -125,7 +126,7 @@ public class OverState extends State {
             else if (i == 2) rank = "3rd.";
 
             Label rankLabel = new Label(rank, skin);
-            Label nameLabel = new Label(players.get(i), skin);
+            Label nameLabel = new Label(currentNames.get(i), skin);
 
             scoreTable.add(rankLabel).left().padRight(10);
             scoreTable.add(nameLabel).left().row();
@@ -134,13 +135,15 @@ public class OverState extends State {
 
 
     @Override
-    public void update(Snapshot snapshot, float dt) {
+    public void update(float dt) {
         bluePig.update(dt);
         crown.update(dt);
 
-        if (!snapshot.getNames().equals(lastNames)) {
-            lastNames = new ArrayList<>(snapshot.getNames());
-            updateScoreBoard(lastNames);
+        Array<String> currentNames = gameWorld.getPlayerNames();
+
+        if (!currentNames.equals(lastNames)) {
+            lastNames = new Array<>(currentNames);
+            updateScoreBoard(currentNames);
         }
     }
 

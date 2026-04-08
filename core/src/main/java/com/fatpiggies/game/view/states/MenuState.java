@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.fatpiggies.game.controller.IViewActions;
+import com.fatpiggies.game.model.GameWorld;
+import com.fatpiggies.game.model.IReadOnlyGameWorld;
 import com.fatpiggies.game.model.Snapshot;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
@@ -176,7 +178,7 @@ public class MenuState extends State {
     }
 
     @Override
-    public void update(Snapshot snapshot, float dt){
+    public void update(float dt){
         stage.act(dt);   // update UI
     }
 
