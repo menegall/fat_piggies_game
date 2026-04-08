@@ -6,7 +6,6 @@ import static com.fatpiggies.game.view.TextureId.RED_PIG;
 import static com.fatpiggies.game.view.TextureId.YELLOW_PIG;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.PooledEngine;
 import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.model.ecs.systems.LifetimeSystem;
 import com.fatpiggies.game.model.ecs.systems.StatSystem;
@@ -18,8 +17,6 @@ import com.fatpiggies.game.model.ecs.systems.move.RespawnSystem;
 import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.view.TextureId;
 
-import java.util.ArrayList;
-
 public class HostPlayController implements IPlayController {
     private final MainController main;
     private final Engine engine;
@@ -27,15 +24,23 @@ public class HostPlayController implements IPlayController {
     public HostPlayController(MainController main) {
         this.main = main;
 
-        engine = new PooledEngine();
+        engine = new Engine();
 
-        // add all systems to engine
+        // 1. Lifecycle
+        engine.addSystem(new LifetimeSystem());
+
+        // 2. Stats and Modifiers
+        engine.addSystem(new StatSystem());
+
+        // 3. Movement
         engine.addSystem(new MovementSystem());
+        engine.addSystem(new ArenaBoundsSystem());
+
+        // 4. Collisions
         engine.addSystem(new CollisionDetectionSystem());
         engine.addSystem(new CollisionResolutionSystem());
-        engine.addSystem(new StatSystem());
-        engine.addSystem(new LifetimeSystem());
-        engine.addSystem(new ArenaBoundsSystem());
+
+        // 5. Game state
         engine.addSystem(new RespawnSystem());
 
         main.world = new GameWorld(engine);

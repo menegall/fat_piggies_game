@@ -6,8 +6,7 @@ import static com.fatpiggies.game.view.TextureId.RED_PIG;
 import static com.fatpiggies.game.view.TextureId.YELLOW_PIG;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
 import com.fatpiggies.game.model.ecs.systems.move.NetworkLerpSystem;
@@ -15,8 +14,6 @@ import com.fatpiggies.game.model.ecs.systems.move.NetworkReconciliationSystem;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.view.TextureId;
-
-import java.util.ArrayList;
 
 public class ClientPlayController implements IPlayController{
     private MainController main;
@@ -29,22 +26,27 @@ public class ClientPlayController implements IPlayController{
             @Override
             public void onStatusUpdated(String status) {
                 if("playing".equals(status)) {
-                    startGame(main.world.getLobbyId());
-                    main.gsm.setPlayState(main, main.world);
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            startGame(main.world.getLobbyId());
+                            main.gsm.setPlayState(main, main.world);
+                        }
+                    });
                 }
             }
 
             @Override
             public void onError(NetworkError error, String errorMessage) {
-
+                // TODO: on error leave lobby?
             }
         });
 
-        engine = new PooledEngine();
+        engine = new Engine();
         // add all systems for client
-        engine.addSystem(new MovementSystem());
-        engine.addSystem(new NetworkLerpSystem());
         engine.addSystem(new NetworkReconciliationSystem());
+        engine.addSystem(new NetworkLerpSystem());
+        engine.addSystem(new MovementSystem());
 
         main.world = new GameWorld(engine);
     }
