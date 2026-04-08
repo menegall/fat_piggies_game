@@ -6,8 +6,6 @@ import static com.fatpiggies.game.view.TextureId.RED_PIG;
 import static com.fatpiggies.game.view.TextureId.YELLOW_PIG;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
 import com.fatpiggies.game.model.ecs.systems.move.NetworkLerpSystem;
@@ -16,7 +14,6 @@ import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.view.TextureId;
 
-import java.util.ArrayList;
 
 public class ClientPlayController implements IPlayController{
     private MainController main;

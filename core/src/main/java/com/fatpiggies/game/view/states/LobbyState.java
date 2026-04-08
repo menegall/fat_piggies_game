@@ -4,10 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.controller.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyGameWorld;
@@ -24,6 +26,7 @@ public class LobbyState extends State {
 
     private final Texture menuBackground;
     private final Texture playBackground;
+    private float copyTimer = 0f;
 
     private final IReadOnlyLobbyModel lobbyModel;
     private Array<String> lastNames = new Array<>();
@@ -86,12 +89,28 @@ public class LobbyState extends State {
 
         stage.addActor(root);
 
-        LobbyCodeLabel = new Label("ID : ----", skin);
+        LobbyCodeLabel = new Label("CODE : ----", skin);
+
         LobbyCodeLabel.setFontScale(3f);
         LobbyCodeLabel.setPosition(
-            Gdx.graphics.getWidth()*2.85f/4f,
-            Gdx.graphics.getHeight()/2f
+            Gdx.graphics.getWidth()*0.72f,
+            Gdx.graphics.getHeight()*0.5f
         );
+
+        LobbyCodeLabel.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                String code = lobbyModel.getLobbyCode();
+
+                if (code != null) {
+                    Gdx.app.getClipboard().setContents(code);
+                    Gdx.input.vibrate(200);
+                    LobbyCodeLabel.setText("COPIED !");
+                    copyTimer = 1.5f;
+                }
+            }
+        });
+
         stage.addActor(LobbyCodeLabel);
     }
 
@@ -109,6 +128,13 @@ public class LobbyState extends State {
         if (lobbyModel.getPlayerNames() != null) {
             updatePlayers(lobbyModel.getPlayerNames());
             LobbyCodeLabel.setText("CODE : " + lobbyModel.getLobbyCode());
+        }
+
+        if (copyTimer > 0) {
+            copyTimer -= dt;
+            if (copyTimer <= 0) {
+                LobbyCodeLabel.setText("CODE : " + lobbyModel.getLobbyCode());
+            }
         }
 
         stage.act(dt); // update UI
