@@ -38,7 +38,6 @@ import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 import com.fatpiggies.game.model.utils.PowerUpType;
 import com.fatpiggies.game.network.dto.PlayerSetup;
-import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.view.TextureId;
 
 import java.util.Map;
@@ -67,10 +66,10 @@ public class GameWorld implements IReadOnlyGameWorld{
     }
 
     /**
-     * Updates the local players pigs position.
+     * Updates the local player input Component with the new joystick values.
      *
-     * @param x x direction
-     * @param y y direction
+     * @param x x joystick percentage
+     * @param y y joystick percentage
      */
     public void updatePlayerInput(float x, float y) {
         PlayerInputComponent input = localPlayer.getComponent(PlayerInputComponent.class);
