@@ -1,6 +1,6 @@
 package com.fatpiggies.game.network.dto;
 
-import com.fatpiggies.game.assets.TextureId;
+import com.fatpiggies.game.view.TextureId;
 
 public class PowerupData {
     public TextureId textureId; // Ex: "apple"

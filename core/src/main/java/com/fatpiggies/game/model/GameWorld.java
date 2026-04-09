@@ -24,7 +24,6 @@ import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
-import com.fatpiggies.game.assets.TextureId;
 import com.fatpiggies.game.model.ecs.components.HealthComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.RenderComponent;
@@ -48,8 +47,8 @@ import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.network.dto.PlayerData;
 import com.fatpiggies.game.network.dto.PlayerInput;
 import com.fatpiggies.game.network.dto.PlayerSetup;
-import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.network.dto.PowerupData;
+import com.fatpiggies.game.view.TextureId;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -243,7 +242,9 @@ public class GameWorld implements IReadOnlyGameWorld {
 
         RenderComponent render = new RenderComponent();
         render.textureId = puData.textureId;
-        // TODO GABIN add width and leght
+        render.width = POWER_UP_WIDTH;
+        render.height = POWER_UP_HEIGHT;
+        render.angleOffset = POWER_UP_ANGLE_OFFSET;
 
         entity.add(transform).add(render);
         engine.addEntity(entity);
