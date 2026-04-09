@@ -109,13 +109,17 @@ public class MovementSystem extends IteratingSystem {
         // If the player pushes the joystick, they shouldn't exceed their currentMaxVelocity.
         // But beware! If they get pushed by an enemy at crazy speeds, we DO NOT clamp it instantly.
         // We apply extra drag so friction slows them down naturally.
-        float speed = currentVelocity.len();
-        if (pim.has(entity) && speed > velocity.currentMaxVelocity) {
+        float speed = currentVelocity.len2();
+        if (pim.has(entity) && speed > velocity.currentMaxVelocity * velocity.currentMaxVelocity) {
             // An elegant trick: apply extra drag if exceeding their OWN max speed.
             // This allows strong collision bounces, but brakes you faster when you are out of control.
             float overSpeedDrag = 10.0f;
             currentVelocity.x -= currentVelocity.x * overSpeedDrag * deltaTime;
             currentVelocity.y -= currentVelocity.y * overSpeedDrag * deltaTime;
+        }
+
+        if (currentVelocity.len2() < 1.0f) {
+            currentVelocity.setZero();
         }
 
         // Save the newly calculated velocity back to the component
