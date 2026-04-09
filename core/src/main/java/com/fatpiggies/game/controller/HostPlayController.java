@@ -1,29 +1,17 @@
 package com.fatpiggies.game.controller;
 
-import static com.fatpiggies.game.assets.TextureId.BLUE_PIG;
-import static com.fatpiggies.game.assets.TextureId.GREEN_PIG;
-import static com.fatpiggies.game.assets.TextureId.RED_PIG;
-import static com.fatpiggies.game.assets.TextureId.YELLOW_PIG;
+import static com.fatpiggies.game.view.TextureId.*;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.assets.TextureId;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.model.GameWorld;
-import com.fatpiggies.game.model.ecs.systems.LifetimeSystem;
-import com.fatpiggies.game.model.ecs.systems.StatSystem;
-import com.fatpiggies.game.model.ecs.systems.collision.ArenaBoundsSystem;
-import com.fatpiggies.game.model.ecs.systems.collision.CollisionDetectionSystem;
-import com.fatpiggies.game.model.ecs.systems.collision.CollisionResolutionSystem;
-import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
-import com.fatpiggies.game.model.ecs.systems.move.RespawnSystem;
-import com.fatpiggies.game.network.DatabaseService;
-import com.fatpiggies.game.network.NetworkError;
-import com.fatpiggies.game.network.dto.GameState;
-import com.fatpiggies.game.network.dto.PlayerInput;
+import com.fatpiggies.game.model.ecs.systems.*;
+import com.fatpiggies.game.model.ecs.systems.collision.*;
+import com.fatpiggies.game.model.ecs.systems.move.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.fatpiggies.game.view.TextureId;
 
 public class HostPlayController implements IPlayController {
     private final IPlayActions actions;

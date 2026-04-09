@@ -11,6 +11,7 @@ import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.model.LobbyModel;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
+import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.states.GameStateManager;
 
 public class MainController implements IViewActions, ILobbyActions, IPlayActions {
@@ -51,6 +52,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
             }
         }
 
+        TextureManager.update(dt); // For the right animated frame to be changed
         gsm.render(batch, dt);
     }
 
@@ -134,7 +136,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
 
     @Override
     public void goToPlayState(IReadOnlyGameWorld gameWorld) {
-        gsm.pushPlayState(this, gameWorld);
+        gsm.pushPlayState(this, gameWorld, lobbyModel.getPlayerId());
     }
 
     @Override

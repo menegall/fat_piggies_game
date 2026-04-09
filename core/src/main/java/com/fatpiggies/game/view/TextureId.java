@@ -1,4 +1,4 @@
-package com.fatpiggies.game.assets;
+package com.fatpiggies.game.view;
 
 public enum TextureId {
     LOGO,
@@ -21,8 +21,9 @@ public enum TextureId {
     CROWN,
     DONUT,
     BEER,
-    EXTRA_LIFE,
+    LIFE,
     APPLE,
+    BONUS,
     BUMP_EFFECT
 
 }

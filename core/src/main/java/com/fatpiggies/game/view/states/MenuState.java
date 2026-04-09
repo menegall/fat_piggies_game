@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -15,8 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.fatpiggies.game.audio.SoundsManager;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
-import com.fatpiggies.game.assets.TextureId;
-import com.fatpiggies.game.assets.TextureManager;
+import com.fatpiggies.game.view.TextureId;
+import com.fatpiggies.game.view.TextureManager;
 
 public class MenuState extends State {
     private TextField nameField;
@@ -24,8 +25,8 @@ public class MenuState extends State {
 
     private TextButton joinButton;
     private TextButton hostButton;
-    private final Texture menuBackground;
-    private final Texture playBackground;
+    private final TextureRegion menuBackground;
+    private final TextureRegion playBackground;
     private String lastNameField;
 
     // Manage errors
@@ -33,8 +34,8 @@ public class MenuState extends State {
 
     public MenuState(IViewActions viewActions) {
         super(viewActions);
-        menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
-        playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
+        menuBackground = TextureManager.getFrame(TextureId.MENU_BACKGROUND);
+        playBackground = TextureManager.getFrame(TextureId.PLAY_BACKGROUND);
 
         createUI("");
     }
@@ -49,6 +50,15 @@ public class MenuState extends State {
                 updateHostButton();
             }
         });
+        nameField.setTextFieldListener((textField, c) -> {
+            String text = textField.getText();
+
+            if (!text.isEmpty()) {
+                text = text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
+                textField.setText(text);
+                textField.setCursorPosition(text.length());
+            }
+        });
 
         lobbyField = new TextField("", skin);
         lobbyField.setMessageText("Code");
@@ -58,6 +68,8 @@ public class MenuState extends State {
                 updateJoinButton();
             }
         });
+        lobbyField.setTextFieldFilter((textField, c) -> Character.isDigit(c));
+        lobbyField.setMaxLength(4);
 
         // Join button
         joinButton = new TextButton("Join", skin);
@@ -177,9 +189,6 @@ public class MenuState extends State {
     public void render(SpriteBatch sb) {
 
         sb.begin();
-        float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();
-
         float size = Math.min(screenWidth, screenHeight) * 0.79f;
 
         float x = (screenWidth - size) * 0.5f;

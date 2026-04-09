@@ -1,22 +1,15 @@
 package com.fatpiggies.game.controller;
 
-import static com.fatpiggies.game.assets.TextureId.BLUE_PIG;
-import static com.fatpiggies.game.assets.TextureId.GREEN_PIG;
-import static com.fatpiggies.game.assets.TextureId.RED_PIG;
-import static com.fatpiggies.game.assets.TextureId.YELLOW_PIG;
+import static com.fatpiggies.game.view.TextureId.*;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.assets.TextureId;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.model.GameWorld;
-import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
-import com.fatpiggies.game.model.ecs.systems.move.NetworkLerpSystem;
-import com.fatpiggies.game.model.ecs.systems.move.NetworkReconciliationSystem;
-import com.fatpiggies.game.network.DatabaseService;
-import com.fatpiggies.game.network.NetworkError;
-import com.fatpiggies.game.network.dto.GameState;
-import com.fatpiggies.game.network.dto.PlayerInput;
+import com.fatpiggies.game.model.ecs.systems.move.*;
+
+import com.fatpiggies.game.view.TextureId;
 
 public class ClientPlayController implements IPlayController {
     private final IPlayActions actions;
