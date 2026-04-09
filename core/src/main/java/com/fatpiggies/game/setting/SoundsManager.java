@@ -1,4 +1,4 @@
-package com.fatpiggies.game.audio;
+package com.fatpiggies.game.setting;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -69,6 +69,8 @@ public class SoundsManager {
     public static boolean isEnabled() {
         return enabled;
     }
+
+    public static void setEnabled(boolean enable) {enabled = enable;}
 
     public static void enable() {
         enabled = true;

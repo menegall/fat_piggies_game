@@ -1,4 +1,4 @@
-package com.fatpiggies.game.audio;
+package com.fatpiggies.game.setting;
 
 
 import com.badlogic.gdx.Gdx;
@@ -25,6 +25,12 @@ public class MusicManager {
 
     public static boolean isEnabled() {
         return enabled;
+    }
+
+    public static void setEnabled(boolean enable) {
+        enabled = enable;
+        if (enabled) music.play();
+        else music.stop();
     }
 
     public static void enable() {

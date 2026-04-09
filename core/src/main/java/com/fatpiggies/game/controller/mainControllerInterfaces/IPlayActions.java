@@ -10,7 +10,7 @@ public interface IPlayActions {
 
     LobbyModel getLobbyModel();
 
-    void goToPlayState(IReadOnlyGameWorld gameWorld);
+    void goToPlayState(IReadOnlyGameWorld gameWorld, boolean isHost);
 
     void goToGameOverState(boolean isHost);
 

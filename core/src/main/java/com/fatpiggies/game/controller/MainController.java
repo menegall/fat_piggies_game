@@ -93,6 +93,11 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
 
     @Override
     public void onLobbyClicked(){
+        if (playController != null) {
+            playController.endGame(lobbyModel.getLobbyId());
+        }
+
+        // TODO : update model and network to go back to lobby, like leave game or something
         gsm.popToLobby();
     }
 
@@ -136,8 +141,8 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     }
 
     @Override
-    public void goToPlayState(IReadOnlyGameWorld gameWorld) {
-        gsm.pushPlayState(this, gameWorld, lobbyModel.getPlayerId());
+    public void goToPlayState(IReadOnlyGameWorld gameWorld, boolean isHost) {
+        gsm.pushPlayState(this, gameWorld, lobbyModel.getPlayerId(), isHost);
     }
 
     @Override

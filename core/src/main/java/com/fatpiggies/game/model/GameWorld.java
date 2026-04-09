@@ -367,7 +367,7 @@ public class GameWorld implements IReadOnlyGameWorld {
     public boolean isThePlayFinish() {
         // TODO Finish implementation of this method
         i++;
-        return false;
+        return i >=300;
     }
 
     public void populateGameState(GameState gameState) {

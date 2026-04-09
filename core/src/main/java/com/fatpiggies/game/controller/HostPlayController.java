@@ -65,7 +65,7 @@ public class HostPlayController implements IPlayController {
 
         attachPlayListener(db);
 
-        actions.goToPlayState(world);
+        actions.goToPlayState(world, true);
         actions.setGameIsPlaying(true);
     }
 
@@ -92,6 +92,8 @@ public class HostPlayController implements IPlayController {
             endGame(actions.getLobbyModel().getLobbyId());
         }
     }
+
+
 
     @Override
     public void updatePlayerInput(float x, float y) {

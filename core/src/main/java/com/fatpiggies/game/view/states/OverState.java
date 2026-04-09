@@ -1,7 +1,6 @@
 package com.fatpiggies.game.view.states;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -10,30 +9,69 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
-import com.fatpiggies.game.audio.SoundsManager;
+import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
-import com.fatpiggies.game.view.Animation;
+import com.fatpiggies.game.setting.VibrationManager;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
 public class OverState extends State {
-    private final boolean isHost;
 
+    // ================= CONSTANTS =================
+    private static final float BUTTON_WIDTH = 0.11f;
+    private static final float BUTTON_HEIGHT = 0.08f;
+    private static final float BUTTON_TEXT_SCALE = 0.001f;
+
+    private static final float MENU_PAD_TOP = 0.5f;
+    private static final float MENU_PAD_LEFT = 0.8f;
+
+    private static final float SCORE_PAD_TOP = 0.08f;
+    private static final float SCORE_PAD_LEFT = 0.03f;
+
+    private static final float PODIUM_WIDTH = 1.2f;
+    private static final float PODIUM_HEIGHT = 0.7f;
+    private static final float PODIUM_ANCHOR_X = 0.5f;
+    private static final float PODIUM_ANCHOR_Y = 0.15f;
+
+    private static final float PIG_SIZE_RATIO = 0.25f;
+
+    private static final float FIRST_X = 0.5f;
+    private static final float FIRST_Y = 0.655f;
+
+    private static final float SECOND_X = 0.25f;
+    private static final float SECOND_Y = 0.52f;
+
+    private static final float THIRD_X = 0.75f;
+    private static final float THIRD_Y = 0.46f;
+
+    private static final float CROWN_X = 0.495f;
+    private static final float CROWN_Y = 0.98f;
+    private static final float CROWN_HEIGHT_RATIO = 0.6f;
+
+    private static final float SCORE_SIZE = 0.6f;
+    private static final float SCORE_ANCHOR_X = 0.15f;
+    private static final float SCORE_ANCHOR_Y = 0.65f;
+
+    private static final float MENU_SIZE = 0.3f;
+    private static final float MENU_ANCHOR_X = 0.9f;
+    private static final float MENU_ANCHOR_Y = 0.25f;
+
+    // ================= DATA =================
+    private final boolean isHost;
+    private final IReadOnlyLobbyModel lobbyModel;
+
+    private Array<String> lastNames = new Array<>();
+
+    // ================= UI =================
     private TextButton lobbyButton;
     private TextButton leaveButton;
-
     private Table scoreTable;
 
     private final TextureRegion menuBackground;
     private final TextureRegion playBackground;
     private final TextureRegion overBackground;
     private final TextureRegion podium;
-
-    private final IReadOnlyLobbyModel lobbyModel;
-    private Array<String> lastNames = new Array<>();
-
-
 
     public OverState(IViewActions viewActions, IReadOnlyLobbyModel lobbyModel, boolean isHost) {
         super(viewActions);
@@ -51,7 +89,7 @@ public class OverState extends State {
     private void createUI() {
 
         leaveButton = new TextButton("Leave", skin);
-        leaveButton.getLabel().setFontScale(screenHeight*0.001f);
+        leaveButton.getLabel().setFontScale(screenHeight * BUTTON_TEXT_SCALE);
         leaveButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -60,7 +98,7 @@ public class OverState extends State {
         });
 
         lobbyButton = new TextButton("Lobby", skin);
-        lobbyButton.getLabel().setFontScale(screenHeight*0.001f);
+        lobbyButton.getLabel().setFontScale(screenHeight * BUTTON_TEXT_SCALE);
         lobbyButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -70,63 +108,64 @@ public class OverState extends State {
 
         Table menuTable = new Table();
         menuTable.setFillParent(true);
-        menuTable.defaults().pad(screenHeight*0.02f);
-        menuTable.padTop(screenHeight*0.5f);
-        menuTable.padLeft(screenWidth*0.8f);
+        menuTable.defaults().pad(screenHeight * 0.02f);
+        menuTable.padTop(screenHeight * MENU_PAD_TOP);
+        menuTable.padLeft(screenWidth * MENU_PAD_LEFT);
 
-        if(isHost) {
+        if (isHost) {
             menuTable.add(lobbyButton)
-                .width(screenWidth*0.11f)
-                .height(screenHeight*0.08f)
+                .width(screenWidth * BUTTON_WIDTH)
+                .height(screenHeight * BUTTON_HEIGHT)
                 .row();
         }
 
         menuTable.add(leaveButton)
-            .width(screenWidth*0.11f)
-            .height(screenHeight*0.08f);
+            .width(screenWidth * BUTTON_WIDTH)
+            .height(screenHeight * BUTTON_HEIGHT);
 
         stage.addActor(menuTable);
 
         scoreTable = new Table();
         scoreTable.setFillParent(true);
         scoreTable.top().left();
+        scoreTable.padTop(screenHeight * SCORE_PAD_TOP);
+        scoreTable.padLeft(screenWidth * SCORE_PAD_LEFT);
 
-        scoreTable.padTop(screenHeight*0.08f);
-        scoreTable.padLeft(screenWidth*0.03f);
         stage.addActor(scoreTable);
     }
 
-    // FOR NOW WITHOUT CONTROLLER
+    // ================= ACTIONS =================
     private void onLobbyClicked() {
         viewActions.onLobbyClicked();
-        Gdx.input.vibrate(200);
+        VibrationManager.vibrate(200);
         SoundsManager.playButton(1f);
     }
 
     private void onLeaveClicked() {
         viewActions.onLeaveClicked();
-        Gdx.input.vibrate(200);
+        VibrationManager.vibrate(200);
         SoundsManager.playButton(1f);
     }
 
-    private void updateScoreBoard(Array<String> currentNames) {
-        scoreTable.clear(); // reset
-        // TODO : manage the rank
-        for (int i = 0; i < currentNames.size; i++) {
-            String rank = (i + 1) + "th.";
+    // ================= SCORE =================
+    private void updateScoreBoard(Array<String> names) {
+        scoreTable.clear();
 
+        for (int i = 0; i < names.size; i++) {
+
+            String rank;
             if (i == 0) rank = "1st.";
             else if (i == 1) rank = "2nd.";
             else if (i == 2) rank = "3rd.";
+            else rank = (i + 1) + "th.";
 
             Label rankLabel = new Label(rank, skin);
-            Label nameLabel = new Label(currentNames.get(i), skin);
+            Label nameLabel = new Label(names.get(i), skin);
 
             scoreTable.add(rankLabel).left().padRight(10);
             scoreTable.add(nameLabel).left().row();
         }
     }
-
 
     @Override
     public void update(float dt) {
@@ -138,64 +177,73 @@ public class OverState extends State {
         }
     }
 
+    // ================= RENDER =================
     @Override
     public void render(SpriteBatch sb) {
-        float anchorX;
-        float anchorY;
 
         sb.begin();
+
+        float base = Math.min(screenWidth, screenHeight);
 
         // Background
         sb.draw(playBackground, 0, 0, screenWidth, screenHeight);
 
-        float baseSize = Math.min(screenWidth, screenHeight);
-
         // Podium
-        float podiumWidth = baseSize * 1.2f;
-        float podiumHeight = baseSize * 0.7f;
-        anchorX = screenWidth * 0.5f;
-        anchorY = screenHeight * 0.15f;
-        float podiumX = anchorX - podiumWidth / 2f;
-        float podiumY = anchorY - podiumHeight / 4f;
-        sb.draw(podium, podiumX, podiumY, podiumWidth, podiumHeight);
+        float podiumW = base * PODIUM_WIDTH;
+        float podiumH = base * PODIUM_HEIGHT;
 
-        // Pigs
-        float pigSize = podiumWidth * 0.25f;
+        float podiumX = screenWidth * PODIUM_ANCHOR_X - podiumW / 2f;
+        float podiumY = screenHeight * PODIUM_ANCHOR_Y - podiumH / 4f;
+
+        sb.draw(podium, podiumX, podiumY, podiumW, podiumH);
+
+        float pigSize = podiumW * PIG_SIZE_RATIO;
 
         // 1st
-        float pig1X = podiumX + podiumWidth * 0.5f - pigSize / 2f;
-        float pig1Y = podiumY + podiumHeight * 0.655f;
-        sb.draw(TextureManager.getFrame(TextureId.OVER_BLUE_PIG), pig1X, pig1Y, pigSize, pigSize);
+        sb.draw(
+            TextureManager.getFrame(TextureId.OVER_BLUE_PIG),
+            podiumX + podiumW * FIRST_X - pigSize / 2f,
+            podiumY + podiumH * FIRST_Y,
+            pigSize, pigSize
+        );
 
         // 2nd
-        float pig2X = podiumX + podiumWidth * 0.25f - pigSize / 2f;
-        float pig2Y = podiumY + podiumHeight * 0.52f;
-        sb.draw(TextureManager.getFrame(TextureId.OVER_GREEN_PIG), pig2X, pig2Y, pigSize, pigSize);
+        sb.draw(
+            TextureManager.getFrame(TextureId.OVER_GREEN_PIG),
+            podiumX + podiumW * SECOND_X - pigSize / 2f,
+            podiumY + podiumH * SECOND_Y,
+            pigSize, pigSize
+        );
 
         // 3rd
-        float pig3X = podiumX + podiumWidth * 0.75f - pigSize / 2f;
-        float pig3Y = podiumY + podiumHeight * 0.46f;
-        sb.draw(TextureManager.getFrame(TextureId.OVER_RED_PIG), pig3X, pig3Y, pigSize, pigSize);
+        sb.draw(
+            TextureManager.getFrame(TextureId.OVER_RED_PIG),
+            podiumX + podiumW * THIRD_X - pigSize / 2f,
+            podiumY + podiumH * THIRD_Y,
+            pigSize, pigSize
+        );
 
         // Crown
-        float crownX = podiumX + podiumWidth * 0.495f - pigSize / 2f;
-        float crownY = podiumY + podiumHeight * 0.98f;
-        sb.draw(TextureManager.getFrame(TextureId.CROWN), crownX, crownY, pigSize, pigSize*0.6f);
+        sb.draw(
+            TextureManager.getFrame(TextureId.CROWN),
+            podiumX + podiumW * CROWN_X - pigSize / 2f,
+            podiumY + podiumH * CROWN_Y,
+            pigSize,
+            pigSize * CROWN_HEIGHT_RATIO
+        );
 
-        // Score
-        float scoreSize = baseSize * 0.6f;
-        anchorX = screenWidth * 0.15f;
-        anchorY = screenHeight * 0.65f;
-        float overX = anchorX - scoreSize / 2f;
-        float overY = anchorY - scoreSize / 2f;
-        sb.draw(overBackground, overX, overY, scoreSize, scoreSize);
+        // Score panel
+        float scoreSize = base * SCORE_SIZE;
+        float scoreX = screenWidth * SCORE_ANCHOR_X - scoreSize / 2f;
+        float scoreY = screenHeight * SCORE_ANCHOR_Y - scoreSize / 2f;
 
-        // Menu
-        float menuSize = baseSize * 0.3f;
-        anchorX = screenWidth * 0.9f;
-        anchorY = screenHeight * 0.25f;
-        float menuX = anchorX - menuSize / 2f;
-        float menuY = anchorY - menuSize / 2f;
+        sb.draw(overBackground, scoreX, scoreY, scoreSize, scoreSize);
+
+        // Menu panel
+        float menuSize = base * MENU_SIZE;
+        float menuX = screenWidth * MENU_ANCHOR_X - menuSize / 2f;
+        float menuY = screenHeight * MENU_ANCHOR_Y - menuSize / 2f;
+
         sb.draw(menuBackground, menuX, menuY, menuSize, menuSize);
 
         sb.end();

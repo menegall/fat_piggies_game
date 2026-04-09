@@ -178,27 +178,21 @@ public class TextureManager {
         BitmapFont font = new BitmapFont(Gdx.files.internal("uiAssets/font_35.fnt"));
         font.getData().setScale(getScreenWidth()*0.0006f);
 
-        Texture buttonUpTexture = new Texture(Gdx.files.internal("uiAssets/buttonUp.png"));
-        Texture buttonDownTexture = new Texture(Gdx.files.internal("uiAssets/buttonDown.png"));
-        Texture textfieldTexture = new Texture(Gdx.files.internal("uiAssets/textfield.png"));
-        Texture cursorTexture = new Texture(Gdx.files.internal("uiAssets/cursor.png"));
-
-        TextureRegionDrawable buttonUpDrawable =
-            new TextureRegionDrawable(new TextureRegion(buttonUpTexture));
-        TextureRegionDrawable buttonDownDrawable =
-            new TextureRegionDrawable(new TextureRegion(buttonDownTexture));
-        TextureRegionDrawable textfieldDrawable =
-            new TextureRegionDrawable(new TextureRegion(textfieldTexture));
-        TextureRegionDrawable cursorDrawable =
-            new TextureRegionDrawable(new TextureRegion(cursorTexture));
-
         skin.add("default-font", font);
         skin.add("white", Color.WHITE);
 
+
+        // --- LABEL---
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = font;
         labelStyle.fontColor = Color.WHITE;
         skin.add("default", labelStyle);
+
+        // --- TEXT BUTTON ---
+        Texture buttonUpTexture = new Texture(Gdx.files.internal("uiAssets/buttonUp.png"));
+        Texture buttonDownTexture = new Texture(Gdx.files.internal("uiAssets/buttonDown.png"));
+        TextureRegionDrawable buttonUpDrawable = new TextureRegionDrawable(new TextureRegion(buttonUpTexture));
+        TextureRegionDrawable buttonDownDrawable = new TextureRegionDrawable(new TextureRegion(buttonDownTexture));
 
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.up = buttonUpDrawable;
@@ -207,6 +201,12 @@ public class TextureManager {
         buttonStyle.font = font;
         buttonStyle.fontColor = Color.WHITE;
         skin.add("default", buttonStyle);
+
+        // --- TEXT FIELD ---
+        Texture textfieldTexture = new Texture(Gdx.files.internal("uiAssets/textfield.png"));
+        Texture cursorTexture = new Texture(Gdx.files.internal("uiAssets/cursor.png"));
+        TextureRegionDrawable textfieldDrawable = new TextureRegionDrawable(new TextureRegion(textfieldTexture));
+        TextureRegionDrawable cursorDrawable = new TextureRegionDrawable(new TextureRegion(cursorTexture));
 
         TextField.TextFieldStyle textFieldStyle = new TextField.TextFieldStyle();
         textFieldStyle.font = font;
@@ -221,17 +221,13 @@ public class TextureManager {
         textFieldStyle.background.setTopHeight(getScreenHeight()*0.02f);
         textFieldStyle.background.setBottomHeight(getScreenHeight()*0.03f);
 
-
         textFieldStyle.cursor.setMinSize(getScreenWidth()*0.04f, getScreenHeight()*0.02f);
 
+        // --- JOYSTICK ---
         Texture joystickBg = new Texture(Gdx.files.internal("uiAssets/joystick_bg.png"));
         Texture joystickKnob = new Texture(Gdx.files.internal("uiAssets/joystick_knob.png"));
-
-        TextureRegionDrawable joystickBgDrawable =
-            new TextureRegionDrawable(new TextureRegion(joystickBg));
-
-        TextureRegionDrawable joystickKnobDrawable =
-            new TextureRegionDrawable(new TextureRegion(joystickKnob));
+        TextureRegionDrawable joystickBgDrawable = new TextureRegionDrawable(new TextureRegion(joystickBg));
+        TextureRegionDrawable joystickKnobDrawable = new TextureRegionDrawable(new TextureRegion(joystickKnob));
 
         joystickBgDrawable.setMinWidth(getScreenWidth()*0.25f);
         joystickBgDrawable.setMinHeight(getScreenWidth()*0.25f);
@@ -244,6 +240,64 @@ public class TextureManager {
         touchpadStyle.knob = joystickKnobDrawable;
 
         skin.add("touchpad", touchpadStyle);
+
+        // --- MUSIC BUTTON ---
+        Texture musicOn = new Texture(Gdx.files.internal("uiAssets/music_on.png"));
+        Texture musicOff = new Texture(Gdx.files.internal("uiAssets/music_off.png"));
+
+        TextureRegionDrawable musicOnDrawable = new TextureRegionDrawable(new TextureRegion(musicOn));
+        TextureRegionDrawable musicOffDrawable = new TextureRegionDrawable(new TextureRegion(musicOff));
+
+        CheckBox.CheckBoxStyle musicStyle = new CheckBox.CheckBoxStyle();
+        musicStyle.checkboxOff = musicOnDrawable;   // ON
+        musicStyle.checkboxOn = musicOffDrawable;  // OFF
+        musicStyle.font = skin.getFont("default-font");
+
+        skin.add("musicButton", musicStyle);
+
+
+        // --- SOUND BUTTON ---
+        Texture soundOn = new Texture(Gdx.files.internal("uiAssets/sound_on.png"));
+        Texture soundOff = new Texture(Gdx.files.internal("uiAssets/sound_off.png"));
+
+        TextureRegionDrawable soundOnDrawable = new TextureRegionDrawable(new TextureRegion(soundOn));
+        TextureRegionDrawable soundOffDrawable = new TextureRegionDrawable(new TextureRegion(soundOff));
+
+        CheckBox.CheckBoxStyle soundStyle = new CheckBox.CheckBoxStyle();
+        soundStyle.checkboxOff = soundOnDrawable;
+        soundStyle.checkboxOn = soundOffDrawable;
+        soundStyle.font = skin.getFont("default-font");
+
+        skin.add("soundButton", soundStyle);
+
+
+        // --- VIBRATION BUTTON ---
+        Texture vibrationOn = new Texture(Gdx.files.internal("uiAssets/vibration_on.png"));
+        Texture vibrationOff = new Texture(Gdx.files.internal("uiAssets/vibration_off.png"));
+
+        TextureRegionDrawable vibrationOnDrawable = new TextureRegionDrawable(new TextureRegion(vibrationOn));
+        TextureRegionDrawable vibrationOffDrawable = new TextureRegionDrawable(new TextureRegion(vibrationOff));
+
+        CheckBox.CheckBoxStyle vibrationStyle = new CheckBox.CheckBoxStyle();
+        vibrationStyle.checkboxOff = vibrationOnDrawable;
+        vibrationStyle.checkboxOn = vibrationOffDrawable;
+        vibrationStyle.font = skin.getFont("default-font");
+
+        skin.add("vibrationButton", vibrationStyle);
+
+        // --- BACK BUTTON ---
+        Texture backTexture = new Texture(Gdx.files.internal("uiAssets/back.png"));
+        TextureRegionDrawable backDrawable = new TextureRegionDrawable(new TextureRegion(backTexture));
+
+        backDrawable.setMinWidth(getScreenWidth() * 0.08f);
+        backDrawable.setMinHeight(getScreenWidth() * 0.08f);
+
+        Button.ButtonStyle backStyle = new Button.ButtonStyle();
+        backStyle.up = backDrawable;
+        backStyle.down = backDrawable.tint(new Color(0.8f, 0.8f, 0.8f, 1f)); // effet click
+
+        skin.add("backButton", backStyle);
+
     }
 
     public static Skin getSkin() {

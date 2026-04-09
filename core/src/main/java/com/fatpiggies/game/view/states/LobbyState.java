@@ -1,7 +1,6 @@
 package com.fatpiggies.game.view.states;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -12,31 +11,55 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.fatpiggies.game.audio.SoundsManager;
+import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
+import com.fatpiggies.game.setting.VibrationManager;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
 public class LobbyState extends State {
-    private final boolean isHost;
 
+    // ================= CONSTANTS =================
+    private static final float MENU_SIZE_RATIO = 0.75f;
+
+    private static final float BUTTON_WIDTH_RATIO = 0.2f;
+    private static final float BUTTON_HEIGHT_RATIO = 0.12f;
+
+    private static final float PADDING_RATIO = 0.015f;
+    private static final float START_BUTTON_TOP_PAD = 0.05f;
+
+    private static final float TITLE_SCALE = 0.002f;
+    private static final float CODE_SCALE = 0.0025f;
+    private static final float BUTTON_TEXT_SCALE = 0.0015f;
+
+    private static final float CODE_X_RATIO = 0.72f;
+    private static final float CODE_Y_RATIO = 0.5f;
+
+    private static final float COPY_DURATION = 1.5f;
+
+    // ================= DATA =================
+    private final boolean isHost;
+    private final IReadOnlyLobbyModel lobbyModel;
+
+    private Array<String> lastNames = new Array<>();
+
+    // ================= UI =================
     private Table playersTable;
     private TextButton startButton;
     private TextButton leaveButton;
+    private Label lobbyCodeLabel;
 
     private final TextureRegion menuBackground;
     private final TextureRegion playBackground;
-    private float copyTimer = 0f;
 
-    private final IReadOnlyLobbyModel lobbyModel;
-    private Array<String> lastNames = new Array<>();
-    private Label LobbyCodeLabel;
+    private float copyTimer = 0f;
 
     public LobbyState(IViewActions viewActions, IReadOnlyLobbyModel lobbyModel, boolean isHost) {
         super(viewActions);
-        this.lobbyModel =lobbyModel;
+        this.lobbyModel = lobbyModel;
         this.isHost = isHost;
+
         menuBackground = TextureManager.getFrame(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getFrame(TextureId.PLAY_BACKGROUND);
 
@@ -45,8 +68,9 @@ public class LobbyState extends State {
 
     private void createUI() {
 
+        // ================= BUTTONS =================
         leaveButton = new TextButton("Leave", skin);
-        leaveButton.getLabel().setFontScale(screenHeight*0.0015f);
+        leaveButton.getLabel().setFontScale(screenHeight * BUTTON_TEXT_SCALE);
         leaveButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -55,9 +79,8 @@ public class LobbyState extends State {
         });
 
         startButton = new TextButton("Start", skin);
-        startButton.getLabel().setFontScale(screenHeight*0.0015f);
+        startButton.getLabel().setFontScale(screenHeight * BUTTON_TEXT_SCALE);
         startButton.setDisabled(true);
-
         startButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -65,107 +88,112 @@ public class LobbyState extends State {
             }
         });
 
-
+        // ================= PLAYERS TABLE =================
         playersTable = new Table();
 
+        // ================= ROOT =================
         Table root = new Table();
         root.setFillParent(true);
-        root.defaults().pad(screenHeight*0.015f);
+        root.defaults().pad(screenHeight * PADDING_RATIO);
 
         Label playerLabel = new Label("Players", skin);
-        playerLabel.setFontScale(screenHeight*0.002f);
+        playerLabel.setFontScale(screenHeight * TITLE_SCALE);
 
         root.add(playerLabel).row();
         root.add(playersTable).row();
 
-        if(isHost) {
+        if (isHost) {
             root.add(startButton)
-                .width(screenWidth*0.2f)
-                .height(screenHeight*0.12f)
-                .padTop(screenHeight*0.05f)
+                .width(screenWidth * BUTTON_WIDTH_RATIO)
+                .height(screenHeight * BUTTON_HEIGHT_RATIO)
+                .padTop(screenHeight * START_BUTTON_TOP_PAD)
                 .row();
         }
 
         root.add(leaveButton)
-            .width(screenWidth*0.2f)
-            .height(screenHeight*0.12f);
+            .width(screenWidth * BUTTON_WIDTH_RATIO)
+            .height(screenHeight * BUTTON_HEIGHT_RATIO);
 
         stage.addActor(root);
 
-        LobbyCodeLabel = new Label("CODE : ----", skin);
-
-        LobbyCodeLabel.setFontScale(screenHeight*0.0025f);
-        LobbyCodeLabel.setPosition(
-            Gdx.graphics.getWidth()*0.72f,
-            Gdx.graphics.getHeight()*0.5f
+        // ================= LOBBY CODE =================
+        lobbyCodeLabel = new Label("CODE : ----", skin);
+        lobbyCodeLabel.setFontScale(screenHeight * CODE_SCALE);
+        lobbyCodeLabel.setPosition(
+            screenWidth * CODE_X_RATIO,
+            screenHeight * CODE_Y_RATIO
         );
 
-        LobbyCodeLabel.addListener(new ClickListener() {
+        lobbyCodeLabel.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 String code = lobbyModel.getLobbyCode();
 
                 if (code != null) {
                     Gdx.app.getClipboard().setContents(code);
-                    Gdx.input.vibrate(200);
-                    LobbyCodeLabel.setText("COPIED !");
-                    copyTimer = 1.5f;
+                    VibrationManager.vibrate(200);
+                    lobbyCodeLabel.setText("COPIED !");
+                    copyTimer = COPY_DURATION;
                 }
             }
         });
 
-        stage.addActor(LobbyCodeLabel);
+        stage.addActor(lobbyCodeLabel);
     }
 
-    // Buttons
+    // ================= BUTTON ACTIONS =================
     private void onStartClicked() {
         viewActions.onStartClicked();
-        Gdx.input.vibrate(200);
+        VibrationManager.vibrate(200);
         SoundsManager.playButton(1f);
     }
 
     private void onLeaveClicked() {
         viewActions.onLeaveClicked();
-        Gdx.input.vibrate(200);
+        VibrationManager.vibrate(200);
         SoundsManager.playButton(1f);
     }
 
+    // ================= UPDATE =================
     @Override
-    public void update(float dt){
+    public void update(float dt) {
+
         if (lobbyModel.getPlayerNames() != null) {
             updatePlayers(lobbyModel.getPlayerNames());
-            LobbyCodeLabel.setText("CODE : " + lobbyModel.getLobbyCode());
+            lobbyCodeLabel.setText("CODE : " + lobbyModel.getLobbyCode());
         }
 
         if (copyTimer > 0) {
             copyTimer -= dt;
             if (copyTimer <= 0) {
-                LobbyCodeLabel.setText("CODE : " + lobbyModel.getLobbyCode());
+                lobbyCodeLabel.setText("CODE : " + lobbyModel.getLobbyCode());
             }
         }
 
-        stage.act(dt); // update UI
+        stage.act(dt);
     }
 
+    // ================= RENDER =================
     @Override
     public void render(SpriteBatch sb) {
 
         sb.begin();
 
-        float size = Math.min(screenWidth, screenHeight) * 0.75f;
-
+        float size = Math.min(screenWidth, screenHeight) * MENU_SIZE_RATIO;
         float x = (screenWidth - size) / 2f;
         float y = (screenHeight - size) / 2f;
 
         sb.draw(playBackground, 0, 0, screenWidth, screenHeight);
         sb.draw(menuBackground, x, y, size, size);
+
         sb.end();
 
-        stage.draw();  // draw UI
+        stage.draw();
     }
 
-
+    // ================= PLAYERS =================
     private void updatePlayers(Array<String> currentNames) {
+
         if (!currentNames.equals(lastNames)) {
             rebuildPlayers(currentNames);
             lastNames = new Array<>(currentNames);
@@ -180,10 +208,9 @@ public class LobbyState extends State {
         playersTable.clear();
 
         for (String name : names) {
-            Label playerListLabel = new Label(name, skin);
-            playerListLabel.setFontScale(1.5f);
-
-            playersTable.add(playerListLabel).row();
+            Label label = new Label(name, skin);
+            label.setFontScale(1.5f);
+            playersTable.add(label).row();
         }
     }
 }

@@ -23,7 +23,7 @@ public class ClientPlayController implements IPlayController {
     private float lastStateTimestamps = 0;
     private Engine engine;
     private GameWorld world;
-    private PlayerInput input = new PlayerInput();
+    private final PlayerInput input = new PlayerInput();
 
     public ClientPlayController(IPlayActions actions, String lobbyId) {
         this.actions = actions;
@@ -55,7 +55,7 @@ public class ClientPlayController implements IPlayController {
         world.setLobbyId(lobbyId);
         attachPlayListener(db);
 
-        actions.goToPlayState(world);
+        actions.goToPlayState(world, true);
         actions.setGameIsPlaying(true);
     }
 
@@ -105,7 +105,7 @@ public class ClientPlayController implements IPlayController {
                         if (!firstStateReceived) {
                             firstStateReceived = true;
 
-                            actions.goToPlayState(world);
+                            actions.goToPlayState(world, true);
                             actions.setGameIsPlaying(true);
                         }
                     }

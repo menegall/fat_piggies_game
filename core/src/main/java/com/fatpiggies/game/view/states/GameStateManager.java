@@ -96,8 +96,8 @@ public class GameStateManager {
         push(new LobbyState(viewActions, lobbyModel, isHost));
     }
 
-    public void pushPlayState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, String playerId) {
-        push(new PlayState(viewActions, gameWorld, playerId));
+    public void pushPlayState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, String playerId, boolean isHost) {
+        push(new PlayState(viewActions, gameWorld, playerId, isHost));
     }
 
     public void pushOverState(IViewActions viewActions, IReadOnlyLobbyModel lobbyModel, boolean isHost) {
