@@ -7,10 +7,12 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.fatpiggies.game.audio.MusicManager;
+import com.fatpiggies.game.audio.SoundsManager;
 import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
-import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.assets.TextureManager;
 
 
 /**
@@ -20,7 +22,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
     AuthService authService;
     DatabaseService databaseService;
     private SpriteBatch batch;
-    private MainController mc;
+    private MainController main;
 
     public FatPiggiesGame(AuthService authService, DatabaseService databaseService) {
         this.authService = authService;
@@ -46,10 +48,14 @@ public class FatPiggiesGame extends ApplicationAdapter {
         // Load only once
         TextureManager.loadTextures();
         TextureManager.loadSkin();
+        SoundsManager.load();
+        MusicManager.load();
+
+        MusicManager.enable();
 
         // To draw
         batch = new SpriteBatch();
-        mc = new MainController(authService, databaseService);
+        main = new MainController(authService, databaseService);
 
     }
 
@@ -59,7 +65,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
         // FOR TESTING
-        mc.update(batch, dt);
+        main.update(batch, dt);
     }
 
     @Override

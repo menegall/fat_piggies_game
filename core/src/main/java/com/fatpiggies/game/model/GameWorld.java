@@ -38,7 +38,7 @@ import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 import com.fatpiggies.game.model.utils.PowerUpType;
 import com.fatpiggies.game.network.dto.PlayerSetup;
-import com.fatpiggies.game.view.TextureId;
+import com.fatpiggies.game.assets.TextureId;
 
 import java.util.Map;
 

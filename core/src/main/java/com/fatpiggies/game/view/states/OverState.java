@@ -1,5 +1,6 @@
 package com.fatpiggies.game.view.states;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -8,12 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
-import com.fatpiggies.game.controller.IViewActions;
-import com.fatpiggies.game.model.IReadOnlyGameWorld;
+import com.fatpiggies.game.audio.SoundsManager;
+import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.view.Animation;
-import com.fatpiggies.game.view.TextureId;
-import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.assets.TextureId;
+import com.fatpiggies.game.assets.TextureManager;
 
 public class OverState extends State {
     private final boolean isHost;
@@ -63,6 +64,7 @@ public class OverState extends State {
     private void createUI() {
 
         leaveButton = new TextButton("Leave", skin);
+        leaveButton.getLabel().setFontScale(screenHeight*0.001f);
         leaveButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -71,7 +73,7 @@ public class OverState extends State {
         });
 
         lobbyButton = new TextButton("Lobby", skin);
-
+        lobbyButton.getLabel().setFontScale(screenHeight*0.001f);
         lobbyButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -109,11 +111,15 @@ public class OverState extends State {
 
     // FOR NOW WITHOUT CONTROLLER
     private void onLobbyClicked() {
-        // TODO: add this feature
+        viewActions.onLobbyClicked();
+        Gdx.input.vibrate(200);
+        SoundsManager.playButton(1f);
     }
 
     private void onLeaveClicked() {
         viewActions.onLeaveClicked();
+        Gdx.input.vibrate(200);
+        SoundsManager.playButton(1f);
     }
 
     private void updateScoreBoard(Array<String> currentNames) {
@@ -212,12 +218,4 @@ public class OverState extends State {
 
         stage.draw();
     }
-
-
-    @Override
-    public void showError(String message) {
-
-    }
-
-
 }

@@ -11,11 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.fatpiggies.game.controller.IViewActions;
-import com.fatpiggies.game.model.IReadOnlyGameWorld;
+import com.fatpiggies.game.audio.SoundsManager;
+import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
-import com.fatpiggies.game.view.TextureId;
-import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.assets.TextureId;
+import com.fatpiggies.game.assets.TextureManager;
 
 public class LobbyState extends State {
     private final boolean isHost;
@@ -45,6 +45,7 @@ public class LobbyState extends State {
     private void createUI() {
 
         leaveButton = new TextButton("Leave", skin);
+        leaveButton.getLabel().setFontScale(screenHeight*0.0015f);
         leaveButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -53,6 +54,7 @@ public class LobbyState extends State {
         });
 
         startButton = new TextButton("Start", skin);
+        startButton.getLabel().setFontScale(screenHeight*0.0015f);
         startButton.setDisabled(true);
 
         startButton.addListener(new ChangeListener() {
@@ -70,7 +72,7 @@ public class LobbyState extends State {
         root.defaults().pad(screenHeight*0.015f);
 
         Label playerLabel = new Label("Players", skin);
-        playerLabel.setFontScale(2f);
+        playerLabel.setFontScale(screenHeight*0.002f);
 
         root.add(playerLabel).row();
         root.add(playersTable).row();
@@ -91,7 +93,7 @@ public class LobbyState extends State {
 
         LobbyCodeLabel = new Label("CODE : ----", skin);
 
-        LobbyCodeLabel.setFontScale(3f);
+        LobbyCodeLabel.setFontScale(screenHeight*0.0025f);
         LobbyCodeLabel.setPosition(
             Gdx.graphics.getWidth()*0.72f,
             Gdx.graphics.getHeight()*0.5f
@@ -114,13 +116,17 @@ public class LobbyState extends State {
         stage.addActor(LobbyCodeLabel);
     }
 
-    // FOR NOW WITHOUT CONTROLLER
+    // Buttons
     private void onStartClicked() {
         viewActions.onStartClicked();
+        Gdx.input.vibrate(200);
+        SoundsManager.playButton(1f);
     }
 
     private void onLeaveClicked() {
         viewActions.onLeaveClicked();
+        Gdx.input.vibrate(200);
+        SoundsManager.playButton(1f);
     }
 
     @Override
@@ -180,10 +186,5 @@ public class LobbyState extends State {
 
             playersTable.add(playerListLabel).row();
         }
-    }
-
-    @Override
-    public void showError(String message) {
-
     }
 }

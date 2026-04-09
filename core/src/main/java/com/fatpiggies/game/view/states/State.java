@@ -7,9 +7,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.fatpiggies.game.controller.IViewActions;
-import com.fatpiggies.game.model.Snapshot;
-import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
+import com.fatpiggies.game.assets.TextureManager;
 
 public abstract class State {
     protected OrthographicCamera cam;
@@ -27,7 +26,6 @@ public abstract class State {
         this.viewActions = viewActions;
 
         stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
         skin = TextureManager.getSkin();
     }
 
@@ -39,5 +37,9 @@ public abstract class State {
         stage.dispose();
     }
 
-    public abstract void showError(String message);
+    public void showError(String message){};
+
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
+    }
 }
