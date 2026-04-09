@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GameState {
-    public long ts; // Timestamp in milliseconds
+    public float ts = 0; // Increasing timestamp in milliseconds
     public Map<String, PlayerData> players;
     public Map<String, PowerupData> powerups;
 

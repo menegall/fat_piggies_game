@@ -17,6 +17,5 @@ public class PlayerData {
         this.x = x;
         this.y = y;
         this.hp = hp;
-        this.fx = fx != null ? fx : new HashMap<>();
     }
 }
