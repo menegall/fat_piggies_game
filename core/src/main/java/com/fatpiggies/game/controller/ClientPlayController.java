@@ -3,6 +3,8 @@ package com.fatpiggies.game.controller;
 import static com.fatpiggies.game.view.TextureId.*;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.Gdx;
+import com.fatpiggies.game.assets.TextureId;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.model.ecs.systems.move.*;
@@ -11,8 +13,10 @@ import com.fatpiggies.game.view.TextureId;
 
 public class ClientPlayController implements IPlayController {
     private final IPlayActions actions;
+    private float lastStateTimestamps = 0;
     private Engine engine;
     private GameWorld world;
+    private PlayerInput input = new PlayerInput();
 
     public ClientPlayController(IPlayActions actions, String lobbyId) {
         this.actions = actions;
@@ -27,7 +31,7 @@ public class ClientPlayController implements IPlayController {
     }
 
     @Override
-    public void startGame(String lobbyId) {
+    public void startGame(String lobbyId, DatabaseService db) {
         TextureId[] textures = {BLUE_PIG, GREEN_PIG, RED_PIG, YELLOW_PIG};
         int count = 0;
 
@@ -41,6 +45,8 @@ public class ClientPlayController implements IPlayController {
             }
         }
 
+        attachPlayListener(db);
+
         actions.goToPlayState(world);
         actions.setGameIsPlaying(true);
     }
@@ -53,6 +59,7 @@ public class ClientPlayController implements IPlayController {
         world.cleanUpWorld();
         engine = null;
         world = null;
+        lastStateTimestamps = 0;
 
         actions.clearPlayController();
     }
@@ -64,6 +71,32 @@ public class ClientPlayController implements IPlayController {
 
     @Override
     public void updatePlayerInput(float x, float y) {
-        world.updatePlayerInput(x, y);
+        world.updateLocalPlayerInput(x, y);
+    }
+
+    @Override
+    public void sendToServer(DatabaseService db, float timer_network) {
+        input.ts += timer_network;
+        world.populatePlayerInput(input);
+        db.pushPlayerInput(world.getLobbyId(), actions.getCurrentUserId(), input);
+    }
+
+    private void attachPlayListener(DatabaseService db) {
+        db.listenToGameState(world.getLobbyId(), new DatabaseService.GameStateCallback() {
+            @Override
+            public void onDataReceived(GameState data) {
+                Gdx.app.postRunnable(() -> {
+                    if (data != null && data.ts >= lastStateTimestamps) {
+                        lastStateTimestamps = data.ts;
+                        world.applyGameState(data);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(NetworkError error, String errorMessage) {
+
+            }
+        });
     }
 }

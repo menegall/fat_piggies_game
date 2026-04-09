@@ -3,7 +3,7 @@ package com.fatpiggies.game.network.dto;
 public class PlayerInput {
     public float jx;
     public float jy;
-    public long ts; // Timestamp
+    public float ts; // Timestamp
 
     public PlayerInput() {}
 

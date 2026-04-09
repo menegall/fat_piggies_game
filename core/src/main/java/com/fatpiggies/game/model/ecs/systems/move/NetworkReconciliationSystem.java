@@ -75,8 +75,8 @@ public class NetworkReconciliationSystem extends IteratingSystem {
                 transform.y = sync.targetY;
 
                 // Overwrite the local velocity with the server's velocity!
-                velocity.vx = sync.targetVx;
-                velocity.vy = sync.targetVy;
+//                velocity.vx = sync.targetVx;
+//                velocity.vy = sync.targetVy;
 
             } else {
                 // MEDIUM DESYNC: We are drifting slightly out of sync.
@@ -89,8 +89,8 @@ public class NetworkReconciliationSystem extends IteratingSystem {
         }
 
         // Synchronize the rotation angle to ensure we are facing the correct direction.
-        if (Math.abs(transform.angle - sync.targetAngle) > 10f) {
-            transform.angle = sync.targetAngle;
-        }
+//        if (Math.abs(transform.angle - sync.targetAngle) > 10f) {
+//            transform.angle = sync.targetAngle;
+//        }
     }
 }

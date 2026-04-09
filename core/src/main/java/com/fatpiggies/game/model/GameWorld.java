@@ -24,6 +24,7 @@ import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
+import com.fatpiggies.game.assets.TextureId;
 import com.fatpiggies.game.model.ecs.components.HealthComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.RenderComponent;
@@ -43,19 +44,29 @@ import com.fatpiggies.game.model.ecs.components.physics.AccelerationComponent;
 import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 import com.fatpiggies.game.model.utils.PowerUpType;
+import com.fatpiggies.game.network.dto.GameState;
+import com.fatpiggies.game.network.dto.PlayerData;
+import com.fatpiggies.game.network.dto.PlayerInput;
 import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.view.TextureId;
+import com.fatpiggies.game.network.dto.PowerupData;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
-
-public class GameWorld implements IReadOnlyGameWorld{
+public class GameWorld implements IReadOnlyGameWorld {
+    // Reusable sets to track active entities per frame without memory allocation
+    private final java.util.Set<String> activePlayersTracker = new java.util.HashSet<>();
+    private final java.util.Set<String> activePowerupsTracker = new java.util.HashSet<>();
+    // Fast lookup map for powerups spawned remotely by the Host
+    private final Map<String, Entity> clientRemotePowerups = new HashMap<>();
     private Engine engine;
     private Entity localPlayer;
     private String lobbyId;
     private String lobbyCode;
     private Map<String, PlayerSetup> playersSetup;
+    private int i = 0; // For testing
 
     public GameWorld(Engine engine) {
         this.engine = engine;
@@ -70,8 +81,7 @@ public class GameWorld implements IReadOnlyGameWorld{
         engine.update(dt);
     }
 
-
-    public void updatePlayerInput(float x, float y) {
+    public void updateLocalPlayerInput(float x, float y) {
         if (localPlayer == null) return;
 
         PlayerInputComponent input = localPlayer.getComponent(PlayerInputComponent.class);
@@ -121,7 +131,6 @@ public class GameWorld implements IReadOnlyGameWorld{
         localPlayer = entity;
         this.engine.addEntity(entity);
     }
-
 
     /**
      * Creates a local pig for the Client. It contains ALL physics.
@@ -221,6 +230,28 @@ public class GameWorld implements IReadOnlyGameWorld{
     }
 
     /**
+     * Creates a "dumb" powerup entity used ONLY on Clients.
+     * It has no collision or physics logic, just a transform and a graphic,
+     * because the Host handles all the real collision logic.
+     */
+    private Entity createVisualPowerupForClient(PowerupData puData) {
+        Entity entity = engine.createEntity();
+
+        TransformComponent transform = new TransformComponent();
+        transform.x = puData.x;
+        transform.y = puData.y;
+
+        RenderComponent render = new RenderComponent();
+        render.textureId = puData.textureId;
+        // TODO GABIN add width and leght
+
+        entity.add(transform).add(render);
+        engine.addEntity(entity);
+
+        return entity;
+    }
+
+    /**
      * Attaches a specific modifier component and the corresponding RenderComponent
      * based on the type.
      *
@@ -309,6 +340,10 @@ public class GameWorld implements IReadOnlyGameWorld{
         this.localPlayer = localPlayer;
     }
 
+    public String getLobbyId() {
+        return lobbyId;
+    }
+
     public void setLobbyId(String lobbyId) {
         this.lobbyId = lobbyId;
     }
@@ -328,12 +363,205 @@ public class GameWorld implements IReadOnlyGameWorld{
         }
     }
 
-    private int i = 0; // For testing
-
     public boolean isThePlayFinish() {
         // TODO Finish implementation of this method
         i++;
         return false;
     }
 
+    public void populateGameState(GameState gameState) {
+        // Remove players that are not in the lobby
+        if (playersSetup != null) {
+            gameState.players.keySet().removeIf(playerId -> !playersSetup.containsKey(playerId));
+        }
+
+        // Clear trackers instead of re-instantiating them
+        activePlayersTracker.clear();
+        activePowerupsTracker.clear();
+
+        // Iterate over all entities currently managed by the Ashley Engine
+        for (Entity entity : engine.getEntities()) {
+            // --- PROCESS PLAYERS ---
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+            if (netId != null && netId.playerId != null) {
+                activePlayersTracker.add(netId.playerId);
+
+                TransformComponent transform = entity.getComponent(TransformComponent.class);
+                HealthComponent health = entity.getComponent(HealthComponent.class);
+
+                if (transform != null) {
+                    // Try to get the pooled object
+                    PlayerData pd = gameState.players.get(netId.playerId);
+
+                    if (pd == null) {
+                        // Allocate only if it's a completely new player
+                        pd = new PlayerData();
+                        gameState.players.put(netId.playerId, pd);
+                    }
+
+                    // Update values
+                    pd.x = roundToOneDecimal(transform.x);
+                    pd.y = roundToOneDecimal(transform.y);
+                    pd.hp = (health != null) ? health.currentLife : 0;
+
+                }
+            }
+
+            // --- PROCESS POWERUPS ---
+            CollectibleComponent collectible = entity.getComponent(CollectibleComponent.class);
+            if (collectible != null) {
+                // Since PowerUps lack a NetworkIdentityComponent, we use their hashcode as a unique ID
+                String powerupId = String.valueOf(entity.hashCode());
+                activePowerupsTracker.add(powerupId);
+
+                TransformComponent transform = entity.getComponent(TransformComponent.class);
+                RenderComponent render = entity.getComponent(RenderComponent.class);
+
+                if (transform != null && render != null) {
+                    PowerupData puData = gameState.powerups.get(powerupId);
+
+                    if (puData == null) {
+                        puData = new PowerupData();
+                        gameState.powerups.put(powerupId, puData);
+                    }
+
+                    puData.x = roundToOneDecimal(transform.x);
+                    puData.y = roundToOneDecimal(transform.y);
+                    puData.textureId = render.textureId;
+                }
+            }
+        }
+
+        // --- CLEANUP ---
+        // Remove players and powerups that are no longer in the Ashley Engine
+        // This prevents memory leaks and stale data on the clients
+        gameState.players.keySet().removeIf(id -> !activePlayersTracker.contains(id));
+        gameState.powerups.keySet().removeIf(id -> !activePowerupsTracker.contains(id));
+    }
+
+    public void populatePlayerInput(PlayerInput input) {
+        if (localPlayer == null) {
+            input.jx = 0f;
+            input.jy = 0f;
+            return;
+        }
+        PlayerInputComponent inputComponent = localPlayer.getComponent(PlayerInputComponent.class);
+
+        if (inputComponent != null) {
+            input.jx = roundToTwoDecimals(inputComponent.joystickPercentageX);
+            input.jy = roundToTwoDecimals(inputComponent.joystickPercentageY);
+        }
+    }
+
+    /**
+     * Rounds a float to 2 decimal places to save network bandwidth.
+     * Example: 123.456789f becomes 123.46f
+     */
+    private float roundToTwoDecimals(float value) {
+        return Math.round(value * 100f) / 100f;
+    }
+
+    /**
+     * Rounds a float to 1 decimal place for maximum compression.
+     * Example: 123.456789f becomes 123.5f
+     */
+    private float roundToOneDecimal(float value) {
+        return Math.round(value * 10f) / 10f;
+    }
+
+    /**
+     * Apply the given input to the remote player input in the host world.
+     * Use this ONLY on the Host controllers!
+     *
+     * @param playerId Unique ID of the player to which put the input
+     * @param input    The input dto to apply
+     */
+    public void applyRemoteInput(String playerId, PlayerInput input) {
+        if (playerId == null || input == null) return;
+
+        // Iterate through the engine's entities to find the target player
+        for (Entity entity : engine.getEntities()) {
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+
+            // Check if this entity belongs to the specific remote player
+            if (netId != null && playerId.equals(netId.playerId)) {
+                PlayerInputComponent inputComp = entity.getComponent(PlayerInputComponent.class);
+
+                if (inputComp != null) {
+                    inputComp.joystickPercentageX = MathUtils.clamp(input.jx, -1.0f, 1.0f);
+                    inputComp.joystickPercentageY = MathUtils.clamp(input.jy, -1.0f, 1.0f);
+                }
+
+                break;
+            }
+        }
+    }
+
+
+    /**
+     * Applies the GameState received from the Host to the local ECS entities.
+     * Use this ONLY on the Client controllers!
+     *
+     * @param state The game state snapshot containing all players and powerups
+     */
+    public void applyGameState(GameState state) {
+        if (state == null) return;
+
+        // We iterate through all existing entities to find the players
+        for (Entity entity : engine.getEntities()) {
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+
+            if (netId != null && netId.playerId != null) {
+                PlayerData pd = state.players.get(netId.playerId);
+
+                if (pd != null) {
+                    NetworkSyncComponent sync = entity.getComponent(NetworkSyncComponent.class);
+                    TransformComponent transform = entity.getComponent(TransformComponent.class);
+                    HealthComponent health = entity.getComponent(HealthComponent.class);
+
+                    if (sync != null) {
+                        sync.targetX = pd.x;
+                        sync.targetY = pd.y;
+                    }
+
+                    // Sync health
+                    if (health != null) {
+                        health.currentLife = pd.hp;
+                    }
+                }
+            }
+        }
+
+        // Remove powerups that were collected on the Host (they no longer exist in the state)
+        clientRemotePowerups.entrySet().removeIf(entry -> {
+            if (!state.powerups.containsKey(entry.getKey())) {
+                // The powerup is gone from the Host's state, destroy it locally
+                engine.removeEntity(entry.getValue());
+                return true; // Remove from the tracking map
+            }
+            return false;
+        });
+
+        // Spawn new powerups or update existing ones
+        for (Map.Entry<String, PowerupData> entry : state.powerups.entrySet()) {
+            String powerupId = entry.getKey();
+            PowerupData puData = entry.getValue();
+
+            Entity localPu = clientRemotePowerups.get(powerupId);
+
+            if (localPu == null) {
+                // A new powerup has appeared! Create a "dumb" visual entity for the Client.
+                localPu = createVisualPowerupForClient(puData);
+                clientRemotePowerups.put(powerupId, localPu);
+            } else {
+                // The powerup already exists. Usually, powerups don't move,
+                // but just in case, we sync its position.
+                TransformComponent transform = localPu.getComponent(TransformComponent.class);
+                if (transform != null) {
+                    transform.x = puData.x;
+                    transform.y = puData.y;
+                }
+            }
+        }
+    }
 }

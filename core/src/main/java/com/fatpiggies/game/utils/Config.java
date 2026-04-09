@@ -25,4 +25,9 @@ public class Config {
     // ---- TAGS ASSETS and RESOURCE -----------
     // ==========================================
     public static final String TAG_ASSETS   = "FatPig_Assets";   // For TextureManager (Load Images, ...)
+
+    // ==========================================
+    // --------- NETWORK Constants -----------
+    // ==========================================
+    public static final float SEND_THRESHOLD = 1 / 5f;
 }
