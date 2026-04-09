@@ -105,6 +105,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
 
     @Override
     public void startClientGame(String lobbyId) {
+        if (lobbyId == null) return;
         playController = new ClientPlayController(this, lobbyId);
         playController.startGame(lobbyId, dbs);
     }

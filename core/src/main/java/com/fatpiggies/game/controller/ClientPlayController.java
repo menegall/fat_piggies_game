@@ -52,6 +52,7 @@ public class ClientPlayController implements IPlayController {
             }
         }
 
+        world.setLobbyId(lobbyId);
         attachPlayListener(db);
 
         actions.goToPlayState(world);
@@ -88,21 +89,32 @@ public class ClientPlayController implements IPlayController {
         db.pushPlayerInput(world.getLobbyId(), actions.getCurrentUserId(), input);
     }
 
+    private boolean firstStateReceived = false;
+
     private void attachPlayListener(DatabaseService db) {
         db.listenToGameState(world.getLobbyId(), new DatabaseService.GameStateCallback() {
+
             @Override
             public void onDataReceived(GameState data) {
                 Gdx.app.postRunnable(() -> {
                     if (data != null && data.ts >= lastStateTimestamps) {
+
                         lastStateTimestamps = data.ts;
                         world.applyGameState(data);
+
+                        if (!firstStateReceived) {
+                            firstStateReceived = true;
+
+                            actions.goToPlayState(world);
+                            actions.setGameIsPlaying(true);
+                        }
                     }
                 });
             }
 
             @Override
             public void onError(NetworkError error, String errorMessage) {
-
+                actions.showError(errorMessage);
             }
         });
     }

@@ -21,4 +21,6 @@ public interface IPlayActions {
     void startGameOnServer(String lobbyId);
 
     void endGameOnServer(String lobbyId);
+
+    void showError(String message);
 }
