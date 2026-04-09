@@ -3,6 +3,9 @@ package com.fatpiggies.game.model;
 import static com.fatpiggies.game.model.utils.GameConstants.BASE_LIFE;
 import static com.fatpiggies.game.model.utils.GameConstants.BOTTOM_BOUND;
 import static com.fatpiggies.game.model.utils.GameConstants.LEFT_BOUND;
+import static com.fatpiggies.game.model.utils.GameConstants.PIG_ANGLE_OFFSET;
+import static com.fatpiggies.game.model.utils.GameConstants.PIG_HEIGHT;
+import static com.fatpiggies.game.model.utils.GameConstants.PIG_WIDTH;
 import static com.fatpiggies.game.model.utils.GameConstants.PLAYER_BASE_ACCELERATION;
 import static com.fatpiggies.game.model.utils.GameConstants.PLAYER_BASE_MASS;
 import static com.fatpiggies.game.model.utils.GameConstants.PLAYER_BASE_VELOCITY;
@@ -11,6 +14,9 @@ import static com.fatpiggies.game.model.utils.GameConstants.POWERUP_COLLISION_RA
 import static com.fatpiggies.game.model.utils.GameConstants.POWERUP_MAX_LIFETIME;
 import static com.fatpiggies.game.model.utils.GameConstants.POWERUP_MIN_LIFETIME;
 import static com.fatpiggies.game.model.utils.GameConstants.POWER_MASS_MODIFIER;
+import static com.fatpiggies.game.model.utils.GameConstants.POWER_UP_ANGLE_OFFSET;
+import static com.fatpiggies.game.model.utils.GameConstants.POWER_UP_HEIGHT;
+import static com.fatpiggies.game.model.utils.GameConstants.POWER_UP_WIDTH;
 import static com.fatpiggies.game.model.utils.GameConstants.POWER_VELOCITY_MODIFIER;
 import static com.fatpiggies.game.model.utils.GameConstants.RIGHT_BOUND;
 import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
@@ -38,7 +44,7 @@ import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 import com.fatpiggies.game.model.utils.PowerUpType;
 import com.fatpiggies.game.network.dto.PlayerSetup;
-import com.fatpiggies.game.assets.TextureId;
+import com.fatpiggies.game.view.TextureId;
 
 import java.util.Map;
 
@@ -105,6 +111,9 @@ public class GameWorld implements IReadOnlyGameWorld{
 
         RenderComponent render = new RenderComponent();
         render.textureId = textureId;
+        render.width = PIG_WIDTH;
+        render.height = PIG_HEIGHT;
+        render.angleOffset = PIG_ANGLE_OFFSET;
 
         entity.add(netId).add(transform).add(health).add(render)
             .add(input).add(collider).add(collisions).add(spawn);
@@ -139,11 +148,14 @@ public class GameWorld implements IReadOnlyGameWorld{
 
         NetworkSyncComponent sync = new NetworkSyncComponent();
 
-        RenderComponent graphic = new RenderComponent();
-        graphic.textureId = textureId;
+        RenderComponent render = new RenderComponent();
+        render.textureId = textureId;
+        render.width = PIG_WIDTH;
+        render.height = PIG_HEIGHT;
+        render.angleOffset = PIG_ANGLE_OFFSET;
 
         entity.add(netId).add(transform).add(health)
-            .add(input).add(sync).add(graphic);
+            .add(input).add(sync).add(render);
 
         localPlayer = entity;
         this.engine.addEntity(entity);
@@ -166,10 +178,14 @@ public class GameWorld implements IReadOnlyGameWorld{
 
         NetworkSyncComponent sync = new NetworkSyncComponent();
 
-        RenderComponent graphic = new RenderComponent();
-        graphic.textureId = textureId;
+        RenderComponent render = new RenderComponent();
+        render.textureId = textureId;
+        render.width = PIG_WIDTH;
+        render.height = PIG_HEIGHT;
+        render.angleOffset = PIG_ANGLE_OFFSET;
 
-        entity.add(netId).add(transform).add(sync).add(graphic);
+
+        entity.add(netId).add(transform).add(sync).add(render);
 
         this.engine.addEntity(entity);
     }
@@ -214,10 +230,15 @@ public class GameWorld implements IReadOnlyGameWorld{
     private void attachModifierAndRender(Entity entity, PowerUpType type) {
         RenderComponent render = new RenderComponent();
 
+        // From same texture length
+        render.width = POWER_UP_WIDTH;
+        render.height = POWER_UP_HEIGHT;
+        render.angleOffset = POWER_UP_ANGLE_OFFSET;
+
         switch (type) {
             case BEER: {
                 InputModifierComponent inputMod = new InputModifierComponent();
-                // TODO: use enum from view: render.textureId = "201";
+                render.textureId = TextureId.BEER;
                 entity.add(inputMod);
                 break;
             }
@@ -227,7 +248,7 @@ public class GameWorld implements IReadOnlyGameWorld{
                 massMod.power = POWER_MASS_MODIFIER;
                 VelocityModifierComponent velocityMod = new VelocityModifierComponent();
                 velocityMod.power = -POWER_VELOCITY_MODIFIER;
-                // TODO: use enum from view for render: render.textureId = "201";
+                render.textureId = TextureId.DONUT;
                 entity.add(massMod).add(velocityMod);
                 break;
             }
@@ -235,7 +256,7 @@ public class GameWorld implements IReadOnlyGameWorld{
             case LIFE: {
                 HealthModifierComponent healthMod = new HealthModifierComponent();
                 entity.add(healthMod);
-                // TODO: use enum from view for render: render.textureId = "201";
+                render.textureId = TextureId.LIFE;
                 break;
             }
 
@@ -243,7 +264,7 @@ public class GameWorld implements IReadOnlyGameWorld{
                 VelocityModifierComponent velocityMod = new VelocityModifierComponent();
                 velocityMod.power = POWER_VELOCITY_MODIFIER;
                 entity.add(velocityMod);
-                // TODO: use enum from view for render: render.textureId = "201";
+                render.textureId = TextureId.APPLE;
                 break;
             }
 
@@ -312,7 +333,7 @@ public class GameWorld implements IReadOnlyGameWorld{
     public boolean isThePlayFinish() {
         // TODO Finish implementation of this method
         i++;
-        return i >= 200;
+        return false;
     }
 
 }

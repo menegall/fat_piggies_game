@@ -3,6 +3,7 @@ package com.fatpiggies.game.view.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -14,8 +15,8 @@ import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.audio.SoundsManager;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
-import com.fatpiggies.game.assets.TextureId;
-import com.fatpiggies.game.assets.TextureManager;
+import com.fatpiggies.game.view.TextureId;
+import com.fatpiggies.game.view.TextureManager;
 
 public class LobbyState extends State {
     private final boolean isHost;
@@ -24,8 +25,8 @@ public class LobbyState extends State {
     private TextButton startButton;
     private TextButton leaveButton;
 
-    private final Texture menuBackground;
-    private final Texture playBackground;
+    private final TextureRegion menuBackground;
+    private final TextureRegion playBackground;
     private float copyTimer = 0f;
 
     private final IReadOnlyLobbyModel lobbyModel;
@@ -36,8 +37,8 @@ public class LobbyState extends State {
         super(viewActions);
         this.lobbyModel =lobbyModel;
         this.isHost = isHost;
-        menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
-        playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
+        menuBackground = TextureManager.getFrame(TextureId.MENU_BACKGROUND);
+        playBackground = TextureManager.getFrame(TextureId.PLAY_BACKGROUND);
 
         createUI();
     }
@@ -150,8 +151,6 @@ public class LobbyState extends State {
     public void render(SpriteBatch sb) {
 
         sb.begin();
-        float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();
 
         float size = Math.min(screenWidth, screenHeight) * 0.75f;
 

@@ -3,6 +3,7 @@ package com.fatpiggies.game.view.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -13,8 +14,8 @@ import com.fatpiggies.game.audio.SoundsManager;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.view.Animation;
-import com.fatpiggies.game.assets.TextureId;
-import com.fatpiggies.game.assets.TextureManager;
+import com.fatpiggies.game.view.TextureId;
+import com.fatpiggies.game.view.TextureManager;
 
 public class OverState extends State {
     private final boolean isHost;
@@ -24,17 +25,10 @@ public class OverState extends State {
 
     private Table scoreTable;
 
-    private final Texture menuBackground;
-    private final Texture playBackground;
-    private final Texture overBackground;
-    private final Texture podium;
-
-    private final Animation bluePig;
-    private final Animation greenPig;
-    private final Animation redPig;
-    private final Animation yellowPig;
-
-    private final Animation crown;
+    private final TextureRegion menuBackground;
+    private final TextureRegion playBackground;
+    private final TextureRegion overBackground;
+    private final TextureRegion podium;
 
     private final IReadOnlyLobbyModel lobbyModel;
     private Array<String> lastNames = new Array<>();
@@ -46,17 +40,10 @@ public class OverState extends State {
         this.lobbyModel = lobbyModel;
         this.isHost = isHost;
 
-        menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
-        playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
-        overBackground = TextureManager.getTexture(TextureId.OVER_BACKGROUND);
-        podium = TextureManager.getTexture(TextureId.PODIUM);
-
-        bluePig = new Animation(TextureManager.getTexture(TextureId.OVER_BLUE_PIG), 2, 2, 4, 2f);
-        greenPig = new Animation(TextureManager.getTexture(TextureId.OVER_GREEN_PIG), 2, 2, 4, 2f);
-        redPig = new Animation(TextureManager.getTexture(TextureId.OVER_RED_PIG), 2, 2, 4, 2f);
-        yellowPig = new Animation(TextureManager.getTexture(TextureId.OVER_YELLOW_PIG), 2, 2, 4, 2f);
-        crown = new Animation(TextureManager.getTexture(TextureId.CROWN), 2, 2, 4, 2f);
-
+        menuBackground = TextureManager.getFrame(TextureId.MENU_BACKGROUND);
+        playBackground = TextureManager.getFrame(TextureId.PLAY_BACKGROUND);
+        overBackground = TextureManager.getFrame(TextureId.OVER_BACKGROUND);
+        podium = TextureManager.getFrame(TextureId.PODIUM);
 
         createUI();
     }
@@ -143,9 +130,6 @@ public class OverState extends State {
 
     @Override
     public void update(float dt) {
-        bluePig.update(dt);
-        crown.update(dt);
-
         Array<String> currentNames = lobbyModel.getPlayerNames();
 
         if (!currentNames.equals(lastNames)) {
@@ -181,22 +165,22 @@ public class OverState extends State {
         // 1st
         float pig1X = podiumX + podiumWidth * 0.5f - pigSize / 2f;
         float pig1Y = podiumY + podiumHeight * 0.655f;
-        sb.draw(bluePig.getFrame(), pig1X, pig1Y, pigSize, pigSize);
+        sb.draw(TextureManager.getFrame(TextureId.OVER_BLUE_PIG), pig1X, pig1Y, pigSize, pigSize);
 
         // 2nd
         float pig2X = podiumX + podiumWidth * 0.25f - pigSize / 2f;
         float pig2Y = podiumY + podiumHeight * 0.52f;
-        sb.draw(greenPig.getFrame(), pig2X, pig2Y, pigSize, pigSize);
+        sb.draw(TextureManager.getFrame(TextureId.OVER_GREEN_PIG), pig2X, pig2Y, pigSize, pigSize);
 
         // 3rd
         float pig3X = podiumX + podiumWidth * 0.75f - pigSize / 2f;
         float pig3Y = podiumY + podiumHeight * 0.46f;
-        sb.draw(redPig.getFrame(), pig3X, pig3Y, pigSize, pigSize);
+        sb.draw(TextureManager.getFrame(TextureId.OVER_RED_PIG), pig3X, pig3Y, pigSize, pigSize);
 
         // Crown
         float crownX = podiumX + podiumWidth * 0.495f - pigSize / 2f;
         float crownY = podiumY + podiumHeight * 0.98f;
-        sb.draw(crown.getFrame(), crownX, crownY, pigSize, pigSize*0.6f);
+        sb.draw(TextureManager.getFrame(TextureId.CROWN), crownX, crownY, pigSize, pigSize*0.6f);
 
         // Score
         float scoreSize = baseSize * 0.6f;

@@ -1,13 +1,13 @@
 package com.fatpiggies.game.controller;
 
-import static com.fatpiggies.game.assets.TextureId.*;
+import static com.fatpiggies.game.view.TextureId.*;
 
 import com.badlogic.ashley.core.Engine;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.model.ecs.systems.move.*;
 
-import com.fatpiggies.game.assets.TextureId;
+import com.fatpiggies.game.view.TextureId;
 
 public class ClientPlayController implements IPlayController {
     private final IPlayActions actions;

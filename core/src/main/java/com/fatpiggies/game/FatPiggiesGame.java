@@ -12,7 +12,7 @@ import com.fatpiggies.game.audio.SoundsManager;
 import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
-import com.fatpiggies.game.assets.TextureManager;
+import com.fatpiggies.game.view.TextureManager;
 
 
 /**

@@ -6,5 +6,4 @@ public class TransformComponent implements Component {
     public float x;
     public float y;
     public float angle; // Degrees
-    public float scale;
 }
