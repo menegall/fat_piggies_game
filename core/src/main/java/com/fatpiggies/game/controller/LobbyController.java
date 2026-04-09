@@ -1,6 +1,7 @@
 package com.fatpiggies.game.controller;
 
 import com.badlogic.gdx.Gdx;
+import com.fatpiggies.game.controller.mainControllerInterfaces.ILobbyActions;
 import com.fatpiggies.game.model.LobbyModel;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
@@ -9,22 +10,21 @@ import com.fatpiggies.game.network.dto.PlayerSetup;
 import java.util.Map;
 
 public class LobbyController {
-    private final String playerId;
     private final DatabaseService dbs;
-    private final MainController main;
+    private final ILobbyActions actions;
     private final LobbyModel lobbyModel;
 
-    public LobbyController(MainController main, String playerId, DatabaseService dbs, LobbyModel lobbyModel) {
-        this.main = main;
+    public LobbyController(ILobbyActions actions, String playerId, DatabaseService dbs, LobbyModel lobbyModel) {
+        this.actions = actions;
         this.dbs = dbs;
-        this.playerId = playerId;
         this.lobbyModel = lobbyModel;
+        lobbyModel.setPlayerId(playerId);
     }
 
     public void hostLobby(String playerName) {
         lobbyModel.setIsHost(true);
 
-        dbs.createLobby(playerId, playerName, new DatabaseService.LobbyCallback() {
+        dbs.createLobby(lobbyModel.getPlayerId(), playerName, new DatabaseService.LobbyCallback() {
             @Override
             public void onSuccess(String lobbyId) {
                 Gdx.app.postRunnable(() -> {
@@ -35,7 +35,7 @@ public class LobbyController {
 
             @Override
             public void onError(NetworkError error, String errorMessage) {
-                showErrorInMainThread(errorMessage);
+                showError(errorMessage);
             }
         });
     }
@@ -43,20 +43,18 @@ public class LobbyController {
     public void joinLobby(String playerName, String lobbyCode) {
         lobbyModel.setIsHost(false);
 
-        dbs.joinLobby(lobbyCode, playerId, playerName, new DatabaseService.LobbyCallback() {
+        dbs.joinLobby(lobbyCode, lobbyModel.getPlayerId(), playerName, new DatabaseService.LobbyCallback() {
             @Override
             public void onSuccess(String lobbyId) {
                 Gdx.app.postRunnable(() -> {
-
                     lobbyModel.setLobbyId(lobbyId);
-
                     changeToLobbyState();
                 });
             }
 
             @Override
             public void onError(NetworkError error, String errorMessage) {
-                showErrorInMainThread(errorMessage);
+                showError(errorMessage);
             }
         });
     }
@@ -64,22 +62,21 @@ public class LobbyController {
     public void leaveLobby() {
         if (lobbyModel.getLobbyId() != null) {
             dbs.stopListening();
-            dbs.leaveLobby(lobbyModel.getLobbyId(), playerId);
+            dbs.leaveLobby(lobbyModel.getLobbyId(), lobbyModel.getPlayerId());
         }
-        main.gsm.setMenuState(main);
     }
 
     private void changeToLobbyState() {
+
         dbs.getLobbyCodeOnce(lobbyModel.getLobbyId(), new DatabaseService.CodeCallback() {
             @Override
             public void onCodeRetrieved(String code) {
-                Gdx.app.postRunnable(() -> {
-                    lobbyModel.setLobbyCode(code);
-                });
+                Gdx.app.postRunnable(() -> lobbyModel.setLobbyCode(code));
             }
 
             @Override
             public void onError(String errorMessage) {
+                showError(errorMessage);
             }
         });
 
@@ -91,33 +88,34 @@ public class LobbyController {
 
             @Override
             public void onError(NetworkError error, String errorMessage) {
+                showError(errorMessage);
             }
         });
-        if (!lobbyModel.getIsHost())
-            main.dbs.listenToLobbyStatus(lobbyModel.getLobbyId(), new DatabaseService.LobbyStatusCallback() {
+
+        if (!lobbyModel.getIsHost()) {
+            dbs.listenToLobbyStatus(lobbyModel.getLobbyId(), new DatabaseService.LobbyStatusCallback() {
                 @Override
                 public void onStatusUpdated(String status) {
                     Gdx.app.postRunnable(() -> {
                         if ("playing".equals(status)) {
-                            main.playController = new ClientPlayController(main, lobbyModel.getLobbyId());
-                            main.playController.startGame(lobbyModel.getLobbyId());
+                            actions.startClientGame(lobbyModel.getLobbyId());
                         } else if ("over".equals(status)) {
-                            main.playController.endGame(lobbyModel.getLobbyId());
+                            actions.endGame(lobbyModel.getLobbyId());
                         }
-
                     });
                 }
 
                 @Override
                 public void onError(NetworkError error, String errorMessage) {
-                    showErrorInMainThread(errorMessage);
+                    showError(errorMessage);
                 }
             });
+        }
 
-        main.gsm.setLobbyState(main, lobbyModel, lobbyModel.getIsHost());
+        actions.goToLobbyState(lobbyModel, lobbyModel.getIsHost());
     }
 
-    private void showErrorInMainThread(String message) {
-        Gdx.app.postRunnable(() -> main.gsm.showError(message));
+    private void showError(String message) {
+        Gdx.app.postRunnable(() -> actions.showError(message));
     }
 }

@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.fatpiggies.game.audio.SoundsManager;
-import com.fatpiggies.game.controller.IViewActions;
+import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.assets.TextureId;
 import com.fatpiggies.game.assets.TextureManager;
 
@@ -26,6 +26,7 @@ public class MenuState extends State {
     private TextButton hostButton;
     private final Texture menuBackground;
     private final Texture playBackground;
+    private String lastNameField;
 
     // Manage errors
     private Label errorLabel;
@@ -35,12 +36,11 @@ public class MenuState extends State {
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
 
-        createUI();
+        createUI("");
     }
 
-    private void createUI() {
-
-        nameField = new TextField("", skin);
+    private void createUI(String lastNameField) {
+        nameField = new TextField(lastNameField, skin);
         nameField.setMessageText("Name");
         nameField.addListener(new ChangeListener() {
             @Override
@@ -133,6 +133,9 @@ public class MenuState extends State {
             .padTop(screenHeight * 0.02f);
 
         stage.addActor(table);
+
+        updateJoinButton();
+        updateHostButton();
     }
 
     private void updateJoinButton() {
@@ -149,38 +152,20 @@ public class MenuState extends State {
     }
 
     private void onJoinClicked() {
-        String name = nameField.getText();
+        lastNameField = nameField.getText();
         String lobbyId = lobbyField.getText();
 
-        viewActions.onJoinLobbyClicked(name, lobbyId);
+        viewActions.onJoinLobbyClicked(lastNameField, lobbyId);
         Gdx.input.vibrate(200);
         SoundsManager.playButton(1f);
     }
 
     private void onHostClicked() {
-        String name = nameField.getText();
+        lastNameField = nameField.getText();
 
-        viewActions.onHostLobbyClicked(name);
+        viewActions.onHostLobbyClicked(lastNameField);
         Gdx.input.vibrate(200);
         SoundsManager.playButton(1f);
-    }
-
-    @Override
-    public void showError(String message) {
-        SoundsManager.playError(3f);
-        errorLabel.clearActions();
-        errorLabel.setText(message);
-        errorLabel.setVisible(true);
-        errorLabel.setFontScale(screenHeight * 0.002f);
-
-        float targetY = screenHeight * 0.93f;
-
-        errorLabel.addAction(Actions.sequence(
-            Actions.moveTo(screenWidth * 0.4f, targetY, 0.3f, Interpolation.swingIn),
-            Actions.delay(2f),
-            Actions.moveTo(screenWidth * 0.4f, -screenHeight, 0.1f, Interpolation.swingOut),
-            Actions.run(() -> errorLabel.setVisible(false))
-        ));
     }
 
     @Override
@@ -205,5 +190,30 @@ public class MenuState extends State {
         sb.end();
 
         stage.draw();  // draw UI
+    }
+
+    @Override
+    public void showError(String message) {
+        SoundsManager.playError(3f);
+        errorLabel.clearActions();
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+        errorLabel.setFontScale(screenHeight * 0.002f);
+
+        float targetY = screenHeight * 0.93f;
+
+        errorLabel.addAction(Actions.sequence(
+            Actions.moveTo(screenWidth * 0.4f, targetY, 0.3f, Interpolation.swingIn),
+            Actions.delay(2f),
+            Actions.moveTo(screenWidth * 0.4f, -screenHeight, 0.1f, Interpolation.swingOut),
+            Actions.run(() -> errorLabel.setVisible(false))
+        ));
+    }
+
+    @Override
+    public void show(){
+        super.show();
+        stage.clear();
+        createUI(lastNameField);
     }
 }

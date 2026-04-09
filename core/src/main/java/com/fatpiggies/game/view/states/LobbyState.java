@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.audio.SoundsManager;
-import com.fatpiggies.game.controller.IViewActions;
+import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.assets.TextureId;
 import com.fatpiggies.game.assets.TextureManager;
@@ -116,7 +116,7 @@ public class LobbyState extends State {
         stage.addActor(LobbyCodeLabel);
     }
 
-    // FOR NOW WITHOUT CONTROLLER
+    // Buttons
     private void onStartClicked() {
         viewActions.onStartClicked();
         Gdx.input.vibrate(200);
@@ -186,10 +186,5 @@ public class LobbyState extends State {
 
             playersTable.add(playerListLabel).row();
         }
-    }
-
-    @Override
-    public void showError(String message) {
-
     }
 }
