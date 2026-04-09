@@ -1,10 +1,11 @@
 package com.fatpiggies.game.controller;
 
+import static com.fatpiggies.game.utils.Config.SEND_THRESHOLD;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.fatpiggies.game.controller.mainControllerInterfaces.ILobbyActions;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
-import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.model.IReadOnlyGameWorld;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.model.LobbyModel;
@@ -21,6 +22,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     private final DatabaseService dbs;
     private final GameStateManager gsm;
     private boolean gameIsPlaying = false;
+    private float timer_network = 0;
 
     public MainController(AuthService auth, DatabaseService db) {
         this.auth = auth;
@@ -42,16 +44,23 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     public void update(SpriteBatch batch, float dt) {
         if (gameIsPlaying && playController != null) {
             playController.updateWorld(dt);
+            timer_network += dt;
+            if (timer_network >= SEND_THRESHOLD) {
+                playController.sendToServer(dbs, timer_network);
+                timer_network = 0;
+            }
         }
+
         gsm.render(batch, dt);
     }
+
 
     // ================= VIEW ACTIONS =================
 
     @Override
     public void onStartClicked() {
         playController = new HostPlayController(this, lobbyModel.getLobbyId());
-        playController.startGame(lobbyModel.getLobbyId());
+        playController.startGame(lobbyModel.getLobbyId(), dbs);
     }
 
     @Override
@@ -95,7 +104,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     @Override
     public void startClientGame(String lobbyId) {
         playController = new ClientPlayController(this, lobbyId);
-        playController.startGame(lobbyId);
+        playController.startGame(lobbyId, dbs);
     }
 
     @Override
@@ -103,6 +112,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         if (playController != null) {
             playController.endGame(lobbyId);
         }
+
     }
 
     @Override
@@ -135,6 +145,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     @Override
     public void setGameIsPlaying(boolean playing) {
         this.gameIsPlaying = playing;
+        if (!playing) timer_network = 0;
     }
 
     @Override
