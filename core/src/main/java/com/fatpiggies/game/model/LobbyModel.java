@@ -23,11 +23,6 @@ public class LobbyModel implements IReadOnlyLobbyModel {
         return lobbyCode;
     }
 
-
-    public String getPlayerId() {
-        return playerId;
-    }
-
     @Override
     public Array<String> getPlayerNames() {
         Array<String> playerNames = new Array<>();
@@ -42,6 +37,11 @@ public class LobbyModel implements IReadOnlyLobbyModel {
 
     public Map<String, PlayerSetup> getPlayersSetup() {
         return playersSetup;
+    }
+
+
+    public String getPlayerId() {
+        return playerId;
     }
 
     public boolean getIsHost() {return isHost;}

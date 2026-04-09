@@ -1,29 +1,23 @@
 package com.fatpiggies.game.controller;
 
-import static com.fatpiggies.game.assets.TextureId.BLUE_PIG;
-import static com.fatpiggies.game.assets.TextureId.GREEN_PIG;
-import static com.fatpiggies.game.assets.TextureId.RED_PIG;
-import static com.fatpiggies.game.assets.TextureId.YELLOW_PIG;
+import static com.fatpiggies.game.assets.TextureId.*;
 
 import com.badlogic.ashley.core.Engine;
+import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.model.GameWorld;
-import com.fatpiggies.game.model.ecs.systems.LifetimeSystem;
-import com.fatpiggies.game.model.ecs.systems.StatSystem;
-import com.fatpiggies.game.model.ecs.systems.collision.ArenaBoundsSystem;
-import com.fatpiggies.game.model.ecs.systems.collision.CollisionDetectionSystem;
-import com.fatpiggies.game.model.ecs.systems.collision.CollisionResolutionSystem;
-import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
-import com.fatpiggies.game.model.ecs.systems.move.RespawnSystem;
-import com.fatpiggies.game.network.dto.GameState;
+import com.fatpiggies.game.model.ecs.systems.*;
+import com.fatpiggies.game.model.ecs.systems.collision.*;
+import com.fatpiggies.game.model.ecs.systems.move.*;
+
 import com.fatpiggies.game.assets.TextureId;
 
 public class HostPlayController implements IPlayController {
-    private final MainController main;
+    private final IPlayActions actions;
     private Engine engine;
     private GameWorld world;
 
-    public HostPlayController(MainController main, String lobbyId) {
-        this.main = main;
+    public HostPlayController(IPlayActions actions, String lobbyId) {
+        this.actions = actions;
 
         engine = new Engine();
 
@@ -41,46 +35,46 @@ public class HostPlayController implements IPlayController {
 
     @Override
     public void startGame(String lobbyId) {
-        main.dbs.startGame(lobbyId);
-        // create entities in gameworld
+        actions.startGameOnServer(lobbyId);
+
         TextureId[] textures = {BLUE_PIG, GREEN_PIG, RED_PIG, YELLOW_PIG};
         int count = 0;
-        for (String playerId : main.lobbyModel.getPlayersSetup().keySet()) {
+
+        for (String playerId : actions.getLobbyModel().getPlayersSetup().keySet()) {
             if (count < textures.length) {
                 world.createHostPig(playerId, textures[count++]);
             }
         }
-        main.gsm.setPlayState(main, world);
-        main.setGameIsPlaying(true);
+
+        actions.goToPlayState(world);
+        actions.setGameIsPlaying(true);
     }
 
     @Override
     public void endGame(String lobbyId) {
-        main.setGameIsPlaying(false);
-        main.dbs.endGame(lobbyId);
-        // TODO: determine winner
-        main.gsm.setOverState(main, main.lobbyModel, true); // it is the host controller
-        // Clean up the Ashley engine and World
+        actions.setGameIsPlaying(false);
+        actions.endGameOnServer(lobbyId);
+
+        actions.goToGameOverState(true);
+
         world.cleanUpWorld();
         engine = null;
         world = null;
-        // Destroy this controller
-        main.playController = null;
+
+        actions.clearPlayController();
     }
 
     @Override
     public void updateWorld(float dt) {
         world.update(dt);
+
         if (world.isThePlayFinish()) {
-            endGame(main.lobbyModel.getLobbyId());
+            endGame(actions.getLobbyModel().getLobbyId());
         }
-        ;
     }
 
     @Override
     public void updatePlayerInput(float x, float y) {
         world.updatePlayerInput(x, y);
     }
-
-
 }

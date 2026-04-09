@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.audio.SoundsManager;
-import com.fatpiggies.game.controller.IViewActions;
+import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.view.Animation;
 import com.fatpiggies.game.assets.TextureId;
@@ -111,7 +111,9 @@ public class OverState extends State {
 
     // FOR NOW WITHOUT CONTROLLER
     private void onLobbyClicked() {
-        // TODO: add this feature
+        viewActions.onLobbyClicked();
+        Gdx.input.vibrate(200);
+        SoundsManager.playButton(1f);
     }
 
     private void onLeaveClicked() {
@@ -216,12 +218,4 @@ public class OverState extends State {
 
         stage.draw();
     }
-
-
-    @Override
-    public void showError(String message) {
-
-    }
-
-
 }

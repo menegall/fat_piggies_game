@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.fatpiggies.game.audio.SoundsManager;
-import com.fatpiggies.game.controller.IViewActions;
+import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.assets.TextureId;
 import com.fatpiggies.game.assets.TextureManager;
 
@@ -24,10 +24,9 @@ public class MenuState extends State {
 
     private TextButton joinButton;
     private TextButton hostButton;
-
-    private Texture logo;
     private final Texture menuBackground;
     private final Texture playBackground;
+    private String lastNameField;
 
     // Manage errors
     private Label errorLabel;
@@ -37,21 +36,12 @@ public class MenuState extends State {
         menuBackground = TextureManager.getTexture(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getTexture(TextureId.PLAY_BACKGROUND);
 
-        createUI();
+        createUI("");
     }
 
-    private void createUI() {
-
-        nameField = new TextField("", skin);
+    private void createUI(String lastNameField) {
+        nameField = new TextField(lastNameField, skin);
         nameField.setMessageText("Name");
-
-        lobbyField = new TextField("", skin);
-        lobbyField.setMessageText("Code");
-
-        // Join button
-        joinButton = new TextButton("Join", skin);
-        joinButton.getLabel().setFontScale(screenHeight*0.0015f);
-        joinButton.setDisabled(true);
         nameField.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -60,6 +50,19 @@ public class MenuState extends State {
             }
         });
 
+        lobbyField = new TextField("", skin);
+        lobbyField.setMessageText("Code");
+        lobbyField.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                updateJoinButton();
+            }
+        });
+
+        // Join button
+        joinButton = new TextButton("Join", skin);
+        joinButton.getLabel().setFontScale(screenHeight * 0.0015f);
+        joinButton.setDisabled(true);
         joinButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -69,15 +72,8 @@ public class MenuState extends State {
 
         // Host button
         hostButton = new TextButton("Host", skin);
-        hostButton.getLabel().setFontScale(screenHeight*0.0015f);
+        hostButton.getLabel().setFontScale(screenHeight * 0.0015f);
         hostButton.setDisabled(true);
-        lobbyField.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                updateJoinButton();
-            }
-        });
-
         hostButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -93,50 +89,53 @@ public class MenuState extends State {
 
         // Initial position out of window
         errorLabel.setPosition(
-            screenWidth*0.4f,
+            screenWidth * 0.4f,
             -screenHeight
         );
-        errorLabel.setSize(screenWidth*0.2f, screenHeight*0.05f);
+        errorLabel.setSize(screenWidth * 0.2f, screenHeight * 0.05f);
 
         stage.addActor(errorLabel);
 
         Table table = new Table();
         table.setFillParent(true);
 
-        table.defaults().pad(screenHeight*0.00f);
+        table.defaults().pad(screenHeight * 0.00f);
 
         Label nameLabel = new Label("Name", skin);
-        nameLabel.setFontScale(screenHeight*0.0015f);
+        nameLabel.setFontScale(screenHeight * 0.0015f);
         table.add(nameLabel).left();
         table.add(nameField)
-            .width(screenWidth*0.18f)
-            .height(screenHeight*0.18f)
-            .padTop(screenHeight*0.015f)
+            .width(screenWidth * 0.18f)
+            .height(screenHeight * 0.18f)
+            .padTop(screenHeight * 0.015f)
             .row();
 
         Label lobbyCodeLabel = new Label("Lobby", skin);
-        lobbyCodeLabel.setFontScale(screenHeight*0.0015f);
+        lobbyCodeLabel.setFontScale(screenHeight * 0.0015f);
         table.add(lobbyCodeLabel).left();
         table.add(lobbyField)
-            .width(screenWidth*0.18f)
-            .height(screenHeight*0.18f)
-            .padTop(screenHeight*0.015f)
+            .width(screenWidth * 0.18f)
+            .height(screenHeight * 0.18f)
+            .padTop(screenHeight * 0.015f)
             .row();
 
         table.add(joinButton)
-            .width(screenWidth*0.2f)
-            .height(screenHeight*0.12f)
+            .width(screenWidth * 0.2f)
+            .height(screenHeight * 0.12f)
             .colspan(2)
-            .padTop(screenHeight*0.02f)
+            .padTop(screenHeight * 0.02f)
             .row();
 
         table.add(hostButton)
-            .width(screenWidth*0.2f)
-            .height(screenHeight*0.12f)
+            .width(screenWidth * 0.2f)
+            .height(screenHeight * 0.12f)
             .colspan(2)
-            .padTop(screenHeight*0.02f);
+            .padTop(screenHeight * 0.02f);
 
         stage.addActor(table);
+
+        updateJoinButton();
+        updateHostButton();
     }
 
     private void updateJoinButton() {
@@ -153,41 +152,24 @@ public class MenuState extends State {
     }
 
     private void onJoinClicked() {
-        String name = nameField.getText();
+        lastNameField = nameField.getText();
         String lobbyId = lobbyField.getText();
 
-        viewActions.onJoinLobbyClicked(name, lobbyId);
+        viewActions.onJoinLobbyClicked(lastNameField, lobbyId);
         Gdx.input.vibrate(200);
         SoundsManager.playButton(1f);
     }
 
     private void onHostClicked() {
-        String name = nameField.getText();
+        lastNameField = nameField.getText();
 
-        viewActions.onHostLobbyClicked(name);
+        viewActions.onHostLobbyClicked(lastNameField);
         Gdx.input.vibrate(200);
         SoundsManager.playButton(1f);
     }
 
     @Override
-    public void showError(String message) {
-        errorLabel.clearActions();
-        errorLabel.setText(message);
-        errorLabel.setVisible(true);
-        errorLabel.setFontScale(screenHeight*0.002f);
-
-        float targetY = screenHeight * 0.93f;
-
-        errorLabel.addAction(Actions.sequence(
-            Actions.moveTo(screenWidth*0.4f, targetY, 0.5f, Interpolation.swingIn),
-            Actions.delay(2.5f),
-            Actions.moveTo(screenWidth*0.4f, -screenHeight, 0.1f, Interpolation.swingOut),
-            Actions.run(() -> errorLabel.setVisible(false))
-        ));
-    }
-
-    @Override
-    public void update(float dt){
+    public void update(float dt) {
         stage.act(dt);   // update UI
     }
 
@@ -200,13 +182,38 @@ public class MenuState extends State {
 
         float size = Math.min(screenWidth, screenHeight) * 0.79f;
 
-        float x = (screenWidth - size)*0.5f;
-        float y = (screenHeight - size)*0.5f;
+        float x = (screenWidth - size) * 0.5f;
+        float y = (screenHeight - size) * 0.5f;
 
         sb.draw(playBackground, 0, 0, screenWidth, screenHeight);
         sb.draw(menuBackground, x, y, size, size);
         sb.end();
 
         stage.draw();  // draw UI
+    }
+
+    @Override
+    public void showError(String message) {
+        SoundsManager.playError(3f);
+        errorLabel.clearActions();
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+        errorLabel.setFontScale(screenHeight * 0.002f);
+
+        float targetY = screenHeight * 0.93f;
+
+        errorLabel.addAction(Actions.sequence(
+            Actions.moveTo(screenWidth * 0.4f, targetY, 0.3f, Interpolation.swingIn),
+            Actions.delay(2f),
+            Actions.moveTo(screenWidth * 0.4f, -screenHeight, 0.1f, Interpolation.swingOut),
+            Actions.run(() -> errorLabel.setVisible(false))
+        ));
+    }
+
+    @Override
+    public void show(){
+        super.show();
+        stage.clear();
+        createUI(lastNameField);
     }
 }

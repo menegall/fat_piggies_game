@@ -22,7 +22,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
     AuthService authService;
     DatabaseService databaseService;
     private SpriteBatch batch;
-    private MainController mc;
+    private MainController main;
 
     public FatPiggiesGame(AuthService authService, DatabaseService databaseService) {
         this.authService = authService;
@@ -55,7 +55,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
 
         // To draw
         batch = new SpriteBatch();
-        mc = new MainController(authService, databaseService);
+        main = new MainController(authService, databaseService);
 
     }
 
@@ -65,7 +65,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
         // FOR TESTING
-        mc.update(batch, dt);
+        main.update(batch, dt);
     }
 
     @Override
