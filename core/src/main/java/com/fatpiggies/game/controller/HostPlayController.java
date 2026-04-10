@@ -5,6 +5,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.model.GameWorld;
+import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
+import com.fatpiggies.game.model.ecs.components.network.NetworkIdentityComponent;
 import com.fatpiggies.game.model.ecs.systems.LifetimeSystem;
 import com.fatpiggies.game.model.ecs.systems.StatSystem;
 import com.fatpiggies.game.model.ecs.systems.collision.ArenaBoundsSystem;
@@ -20,14 +22,25 @@ import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class HostPlayController implements IPlayController {
 
     private final IPlayActions actions;
-    private final Map<String, Float> lastInputTimestamps = new HashMap<>();
     private final GameState gameState = new GameState();
+
+    private final Map<String, Float> remoteInputFreshness = new HashMap<>();
+    private static final float INPUT_TIMEOUT = 0.2f;
+
+    // 🔥 INPUT DELAY SYSTEM
+    private static class BufferedInput {
+        String playerId;
+        PlayerInput input;
+        float timestamp;
+    }
+
+    private final List<BufferedInput> inputBuffer = new ArrayList<>();
+    private static final float INPUT_DELAY = 0.1f;
 
     private Engine engine;
     private GameWorld world;
@@ -61,6 +74,8 @@ public class HostPlayController implements IPlayController {
     public void startGame(DatabaseService db) {
         this.db = db;
         gameRunning = true;
+        remoteInputFreshness.clear();
+        inputBuffer.clear();
 
         String currentUser = actions.getCurrentUserId();
         Map<String, PlayerSetup> playerSetups = actions.getLobbyModel().getPlayerSetups();
@@ -72,12 +87,12 @@ public class HostPlayController implements IPlayController {
             PlayerSetup setup = entry.getValue();
 
             TextureId texture = TextureManager.getPigTexture(setup.color);
-
             Entity pig = world.createHostPig(playerId, texture);
 
-            // On définit explicitement le joueur local du host
             if (playerId.equals(currentUser)) {
                 world.setLocalPlayer(pig);
+            } else {
+                remoteInputFreshness.put(playerId, 0f);
             }
         }
 
@@ -94,12 +109,47 @@ public class HostPlayController implements IPlayController {
 
         engine = null;
         world = null;
-        lastInputTimestamps.clear();
+        remoteInputFreshness.clear();
+        inputBuffer.clear();
     }
 
     @Override
     public void updateWorld(float dt) {
         if (!gameRunning || world == null) return;
+
+        String currentUser = actions.getCurrentUserId();
+
+        // Apply delay
+        float currentTime = gameState.ts;
+
+        Iterator<BufferedInput> it = inputBuffer.iterator();
+        while (it.hasNext()) {
+            BufferedInput bi = it.next();
+
+            if ((currentTime - bi.timestamp) >= INPUT_DELAY) {
+                world.applyRemoteInput(bi.playerId, bi.input);
+                it.remove();
+            }
+        }
+
+        for (Entity entity : engine.getEntities()) {
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+            PlayerInputComponent inputComp = entity.getComponent(PlayerInputComponent.class);
+
+            if (netId == null || inputComp == null || netId.playerId == null) continue;
+
+            if (netId.playerId.equals(currentUser)) continue;
+
+            float remaining = remoteInputFreshness.getOrDefault(netId.playerId, 0f) - dt;
+
+            if (remaining <= 0f) {
+                remaining = 0f;
+                inputComp.joystickPercentageX = 0f;
+                inputComp.joystickPercentageY = 0f;
+            }
+
+            remoteInputFreshness.put(netId.playerId, remaining);
+        }
 
         world.update(dt);
 
@@ -131,26 +181,26 @@ public class HostPlayController implements IPlayController {
             @Override
             public void onInputsReceived(Map<String, PlayerInput> inputs) {
                 Gdx.app.postRunnable(() -> {
-                    if (!gameRunning || world == null) return;
+                    if (!gameRunning || world == null || inputs == null) return;
 
                     String currentUser = actions.getCurrentUserId();
 
                     for (Map.Entry<String, PlayerInput> entry : inputs.entrySet()) {
                         String playerId = entry.getKey();
-                        PlayerInput input = entry.getValue();
+                        PlayerInput playerInput = entry.getValue();
 
-                        if (playerId == null || input == null) continue;
+                        if (playerId == null || playerInput == null) continue;
 
-                        // ❗ ne jamais appliquer l’input réseau du host sur lui-même
                         if (playerId.equals(currentUser)) continue;
+                        BufferedInput bi = new BufferedInput();
+                        bi.playerId = playerId;
+                        bi.input = playerInput;
+                        bi.timestamp = gameState.ts;
 
-                        float lastTs = lastInputTimestamps.getOrDefault(playerId, -1f);
+                        inputBuffer.add(bi);
 
-                        // ✅ tolérance pour éviter freeze réseau
-                        if (input.ts > lastTs || lastTs == -1f) {
-                            lastInputTimestamps.put(playerId, input.ts);
-                            world.applyRemoteInput(playerId, input);
-                        }
+                        // refresh timeout
+                        remoteInputFreshness.put(playerId, INPUT_TIMEOUT);
                     }
                 });
             }

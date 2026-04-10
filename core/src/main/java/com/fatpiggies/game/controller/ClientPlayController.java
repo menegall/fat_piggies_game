@@ -20,29 +20,42 @@ import java.util.Map;
 public class ClientPlayController implements IPlayController {
 
     private final IPlayActions actions;
+
     private Engine engine;
     private GameWorld world;
+
     private final PlayerInput input = new PlayerInput();
+
     private float lastStateTimestamp = 0f;
     private boolean gameRunning = false;
+    private boolean firstStateReceived = false;
 
     private DatabaseService db;
+
+    private float sendTimer = 0f;
+    private float lastSendTime = 0f;
+
+    private static final float SEND_RATE = 1f / 20f; // 20 Hz
+    private static final float KEEP_ALIVE = 0.2f;    // 200 ms
+    private static final float DEADZONE = 0.02f;
 
     public ClientPlayController(IPlayActions actions, String lobbyId) {
         this.actions = actions;
 
         engine = new Engine();
 
+        engine.addSystem(new MovementSystem());
         engine.addSystem(new NetworkReconciliationSystem());
         engine.addSystem(new NetworkLerpSystem());
-        engine.addSystem(new MovementSystem());
 
         world = new GameWorld(engine);
         world.setLobbyId(lobbyId);
     }
 
     @Override
-    public GameWorld getWorld() { return world;}
+    public GameWorld getWorld() {
+        return world;
+    }
 
     @Override
     public void startGame(DatabaseService db) {
@@ -50,6 +63,14 @@ public class ClientPlayController implements IPlayController {
 
         gameRunning = true;
         lastStateTimestamp = 0f;
+        firstStateReceived = false;
+        sendTimer = 0f;
+        lastSendTime = 0f;
+
+        // To not have old inputs
+        input.jx = 0f;
+        input.jy = 0f;
+        input.ts = 0f;
 
         String currentUser = actions.getCurrentUserId();
 
@@ -81,31 +102,55 @@ public class ClientPlayController implements IPlayController {
 
         engine = null;
         world = null;
-        lastStateTimestamp = 0f;
     }
 
     @Override
     public void updateWorld(float dt) {
-        if (world != null) {
-            world.update(dt);
+        if (!gameRunning || world == null) {
+            return;
         }
+
+        world.update(dt);
     }
 
     @Override
     public void updatePlayerInput(float x, float y) {
-        if (world != null) {
-            world.updateLocalPlayerInput(x, y);
+        if (world == null) {
+            return;
         }
+
+        if (Math.abs(x) < DEADZONE) {
+            x = 0f;
+        }
+        if (Math.abs(y) < DEADZONE) {
+            y = 0f;
+        }
+
+        world.updateLocalPlayerInput(x, y);
     }
 
     @Override
-    public void sendToServer(DatabaseService db, float timerNetwork) {
-        if (!gameRunning || world == null) return;
+    public void sendToServer(DatabaseService db, float dt) {
+        if (!gameRunning || world == null) {
+            return;
+        }
 
-        input.ts += timerNetwork;
+        sendTimer += dt;
+        if (sendTimer < SEND_RATE) {
+            return;
+        }
+        sendTimer = 0f;
+
         world.populatePlayerInput(input);
 
-        db.pushPlayerInput(world.getLobbyId(), actions.getCurrentUserId(), input);
+        boolean isMoving = Math.abs(input.jx) > 0.001f || Math.abs(input.jy) > 0.001f;
+        boolean keepAlive = (input.ts - lastSendTime) >= KEEP_ALIVE;
+
+        if (isMoving || keepAlive) {
+            input.ts += SEND_RATE;
+            db.pushPlayerInput(world.getLobbyId(), actions.getCurrentUserId(), input);
+            lastSendTime = input.ts;
+        }
     }
 
     private void attachPlayListener() {
@@ -114,15 +159,19 @@ public class ClientPlayController implements IPlayController {
             @Override
             public void onDataReceived(GameState data) {
                 Gdx.app.postRunnable(() -> {
+                    if (!gameRunning || world == null || data == null) {
+                        return;
+                    }
 
-                    // Safety check
-                    if (!gameRunning || world == null) return;
-
-                    if (data != null && data.ts >= lastStateTimestamp) {
-
+                    if (data.ts > lastStateTimestamp) {
                         lastStateTimestamp = data.ts;
 
-                        world.applyGameState(data);
+                        if (!firstStateReceived) {
+                            firstStateReceived = true;
+                            world.applyGameStateInstant(data);
+                        } else {
+                            world.applyGameState(data);
+                        }
                     }
                 });
             }

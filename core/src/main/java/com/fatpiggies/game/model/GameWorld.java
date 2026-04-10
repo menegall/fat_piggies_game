@@ -161,22 +161,19 @@ public class GameWorld implements IReadOnlyGameWorld {
         PlayerInputComponent input = new PlayerInputComponent();
         input.multiplier = 1;
 
-        NetworkSyncComponent sync = new NetworkSyncComponent();
-
         RenderComponent render = new RenderComponent();
         render.textureId = textureId;
         render.width = PIG_WIDTH;
         render.height = PIG_HEIGHT;
         render.angleOffset = PIG_ANGLE_OFFSET;
 
+        // No network sync
         entity.add(netId).add(transform).add(health)
-            .add(input).add(sync).add(render);
+            .add(input).add(render);
 
-        if (localPlayer == null) {
-            localPlayer = entity;
-        }
+        localPlayer = entity;
 
-        this.engine.addEntity(entity);
+        engine.addEntity(entity);
     }
 
     /**
@@ -539,41 +536,70 @@ public class GameWorld implements IReadOnlyGameWorld {
     public void applyGameState(GameState state) {
         if (state == null) return;
 
-        // We iterate through all existing entities to find the players
         for (Entity entity : engine.getEntities()) {
             NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
 
-            if (netId != null && netId.playerId != null) {
-                PlayerData pd = state.players.get(netId.playerId);
+            if (netId == null || netId.playerId == null) continue;
 
-                if (pd != null) {
-                    NetworkSyncComponent sync = entity.getComponent(NetworkSyncComponent.class);
-                    HealthComponent health = entity.getComponent(HealthComponent.class);
+            PlayerData pd = state.players.get(netId.playerId);
+            if (pd == null) continue;
 
-                    if (sync != null) {
-                        sync.targetX = pd.x;
-                        sync.targetY = pd.y;
+            TransformComponent transform = entity.getComponent(TransformComponent.class);
+            NetworkSyncComponent sync = entity.getComponent(NetworkSyncComponent.class);
+            HealthComponent health = entity.getComponent(HealthComponent.class);
+
+            // ✅ SYNC HP (TOUJOURS)
+            if (health != null) {
+                health.currentLife = pd.hp;
+            }
+
+            // --- LOCAL PLAYER ---
+            if (entity == localPlayer) {
+
+                if (transform != null) {
+
+                    float dx = pd.x - transform.x;
+                    float dy = pd.y - transform.y;
+
+                    float dist2 = dx * dx + dy * dy;
+
+                    float SNAP_THRESHOLD = 4f;
+                    float DEADZONE = 0.0005f;
+
+                    if (dist2 < DEADZONE) continue;
+
+                    if (dist2 > SNAP_THRESHOLD) {
+                        transform.x = pd.x;
+                        transform.y = pd.y;
                     }
+                    else {
+                        float dist = (float)Math.sqrt(dist2);
+                        float factor = Math.min(0.15f, dist * 0.08f);
 
-                    // Sync health
-                    if (health != null) {
-                        health.currentLife = pd.hp;
+                        transform.x += dx * factor;
+                        transform.y += dy * factor;
                     }
+                }
+
+            }
+            // --- REMOTE PLAYERS ---
+            else {
+                if (sync != null) {
+                    sync.targetX = pd.x;
+                    sync.targetY = pd.y;
                 }
             }
         }
 
-        // Remove powerups that were collected on the Host (they no longer exist in the state)
+        // --- CLEAN POWERUPS ---
         clientRemotePowerups.entrySet().removeIf(entry -> {
             if (!state.powerups.containsKey(entry.getKey())) {
-                // The powerup is gone from the Host's state, destroy it locally
                 engine.removeEntity(entry.getValue());
-                return true; // Remove from the tracking map
+                return true;
             }
             return false;
         });
 
-        // Spawn new powerups or update existing ones
         for (Map.Entry<String, PowerupData> entry : state.powerups.entrySet()) {
             String powerupId = entry.getKey();
             PowerupData puData = entry.getValue();
@@ -581,12 +607,9 @@ public class GameWorld implements IReadOnlyGameWorld {
             Entity localPu = clientRemotePowerups.get(powerupId);
 
             if (localPu == null) {
-                // A new powerup has appeared! Create a "dumb" visual entity for the Client.
                 localPu = createVisualPowerupForClient(puData);
                 clientRemotePowerups.put(powerupId, localPu);
             } else {
-                // The powerup already exists. Usually, powerups don't move,
-                // but just in case, we sync its position.
                 TransformComponent transform = localPu.getComponent(TransformComponent.class);
                 if (transform != null) {
                     transform.x = puData.x;
@@ -595,4 +618,28 @@ public class GameWorld implements IReadOnlyGameWorld {
             }
         }
     }
-}
+
+    public void applyGameStateInstant(GameState state) {
+        if (state == null) return;
+
+        for (Entity entity : engine.getEntities()) {
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+
+            if (netId == null || netId.playerId == null) continue;
+
+            PlayerData pd = state.players.get(netId.playerId);
+            if (pd == null) continue;
+
+            TransformComponent transform = entity.getComponent(TransformComponent.class);
+            HealthComponent health = entity.getComponent(HealthComponent.class);
+
+            if (transform != null) {
+                transform.x = pd.x;
+                transform.y = pd.y;
+            }
+
+            if (health != null) {
+                health.currentLife = pd.hp;
+            }
+        }
+    }}
