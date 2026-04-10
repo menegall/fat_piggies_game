@@ -2,6 +2,7 @@ package com.fatpiggies.game.model;
 
 import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.network.dto.PlayerSetup;
+import com.fatpiggies.game.view.PlayerColor;
 
 import java.util.Map;
 
@@ -10,4 +11,6 @@ public interface IReadOnlyLobbyModel {
     String getLobbyId();
     String getLobbyCode();
     Array<String> getPlayerNames();
+    Array<PlayerColor> getPlayerColors();
+    Map<String, PlayerSetup> getPlayerSetups();
 }

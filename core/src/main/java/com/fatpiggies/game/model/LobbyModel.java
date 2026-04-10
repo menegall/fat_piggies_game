@@ -2,6 +2,7 @@ package com.fatpiggies.game.model;
 
 import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.network.dto.PlayerSetup;
+import com.fatpiggies.game.view.PlayerColor;
 
 import java.util.Map;
 
@@ -11,7 +12,7 @@ public class LobbyModel implements IReadOnlyLobbyModel {
     private String lobbyId;
     private String lobbyCode;
     private String playerId;
-    private Map<String, PlayerSetup> playersSetup;
+    private Map<String, PlayerSetup> playerSetups;
 
     @Override
     public String getLobbyId() {
@@ -26,8 +27,8 @@ public class LobbyModel implements IReadOnlyLobbyModel {
     @Override
     public Array<String> getPlayerNames() {
         Array<String> playerNames = new Array<>();
-        if(playersSetup != null) {
-            playersSetup.forEach((id, setup) -> {
+        if(playerSetups != null) {
+            playerSetups.forEach((id, setup) -> {
                     playerNames.add(setup.name);
                 }
             );
@@ -35,8 +36,21 @@ public class LobbyModel implements IReadOnlyLobbyModel {
         return playerNames;
     }
 
-    public Map<String, PlayerSetup> getPlayersSetup() {
-        return playersSetup;
+    @Override
+    public Array<PlayerColor> getPlayerColors() {
+        Array<PlayerColor> playerColors = new Array<>();
+
+        if (playerSetups != null) {
+            playerSetups.forEach((id, setup) -> {
+                playerColors.add(setup.color);
+            });
+        }
+
+        return playerColors;
+    }
+
+    public Map<String, PlayerSetup> getPlayerSetups() {
+        return playerSetups;
     }
 
 
@@ -64,6 +78,6 @@ public class LobbyModel implements IReadOnlyLobbyModel {
     }
 
     public void setPlayersSetup(Map<String, PlayerSetup> playersSetup) {
-        this.playersSetup = playersSetup;
+        this.playerSetups = playersSetup;
     }
 }

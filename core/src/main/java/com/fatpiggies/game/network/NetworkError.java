@@ -14,6 +14,7 @@ public enum NetworkError {
     LOBBY_FULL,             // Lobby is full
     LOBBY_ALREADY_STARTED,  // The game for the provided lobby is started
     NAME_ALREADY_EXIST,     // Name already exist
+    COLOR_ALREADY_TAKEN,    // Color already exist
     DATABASE_ERROR,         // Database error
 }
 

@@ -149,6 +149,102 @@ public class TextureManager {
         return getFrame(id);
     }
 
+    public static TextureId getLifeTextureId(TextureId textureId) {
+        if (textureId == null) return TextureId.LIFE_BLUE_PIG;
+
+        switch (textureId) {
+            case BLUE_PIG:
+                return TextureId.LIFE_BLUE_PIG;
+            case RED_PIG:
+                return TextureId.LIFE_RED_PIG;
+            case GREEN_PIG:
+                return TextureId.LIFE_GREEN_PIG;
+            case YELLOW_PIG:
+                return TextureId.LIFE_YELLOW_PIG;
+            default:
+                return TextureId.LIFE_BLUE_PIG;
+        }
+    }
+
+    public static TextureId getOverTextureId(TextureId textureId) {
+        if (textureId == null) return TextureId.OVER_BLUE_PIG;
+
+        switch (textureId) {
+            case BLUE_PIG:
+                return TextureId.OVER_BLUE_PIG;
+            case RED_PIG:
+                return TextureId.OVER_RED_PIG;
+            case GREEN_PIG:
+                return TextureId.OVER_GREEN_PIG;
+            case YELLOW_PIG:
+                return TextureId.OVER_YELLOW_PIG;
+            default:
+                return TextureId.OVER_BLUE_PIG;
+        }
+    }
+
+    public static TextureId getPigTexture(PlayerColor color) {
+        if (color == null) return TextureId.BLUE_PIG;
+
+        switch (color) {
+            case BLUE:
+                return TextureId.BLUE_PIG;
+            case RED:
+                return TextureId.RED_PIG;
+            case GREEN:
+                return TextureId.GREEN_PIG;
+            case YELLOW:
+                return TextureId.YELLOW_PIG;
+            default:
+                return TextureId.BLUE_PIG;
+        }
+    }
+
+    public static PlayerColor getColorFromTexture(TextureId textureId) {
+        if (textureId == null) return PlayerColor.BLUE;
+
+        switch (textureId) {
+            case BLUE_PIG:
+            case LIFE_BLUE_PIG:
+            case OVER_BLUE_PIG:
+                return PlayerColor.BLUE;
+
+            case RED_PIG:
+            case LIFE_RED_PIG:
+            case OVER_RED_PIG:
+                return PlayerColor.RED;
+
+            case GREEN_PIG:
+            case LIFE_GREEN_PIG:
+            case OVER_GREEN_PIG:
+                return PlayerColor.GREEN;
+
+            case YELLOW_PIG:
+            case LIFE_YELLOW_PIG:
+            case OVER_YELLOW_PIG:
+                return PlayerColor.YELLOW;
+
+            default:
+                return PlayerColor.BLUE;
+        }
+    }
+
+    public static TextureId nextPig(TextureId current) {
+        if (current == null) return TextureId.OVER_BLUE_PIG;
+
+        switch (current) {
+            case OVER_BLUE_PIG:
+                return TextureId.OVER_GREEN_PIG;
+            case OVER_GREEN_PIG:
+                return TextureId.OVER_RED_PIG;
+            case OVER_RED_PIG:
+                return TextureId.OVER_YELLOW_PIG;
+            case OVER_YELLOW_PIG:
+                return TextureId.OVER_BLUE_PIG;
+            default:
+                return TextureId.OVER_BLUE_PIG;
+        }
+    }
 //    public static Texture getTexture(TextureId id) {
 //        Texture texture = textures.get(id);
 //
@@ -176,7 +272,7 @@ public class TextureManager {
         skin = new Skin();
 
         BitmapFont font = new BitmapFont(Gdx.files.internal("uiAssets/font_35.fnt"));
-        font.getData().setScale(getScreenWidth()*0.0006f);
+        font.getData().setScale(getScreenHeight()*0.0018f);
 
         skin.add("default-font", font);
         skin.add("white", Color.WHITE);
@@ -206,7 +302,7 @@ public class TextureManager {
         Texture textfieldTexture = new Texture(Gdx.files.internal("uiAssets/textfield.png"));
         Texture cursorTexture = new Texture(Gdx.files.internal("uiAssets/cursor.png"));
         TextureRegionDrawable textfieldDrawable = new TextureRegionDrawable(new TextureRegion(textfieldTexture));
-        TextureRegionDrawable cursorDrawable = new TextureRegionDrawable(new TextureRegion(cursorTexture));
+        NinePatchDrawable cursorDrawable = new NinePatchDrawable(new NinePatch(cursorTexture, 2, 2, 2, 2));
 
         TextField.TextFieldStyle textFieldStyle = new TextField.TextFieldStyle();
         textFieldStyle.font = font;
@@ -220,8 +316,6 @@ public class TextureManager {
         textFieldStyle.background.setRightWidth(getScreenWidth()*0.04f);
         textFieldStyle.background.setTopHeight(getScreenHeight()*0.02f);
         textFieldStyle.background.setBottomHeight(getScreenHeight()*0.03f);
-
-        textFieldStyle.cursor.setMinSize(getScreenWidth()*0.04f, getScreenHeight()*0.02f);
 
         // --- JOYSTICK ---
         Texture joystickBg = new Texture(Gdx.files.internal("uiAssets/joystick_bg.png"));
@@ -248,6 +342,12 @@ public class TextureManager {
         TextureRegionDrawable musicOnDrawable = new TextureRegionDrawable(new TextureRegion(musicOn));
         TextureRegionDrawable musicOffDrawable = new TextureRegionDrawable(new TextureRegion(musicOff));
 
+        musicOnDrawable.setMinWidth(getScreenWidth() * 0.06f);
+        musicOnDrawable.setMinHeight(getScreenWidth() * 0.06f);
+        musicOffDrawable.setMinWidth(getScreenWidth() * 0.06f);
+        musicOffDrawable.setMinHeight(getScreenWidth() * 0.06f);
+
+
         CheckBox.CheckBoxStyle musicStyle = new CheckBox.CheckBoxStyle();
         musicStyle.checkboxOff = musicOnDrawable;   // ON
         musicStyle.checkboxOn = musicOffDrawable;  // OFF
@@ -263,6 +363,11 @@ public class TextureManager {
         TextureRegionDrawable soundOnDrawable = new TextureRegionDrawable(new TextureRegion(soundOn));
         TextureRegionDrawable soundOffDrawable = new TextureRegionDrawable(new TextureRegion(soundOff));
 
+        soundOnDrawable.setMinWidth(getScreenWidth() * 0.06f);
+        soundOnDrawable.setMinHeight(getScreenWidth() * 0.06f);
+        soundOffDrawable.setMinWidth(getScreenWidth() * 0.06f);
+        soundOffDrawable.setMinHeight(getScreenWidth() * 0.06f);
+
         CheckBox.CheckBoxStyle soundStyle = new CheckBox.CheckBoxStyle();
         soundStyle.checkboxOff = soundOnDrawable;
         soundStyle.checkboxOn = soundOffDrawable;
@@ -277,6 +382,11 @@ public class TextureManager {
 
         TextureRegionDrawable vibrationOnDrawable = new TextureRegionDrawable(new TextureRegion(vibrationOn));
         TextureRegionDrawable vibrationOffDrawable = new TextureRegionDrawable(new TextureRegion(vibrationOff));
+
+        vibrationOnDrawable.setMinWidth(getScreenWidth() * 0.06f);
+        vibrationOnDrawable.setMinHeight(getScreenWidth() * 0.06f);
+        vibrationOffDrawable.setMinWidth(getScreenWidth() * 0.06f);
+        vibrationOffDrawable.setMinHeight(getScreenWidth() * 0.06f);
 
         CheckBox.CheckBoxStyle vibrationStyle = new CheckBox.CheckBoxStyle();
         vibrationStyle.checkboxOff = vibrationOnDrawable;

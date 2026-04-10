@@ -43,7 +43,6 @@ public class PlayState extends State {
     private static final float LIFE_Y = 0.8f;
 
     // ================= DATA =================
-    private final IReadOnlyGameWorld gameWorld;
     private final boolean isHost;
     private final String playerId;
 
@@ -59,13 +58,12 @@ public class PlayState extends State {
     private Touchpad touchpad;
     private Button backButton;
     private int remainingLife = MAX_LIFE;
+    private TextureId playerTexture = null;
 
     private final TextureRegion playBackground;
 
     public PlayState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, String playerId, boolean isHost) {
         super(viewActions);
-
-        this.gameWorld = gameWorld;
         this.playerId = playerId;
         this.isHost = isHost;
 
@@ -131,11 +129,8 @@ public class PlayState extends State {
         float joyX = touchpad.getKnobPercentX();
         float joyY = touchpad.getKnobPercentY();
 
-        float power = (float) Math.sqrt(joyX * joyX + joyY * joyY);
+        viewActions.onJoystickMoved(joyX, joyY);
 
-        if (power > INPUT_THRESHOLD) {
-            viewActions.onJoystickMoved(joyX, joyY);
-        }
 
         stage.act(dt);
     }
@@ -185,8 +180,17 @@ public class PlayState extends State {
 
         for (int i = 0; i < networkEntities.size(); ++i) {
             Entity e = networkEntities.get(i);
+
             if (nm.get(e).playerId.equals(playerId)) {
+
                 remainingLife = hm.get(e).currentLife;
+
+                RenderComponent r = rm.get(e);
+                if (r != null) {
+                    playerTexture = r.textureId;
+                }
+
+                break;
             }
         }
 
@@ -198,8 +202,8 @@ public class PlayState extends State {
             boolean alive = i <= remainingLife;
 
             TextureRegion frame = alive
-                ? TextureManager.getFrame(TextureId.LIFE_BLUE_PIG)
-                : TextureManager.getFrame(TextureId.LIFE_BLUE_PIG, 3);
+                ? TextureManager.getFrame(TextureManager.getLifeTextureId(playerTexture))
+                : TextureManager.getFrame(TextureManager.getLifeTextureId(playerTexture), 3);
 
             if (!alive) {
                 sb.setColor(0.3f, 0.3f, 0.3f, 1f);

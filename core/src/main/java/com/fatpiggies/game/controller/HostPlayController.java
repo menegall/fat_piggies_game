@@ -1,10 +1,5 @@
 package com.fatpiggies.game.controller;
 
-import static com.fatpiggies.game.view.TextureId.BLUE_PIG;
-import static com.fatpiggies.game.view.TextureId.GREEN_PIG;
-import static com.fatpiggies.game.view.TextureId.RED_PIG;
-import static com.fatpiggies.game.view.TextureId.YELLOW_PIG;
-
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
@@ -20,18 +15,25 @@ import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.network.dto.PlayerInput;
+import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.view.TextureId;
+import com.fatpiggies.game.view.TextureManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class HostPlayController implements IPlayController {
+
     private final IPlayActions actions;
-    // Keeps track of the latest received input timestamp for each player
+
     private final Map<String, Float> lastInputTimestamps = new HashMap<>();
     private final GameState gameState = new GameState();
+
     private Engine engine;
     private GameWorld world;
+
+    private DatabaseService db;
+    private boolean gameRunning = false;
 
     public HostPlayController(IPlayActions actions, String lobbyId) {
         this.actions = actions;
@@ -51,78 +53,93 @@ public class HostPlayController implements IPlayController {
     }
 
     @Override
-    public void startGame(String lobbyId, DatabaseService db) {
-        actions.startGameOnServer(lobbyId);
+    public GameWorld getWorld() { return world;}
 
-        TextureId[] textures = {BLUE_PIG, GREEN_PIG, RED_PIG, YELLOW_PIG};
-        int count = 0;
+    @Override
+    public void startGame(DatabaseService db) {
+        this.db = db;
+        gameRunning = true;
 
-        for (String playerId : actions.getLobbyModel().getPlayersSetup().keySet()) {
-            if (count < textures.length) {
-                world.createHostPig(playerId, textures[count++]);
+        String currentUser = actions.getCurrentUserId();
+
+        for (Map.Entry<String, PlayerSetup> entry :
+            actions.getLobbyModel().getPlayerSetups().entrySet()) {
+
+            String playerId = entry.getKey();
+            PlayerSetup setup = entry.getValue();
+
+            TextureId texture = TextureManager.getPigTexture(setup.color);
+
+            if (playerId.equals(currentUser)) {
+                world.createHostPig(playerId, texture); // joueur local
+            } else {
+                world.createHostPig(playerId, texture); // remote (mais sans écraser local)
             }
         }
 
-        attachPlayListener(db);
-
-        actions.goToPlayState(world, true);
-        actions.setGameIsPlaying(true);
+        attachPlayListener();
     }
 
     @Override
-    public void endGame(String lobbyId) {
-        actions.setGameIsPlaying(false);
-        actions.endGameOnServer(lobbyId);
+    public void endGame() {
+        gameRunning = false;
 
-        actions.goToGameOverState(true);
+        if (world != null) {
+            world.cleanUpWorld();
+        }
 
-        world.cleanUpWorld();
         engine = null;
         world = null;
         lastInputTimestamps.clear();
-
-        actions.clearPlayController();
     }
 
     @Override
     public void updateWorld(float dt) {
+        if (!gameRunning || world == null) return;
+
         world.update(dt);
 
         if (world.isThePlayFinish()) {
-            endGame(actions.getLobbyModel().getLobbyId());
+            actions.onGameFinishedByHost();
         }
     }
 
-
-
     @Override
     public void updatePlayerInput(float x, float y) {
-        world.updateLocalPlayerInput(x, y);
+        if (world != null) {
+            world.updateLocalPlayerInput(x, y);
+        }
     }
 
     @Override
     public void sendToServer(DatabaseService db, float timer) {
+        if (!gameRunning || world == null) return;
+
         gameState.ts += timer;
         world.populateGameState(gameState);
+
         db.pushGameState(world.getLobbyId(), gameState);
     }
 
-    private void attachPlayListener(DatabaseService db) {
+    private void attachPlayListener() {
         db.listenToInputs(world.getLobbyId(), new DatabaseService.InputsCallback() {
+
             @Override
             public void onInputsReceived(Map<String, PlayerInput> inputs) {
                 Gdx.app.postRunnable(() -> {
-                    // Iterate through all received player inputs
+
+                    // SAFETY
+                    if (!gameRunning || world == null) return;
+
                     for (Map.Entry<String, PlayerInput> entry : inputs.entrySet()) {
+
                         String playerId = entry.getKey();
                         PlayerInput input = entry.getValue();
 
-                        // Safety check just in case the db sends null values
                         if (playerId == null || input == null) continue;
 
                         float lastKnownTs = lastInputTimestamps.getOrDefault(playerId, -1f);
 
-                        // Process only if the packet is fresh (out-of-order prevention)
                         if (input.ts > lastKnownTs) {
                             lastInputTimestamps.put(playerId, input.ts);
                             world.applyRemoteInput(playerId, input);

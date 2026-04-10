@@ -1,10 +1,5 @@
 package com.fatpiggies.game.controller;
 
-import static com.fatpiggies.game.view.TextureId.BLUE_PIG;
-import static com.fatpiggies.game.view.TextureId.GREEN_PIG;
-import static com.fatpiggies.game.view.TextureId.RED_PIG;
-import static com.fatpiggies.game.view.TextureId.YELLOW_PIG;
-
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
@@ -16,14 +11,22 @@ import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.network.dto.PlayerInput;
+import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.view.TextureId;
+import com.fatpiggies.game.view.TextureManager;
+
+import java.util.Map;
 
 public class ClientPlayController implements IPlayController {
+
     private final IPlayActions actions;
-    private float lastStateTimestamps = 0;
     private Engine engine;
     private GameWorld world;
     private final PlayerInput input = new PlayerInput();
+    private float lastStateTimestamp = 0f;
+    private boolean gameRunning = false;
+
+    private DatabaseService db;
 
     public ClientPlayController(IPlayActions actions, String lobbyId) {
         this.actions = actions;
@@ -35,79 +38,91 @@ public class ClientPlayController implements IPlayController {
         engine.addSystem(new MovementSystem());
 
         world = new GameWorld(engine);
+        world.setLobbyId(lobbyId);
     }
 
     @Override
-    public void startGame(String lobbyId, DatabaseService db) {
-        TextureId[] textures = {BLUE_PIG, GREEN_PIG, RED_PIG, YELLOW_PIG};
-        int count = 0;
+    public GameWorld getWorld() { return world;}
+
+    @Override
+    public void startGame(DatabaseService db) {
+        this.db = db;
+
+        gameRunning = true;
+        lastStateTimestamp = 0f;
 
         String currentUser = actions.getCurrentUserId();
 
-        world.createLocalPig(currentUser, textures[count++]);
+        for (Map.Entry<String, PlayerSetup> entry :
+            actions.getLobbyModel().getPlayerSetups().entrySet()) {
 
-        for (String playerId : actions.getLobbyModel().getPlayersSetup().keySet()) {
-            if (!playerId.equals(currentUser) && count < textures.length) {
-                world.createRemotePig(playerId, textures[count++]);
+            String playerId = entry.getKey();
+            PlayerSetup setup = entry.getValue();
+
+            TextureId texture = TextureManager.getPigTexture(setup.color);
+
+            if (playerId.equals(currentUser)) {
+                world.createLocalPig(playerId, texture);
+            } else {
+                world.createRemotePig(playerId, texture);
             }
         }
 
-        world.setLobbyId(lobbyId);
-        attachPlayListener(db);
-
-        actions.goToPlayState(world, true);
-        actions.setGameIsPlaying(true);
+        attachPlayListener();
     }
 
     @Override
-    public void endGame(String lobbyId) {
-        actions.setGameIsPlaying(false);
-        actions.goToGameOverState(false);
+    public void endGame() {
+        gameRunning = false;
 
-        world.cleanUpWorld();
+        if (world != null) {
+            world.cleanUpWorld();
+        }
+
         engine = null;
         world = null;
-        lastStateTimestamps = 0;
-
-        actions.clearPlayController();
+        lastStateTimestamp = 0f;
     }
 
     @Override
     public void updateWorld(float dt) {
-        world.update(dt);
+        if (world != null) {
+            world.update(dt);
+        }
     }
 
     @Override
     public void updatePlayerInput(float x, float y) {
-        world.updateLocalPlayerInput(x, y);
+        if (world != null) {
+            world.updateLocalPlayerInput(x, y);
+        }
     }
 
     @Override
-    public void sendToServer(DatabaseService db, float timer_network) {
-        input.ts += timer_network;
+    public void sendToServer(DatabaseService db, float timerNetwork) {
+        if (!gameRunning || world == null) return;
+
+        input.ts += timerNetwork;
         world.populatePlayerInput(input);
+
         db.pushPlayerInput(world.getLobbyId(), actions.getCurrentUserId(), input);
     }
 
-    private boolean firstStateReceived = false;
-
-    private void attachPlayListener(DatabaseService db) {
+    private void attachPlayListener() {
         db.listenToGameState(world.getLobbyId(), new DatabaseService.GameStateCallback() {
 
             @Override
             public void onDataReceived(GameState data) {
                 Gdx.app.postRunnable(() -> {
-                    if (data != null && data.ts >= lastStateTimestamps) {
 
-                        lastStateTimestamps = data.ts;
+                    // Safety check
+                    if (!gameRunning || world == null) return;
+
+                    if (data != null && data.ts >= lastStateTimestamp) {
+
+                        lastStateTimestamp = data.ts;
+
                         world.applyGameState(data);
-
-                        if (!firstStateReceived) {
-                            firstStateReceived = true;
-
-                            actions.goToPlayState(world, true);
-                            actions.setGameIsPlaying(true);
-                        }
                     }
                 });
             }

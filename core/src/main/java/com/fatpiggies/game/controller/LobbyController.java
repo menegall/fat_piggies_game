@@ -6,13 +6,19 @@ import com.fatpiggies.game.model.LobbyModel;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.network.dto.PlayerSetup;
+import com.fatpiggies.game.view.PlayerColor;
 
 import java.util.Map;
 
 public class LobbyController {
+
     private final DatabaseService dbs;
     private final ILobbyActions actions;
     private final LobbyModel lobbyModel;
+
+    // Avoid infinite loop when attaching the lobby status listener:
+    // Firebase immediately sends the current value once.
+    private boolean ignoreFirstLobbyStatusEvent = false;
 
     public LobbyController(ILobbyActions actions, String playerId, DatabaseService dbs, LobbyModel lobbyModel) {
         this.actions = actions;
@@ -21,10 +27,10 @@ public class LobbyController {
         lobbyModel.setPlayerId(playerId);
     }
 
-    public void hostLobby(String playerName) {
+    public void hostLobby(String playerName, PlayerColor playerColor) {
         lobbyModel.setIsHost(true);
 
-        dbs.createLobby(lobbyModel.getPlayerId(), playerName, new DatabaseService.LobbyCallback() {
+        dbs.createLobby(lobbyModel.getPlayerId(), playerName, playerColor, new DatabaseService.LobbyCallback() {
             @Override
             public void onSuccess(String lobbyId) {
                 Gdx.app.postRunnable(() -> {
@@ -40,10 +46,10 @@ public class LobbyController {
         });
     }
 
-    public void joinLobby(String playerName, String lobbyCode) {
+    public void joinLobby(String playerName, String lobbyCode, PlayerColor playerColor) {
         lobbyModel.setIsHost(false);
 
-        dbs.joinLobby(lobbyCode, lobbyModel.getPlayerId(), playerName, new DatabaseService.LobbyCallback() {
+        dbs.joinLobby(lobbyCode, lobbyModel.getPlayerId(), playerName, playerColor, new DatabaseService.LobbyCallback() {
             @Override
             public void onSuccess(String lobbyId) {
                 Gdx.app.postRunnable(() -> {
@@ -66,9 +72,26 @@ public class LobbyController {
         }
     }
 
-    private void changeToLobbyState() {
+    public void goBackToLobby() {
+        if (lobbyModel.getLobbyId() == null) return;
 
-        dbs.getLobbyCodeOnce(lobbyModel.getLobbyId(), new DatabaseService.CodeCallback() {
+        // Only host resets the lobby data in Firebase.
+        if (lobbyModel.getIsHost()) {
+            dbs.resetLobbyToWaiting(lobbyModel.getLobbyId());
+        }
+
+        // Stop listening then reattach the listeners
+        dbs.stopListening();
+        changeToLobbyState();
+    }
+
+    private void changeToLobbyState() {
+        String lobbyId = lobbyModel.getLobbyId();
+        if (lobbyId == null) return;
+
+        ignoreFirstLobbyStatusEvent = true;
+
+        dbs.getLobbyCodeOnce(lobbyId, new DatabaseService.CodeCallback() {
             @Override
             public void onCodeRetrieved(String code) {
                 Gdx.app.postRunnable(() -> lobbyModel.setLobbyCode(code));
@@ -80,10 +103,10 @@ public class LobbyController {
             }
         });
 
-        dbs.listenToPlayersSetup(lobbyModel.getLobbyId(), new DatabaseService.PlayersSetupCallback() {
+        dbs.listenToPlayersSetup(lobbyId, new DatabaseService.PlayersSetupCallback() {
             @Override
             public void onPlayersSetupUpdated(Map<String, PlayerSetup> playersSetup) {
-                lobbyModel.setPlayersSetup(playersSetup);
+                Gdx.app.postRunnable(() -> lobbyModel.setPlayersSetup(playersSetup));
             }
 
             @Override
@@ -92,22 +115,46 @@ public class LobbyController {
             }
         });
 
+        // CLIENT ONLY
         if (!lobbyModel.getIsHost()) {
-            dbs.listenToLobbyStatus(lobbyModel.getLobbyId(), new DatabaseService.LobbyStatusCallback() {
+
+            dbs.listenToLobbyStatus(lobbyId, new DatabaseService.LobbyStatusCallback() {
+
                 @Override
                 public void onStatusUpdated(String status) {
                     Gdx.app.postRunnable(() -> {
-                        if ("playing".equals(status)) {
-                            actions.startClientGame(lobbyModel.getLobbyId());
-                        } else if ("over".equals(status)) {
-                            actions.endGame(lobbyModel.getLobbyId());
+
+                        if (status == null) return;
+
+                        // ignore first callback
+                        if (ignoreFirstLobbyStatusEvent) {
+                            ignoreFirstLobbyStatusEvent = false;
+                            return;
+                        }
+
+                        switch (status) {
+
+                            case "playing":
+                                actions.goToPlayState();
+                                break;
+
+                            case "over":
+                                actions.goToOverState();
+                                break;
+
+                            case "waiting":
+                                actions.goBackToLobbyState();
+                                break;
                         }
                     });
                 }
 
                 @Override
                 public void onError(NetworkError error, String errorMessage) {
-                    showError(errorMessage);
+                    Gdx.app.postRunnable(() -> {
+                        actions.showError("Host left the lobby");
+                        actions.goToMenuState();
+                    });
                 }
             });
         }

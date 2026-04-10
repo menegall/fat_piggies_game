@@ -1,7 +1,5 @@
 package com.fatpiggies.game.controller.mainControllerInterfaces;
 
-import com.fatpiggies.game.model.GameWorld;
-import com.fatpiggies.game.model.IReadOnlyGameWorld;
 import com.fatpiggies.game.model.LobbyModel;
 
 public interface IPlayActions {
@@ -10,17 +8,7 @@ public interface IPlayActions {
 
     LobbyModel getLobbyModel();
 
-    void goToPlayState(IReadOnlyGameWorld gameWorld, boolean isHost);
-
-    void goToGameOverState(boolean isHost);
-
-    void setGameIsPlaying(boolean playing);
-
-    void clearPlayController();
-
-    void startGameOnServer(String lobbyId);
-
-    void endGameOnServer(String lobbyId);
+    void onGameFinishedByHost();
 
     void showError(String message);
 }

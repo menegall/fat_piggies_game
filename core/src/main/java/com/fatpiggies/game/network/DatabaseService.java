@@ -3,6 +3,7 @@ package com.fatpiggies.game.network;
 import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.network.dto.PlayerInput;
 import com.fatpiggies.game.network.dto.PlayerSetup;
+import com.fatpiggies.game.view.PlayerColor;
 
 import java.util.Map;
 
@@ -21,9 +22,10 @@ public interface DatabaseService {
      *
      * @param hostId     The unique identifier of the user creating the lobby (from AuthService).
      * @param playerName The display name chosen by the host.
+     * @param playerColor The display color chosen by the player.
      * @param callback   Triggered with the unique lobby ID on success, or a specific {@link NetworkError}.
      */
-    void createLobby(String hostId, String playerName, LobbyCallback callback);
+    void createLobby(String hostId, String playerName, PlayerColor playerColor, LobbyCallback callback);
 
     /**
      * Attempts to join an existing lobby using a short 6-character code.
@@ -32,9 +34,10 @@ public interface DatabaseService {
      * @param lobbyCode  The short code shared by the Host.
      * @param playerId   The unique identifier of the user joining (from AuthService).
      * @param playerName The display name chosen by the player.
+     * @param playerColor The display color chosen by the player.
      * @param callback   Triggered with the unique lobby ID on success, or a specific {@link NetworkError}.
      */
-    void joinLobby(String lobbyCode, String playerId, String playerName, LobbyCallback callback);
+    void joinLobby(String lobbyCode, String playerId, String playerName, PlayerColor playerColor, LobbyCallback callback);
 
     /**
      * Removes a player from the lobby.
@@ -62,6 +65,14 @@ public interface DatabaseService {
      * @param lobbyId The unique ID of the lobby.
      */
     void endGame(String lobbyId);
+
+    /**
+     * Changes the lobby status to "waiting".
+     * Signals to clients that the match has concluded and they should transition to the LobbyState.
+     *
+     * @param lobbyId The unique ID of the lobby.
+     */
+    void resetLobbyToWaiting(String lobbyId);
 
     /**
      * Listens for real-time updates regarding the lobby's lifecycle state ( waiting, playing, over).

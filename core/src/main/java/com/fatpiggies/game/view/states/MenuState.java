@@ -1,6 +1,5 @@
 package com.fatpiggies.game.view.states;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -8,16 +7,19 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.fatpiggies.game.setting.MusicManager;
 import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.setting.VibrationManager;
+import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
@@ -27,12 +29,13 @@ public class MenuState extends State {
     private static final float BTN_SIZE_RATIO = 0.09f;
 
     private static final float BTN_X_RATIO = 0.22f;
-    private static final float MUSIC_Y_RATIO = 0.39f;
+    private static final float COLOR_Y_RATIO = 0.53f;
+    private static final float MUSIC_Y_RATIO = 0.37f;
     private static final float SOUND_Y_RATIO = 0.25f;
     private static final float VIBRATE_Y_RATIO = 0.11f;
 
     private static final float PANEL_WIDTH_RATIO = 0.1f;
-    private static final float PANEL_HEIGHT_RATIO = 0.50f;
+    private static final float PANEL_HEIGHT_RATIO = 0.65f;
 
     private static final float MENU_SIZE_RATIO = 0.79f;
 
@@ -53,6 +56,8 @@ public class MenuState extends State {
 
     private TextButton joinButton;
     private TextButton hostButton;
+    private ImageButton colorButton;
+    private TextureId currentPig = TextureId.OVER_BLUE_PIG;
     private CheckBox musicButton;
     private CheckBox soundButton;
     private CheckBox vibrationButton;
@@ -78,6 +83,7 @@ public class MenuState extends State {
         // ================= INPUTS =================
         nameField = new TextField(lastNameField, skin);
         nameField.setMessageText("Name");
+        nameField.setMaxLength(20);
         nameField.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -181,12 +187,33 @@ public class MenuState extends State {
         // ================= SETTINGS BUTTONS =================
         btnSize = screenWidth * BTN_SIZE_RATIO;
 
+        TextureRegionDrawable drawable = new TextureRegionDrawable(TextureManager.getFrame(currentPig));
+        colorButton = new ImageButton(drawable);
+
+        colorButton.setSize(btnSize, btnSize);
+        colorButton.setPosition(
+            screenWidth * BTN_X_RATIO,
+            screenHeight * COLOR_Y_RATIO
+        );
+        colorButton.getImageCell().expand().fill();
+
+        colorButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                currentPig = TextureManager.nextPig(currentPig);
+                updateColorButton();
+            }
+        });
+        stage.addActor(colorButton);
+        updateColorButton();
+
         musicButton = new CheckBox("", skin, "musicButton");
         musicButton.setSize(btnSize, btnSize);
         musicButton.setPosition(
             screenWidth * BTN_X_RATIO,
             screenHeight * MUSIC_Y_RATIO
         );
+        musicButton.getImageCell().expand().fill();
         musicButton.setChecked(!MusicManager.isEnabled());
 
         musicButton.addListener(new ChangeListener() {
@@ -198,6 +225,7 @@ public class MenuState extends State {
                 VibrationManager.vibrate(200);
             }
         });
+
         stage.addActor(musicButton);
 
         soundButton = new CheckBox("", skin, "soundButton");
@@ -206,6 +234,7 @@ public class MenuState extends State {
             screenWidth * BTN_X_RATIO,
             screenHeight * SOUND_Y_RATIO
         );
+        soundButton.getImageCell().expand().fill();
         soundButton.setChecked(!SoundsManager.isEnabled());
 
         soundButton.addListener(new ChangeListener() {
@@ -225,6 +254,7 @@ public class MenuState extends State {
             screenWidth * BTN_X_RATIO,
             screenHeight * VIBRATE_Y_RATIO
         );
+        vibrationButton.getImageCell().expand().fill();
         vibrationButton.setChecked(!SoundsManager.isEnabled());
 
         vibrationButton.addListener(new ChangeListener() {
@@ -252,22 +282,44 @@ public class MenuState extends State {
         );
     }
 
+
+    private void updateColorButton() {
+        TextureRegion region = TextureManager.getFrame(currentPig);
+        colorButton.getStyle().imageUp = new TextureRegionDrawable(region);
+    }
+
     private void onJoinClicked() {
         lastNameField = nameField.getText();
-        viewActions.onJoinLobbyClicked(lastNameField, lobbyField.getText());
+
+        PlayerColor color = TextureManager.getColorFromTexture(currentPig);
+
+        viewActions.onJoinLobbyClicked(
+            lastNameField,
+            lobbyField.getText(),
+            color
+        );
+
         VibrationManager.vibrate(200);
         SoundsManager.playButton(1f);
     }
 
     private void onHostClicked() {
         lastNameField = nameField.getText();
-        viewActions.onHostLobbyClicked(lastNameField);
+
+        PlayerColor color = TextureManager.getColorFromTexture(currentPig);
+
+        viewActions.onHostLobbyClicked(
+            lastNameField,
+            color
+        );
+
         VibrationManager.vibrate(200);
         SoundsManager.playButton(1f);
     }
 
     @Override
     public void update(float dt) {
+        updateColorButton();
         stage.act(dt);
     }
 

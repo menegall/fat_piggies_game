@@ -1,10 +1,14 @@
 package com.fatpiggies.game.controller;
 
+import com.fatpiggies.game.model.GameWorld;
 import com.fatpiggies.game.network.DatabaseService;
 
 public interface IPlayController {
-    public void startGame(String lobbyId, DatabaseService db);
-    void endGame(String lobbyId);
+    GameWorld getWorld();
+
+    void startGame(DatabaseService db);
+
+    void endGame();
 
     void updateWorld(float dt);
 

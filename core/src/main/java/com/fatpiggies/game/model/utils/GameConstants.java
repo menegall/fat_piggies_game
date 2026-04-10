@@ -9,14 +9,17 @@ public final class GameConstants {
     public static final float RIGHT_BOUND = WORLD_WIDTH - 50f;
     public static final float BOTTOM_BOUND = 50f;
     public static final float TOP_BOUND = WORLD_HEIGHT - 50f;
-    public static final float GROUND_FRICTION = 0.0f;
+    public static final float GROUND_FRICTION = 50f;
+    public static final float FORCE_FACTOR = 10f;
+    public static final float STOP_THRESHOLD = 0.0001f;
+    public static final float INPUT_DEADZONE = 0.1f;
 
     // --- RESPAWN & SPAWN SETTINGS ---
     public static final float SAFE_SPAWN_RADIUS = 60f;
     public static final int MAX_SPAWN_ATTEMPTS = 10;
 
     // --- PLAYER SETTINGS ---
-    public static final float PLAYER_BASE_VELOCITY = 3000;
+    public static final float PLAYER_BASE_VELOCITY = 4000;
     public static final float PLAYER_BASE_ACCELERATION = 200f;
     public static final float PLAYER_BASE_MASS = 10f;
     public static final int MAX_PLAYERS = 4;

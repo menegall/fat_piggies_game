@@ -12,6 +12,7 @@ import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.network.dto.LobbyInfo;
 import com.fatpiggies.game.network.dto.PlayerInput;
 import com.fatpiggies.game.network.dto.PlayerSetup;
+import com.fatpiggies.game.view.PlayerColor;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
@@ -40,7 +41,7 @@ public class AndroidDatabase implements DatabaseService {
     }
 
     @Override
-    public void createLobby(String hostId, String playerName, LobbyCallback callback) {
+    public void createLobby(String hostId, String playerName, PlayerColor playerColor, LobbyCallback callback) {
         final long startTime = System.currentTimeMillis();
         Log.i(TAG_DATABASE, playerName + " create a new lobby");
         // Push new lobby node and get its ID
@@ -53,7 +54,7 @@ public class AndroidDatabase implements DatabaseService {
         String lobbyCode = generateRandomCode();
 
         LobbyInfo info = new LobbyInfo("waiting", lobbyCode, hostId);
-        PlayerSetup hostSetup = new PlayerSetup(playerName);
+        PlayerSetup hostSetup = new PlayerSetup(playerName, playerColor);
 
         info.playersSetup.put(hostId, hostSetup); // Add host to playersSetup
 
@@ -72,7 +73,7 @@ public class AndroidDatabase implements DatabaseService {
     }
 
     @Override
-    public void joinLobby(String lobbyCode, String playerId, String playerName, LobbyCallback callback) {
+    public void joinLobby(String lobbyCode, String playerId, String playerName, PlayerColor playerColor, LobbyCallback callback) {
         final long startTime = System.currentTimeMillis();
         Log.i(TAG_DATABASE, playerName + "join lobby " + lobbyCode);
         // Find lobby by code
@@ -91,6 +92,7 @@ public class AndroidDatabase implements DatabaseService {
                     if (isGameAlreadyStarted(lobbySnapshot, callback)) return;
                     if (isLobbyFull(lobbySnapshot, callback)) return;
                     if (isPlayerNameTaken(lobbySnapshot, playerName, callback)) return;
+                    if (isPlayerColorTaken(lobbySnapshot, playerColor, callback)) return;
 
                     assert lobbyId != null; // Assert that lobbyId is not null
                     DatabaseReference playerSetupRef = lobbiesRef.child(lobbyId)
@@ -101,7 +103,7 @@ public class AndroidDatabase implements DatabaseService {
                     // Prepare player setup
                     long numPlayers = lobbySnapshot.child("info")
                         .child("playersSetup").getChildrenCount();
-                    PlayerSetup setup = new PlayerSetup(playerName);
+                    PlayerSetup setup = new PlayerSetup(playerName, playerColor);
 
                     // Write player setup to the database
                     playerSetupRef.setValue(setup)
@@ -165,6 +167,20 @@ public class AndroidDatabase implements DatabaseService {
     }
 
     @Override
+    public void resetLobbyToWaiting(String lobbyId) {
+        Log.i(TAG_DATABASE, "Reset lobby to WAITING");
+
+        DatabaseReference lobbyRef = lobbiesRef.child(lobbyId);
+        Map<String, Object> updates = new java.util.HashMap<>();
+
+        updates.put("info/status", "waiting");
+        updates.put("inputs", null);
+        updates.put("game_state", null);
+
+        lobbyRef.updateChildren(updates);
+    }
+
+    @Override
     public void listenToPlayersSetup(String lobbyId, PlayersSetupCallback callback) {
         playersSetupRef = lobbiesRef.child(lobbyId).child("info").child("playersSetup");
         // Create a listener to listen for changes in the lobby info node
@@ -178,6 +194,9 @@ public class AndroidDatabase implements DatabaseService {
                     if (playersSetup != null) {
                         callback.onPlayersSetupUpdated(playersSetup);
                     }
+                }
+                if (!snapshot.exists()) {
+                    callback.onError(NetworkError.LOBBY_NOT_FOUND, "Lobby deleted");
                 }
             }
 
@@ -204,6 +223,9 @@ public class AndroidDatabase implements DatabaseService {
                     if (status != null) {
                         callback.onStatusUpdated(status);
                     }
+                }
+                if (!snapshot.exists()) {
+                    callback.onError(NetworkError.LOBBY_NOT_FOUND, "Lobby deleted");
                 }
             }
 
@@ -409,6 +431,19 @@ public class AndroidDatabase implements DatabaseService {
             if (java.util.Objects.equals(playerNameDB, playerName)) {
                 callback.onError(NetworkError.NAME_ALREADY_EXIST, "Name already exist");
                 return true; // Indicates the name is taken and the error was handled
+            }
+        }
+        return false;
+    }
+
+    private boolean isPlayerColorTaken(com.google.firebase.database.DataSnapshot lobbySnapshot,
+                                      PlayerColor playerColor,
+                                      LobbyCallback callback) {
+        for (com.google.firebase.database.DataSnapshot playerSnapshot : lobbySnapshot.child("info/playersSetup").getChildren()) {
+            String colorStr = playerSnapshot.child("color").getValue(String.class);
+            if (colorStr != null && colorStr.equals(playerColor.name())) {
+                callback.onError(NetworkError.COLOR_ALREADY_TAKEN, "Color already taken");
+                return true;
             }
         }
         return false;

@@ -5,18 +5,23 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.setting.VibrationManager;
+import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
+
+import java.util.Map;
 
 public class LobbyState extends State {
 
@@ -30,10 +35,13 @@ public class LobbyState extends State {
     private static final float START_BUTTON_TOP_PAD = 0.05f;
 
     private static final float TITLE_SCALE = 0.002f;
+    private static final float SUBTITLE_SCALE = 0.0015f;
+    private static final float IMAGE_SIZE = 0.03f;
+    private static final float PAD_LEFT = 0.03f;
     private static final float CODE_SCALE = 0.0025f;
     private static final float BUTTON_TEXT_SCALE = 0.0015f;
 
-    private static final float CODE_X_RATIO = 0.72f;
+    private static final float CODE_X_RATIO = 0.69f;
     private static final float CODE_Y_RATIO = 0.5f;
 
     private static final float COPY_DURATION = 1.5f;
@@ -42,7 +50,7 @@ public class LobbyState extends State {
     private final boolean isHost;
     private final IReadOnlyLobbyModel lobbyModel;
 
-    private Array<String> lastNames = new Array<>();
+    private final Array<String> lastNames = new Array<>();
 
     // ================= UI =================
     private Table playersTable;
@@ -158,8 +166,8 @@ public class LobbyState extends State {
     @Override
     public void update(float dt) {
 
-        if (lobbyModel.getPlayerNames() != null) {
-            updatePlayers(lobbyModel.getPlayerNames());
+        if (lobbyModel.getPlayerSetups() != null) {
+            updatePlayers(lobbyModel.getPlayerSetups());
             lobbyCodeLabel.setText("CODE : " + lobbyModel.getLobbyCode());
         }
 
@@ -192,25 +200,32 @@ public class LobbyState extends State {
     }
 
     // ================= PLAYERS =================
-    private void updatePlayers(Array<String> currentNames) {
-
-        if (!currentNames.equals(lastNames)) {
-            rebuildPlayers(currentNames);
-            lastNames = new Array<>(currentNames);
-        }
+    private void updatePlayers(Map<String, PlayerSetup> players) {
+        rebuildPlayers(players);
 
         if (isHost) {
-            startButton.setDisabled(currentNames.size < 1);
+            startButton.setDisabled(players.size() < 2);
         }
     }
 
-    private void rebuildPlayers(Array<String> names) {
+    private void rebuildPlayers(Map<String, PlayerSetup> players) {
         playersTable.clear();
 
-        for (String name : names) {
-            Label label = new Label(name, skin);
-            label.setFontScale(1.5f);
-            playersTable.add(label).row();
+        for (PlayerSetup setup : players.values()) {
+
+            Image pig = new Image(TextureManager.getFrame(
+                TextureManager.getLifeTextureId(TextureManager.getPigTexture(setup.color)
+            )));
+
+            float size = screenWidth * IMAGE_SIZE;
+
+            Label label = new Label(setup.name, skin);
+            label.setFontScale(screenHeight * SUBTITLE_SCALE);
+
+            playersTable.add(pig).size(size, size);
+            playersTable.add(label).padLeft(screenHeight * PAD_LEFT).row();
         }
     }
 }
+
+

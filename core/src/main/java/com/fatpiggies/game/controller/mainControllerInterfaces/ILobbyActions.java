@@ -1,15 +1,18 @@
 package com.fatpiggies.game.controller.mainControllerInterfaces;
 
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
-import com.fatpiggies.game.model.LobbyModel;
 
 public interface ILobbyActions {
 
+    void goToMenuState();
+
     void goToLobbyState(IReadOnlyLobbyModel lobbyModel, boolean isHost);
 
-    void startClientGame(String lobbyId);
+    void goBackToLobbyState();
 
-    void endGame(String lobbyId);
+    void goToPlayState();
+
+    void goToOverState();
 
     void showError(String message);
 }

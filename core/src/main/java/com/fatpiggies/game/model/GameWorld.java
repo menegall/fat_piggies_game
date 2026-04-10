@@ -81,7 +81,9 @@ public class GameWorld implements IReadOnlyGameWorld {
     }
 
     public void updateLocalPlayerInput(float x, float y) {
-        if (localPlayer == null) return;
+        if (localPlayer == null) {
+            return;
+        }
 
         PlayerInputComponent input = localPlayer.getComponent(PlayerInputComponent.class);
         if (input != null) {
@@ -165,7 +167,7 @@ public class GameWorld implements IReadOnlyGameWorld {
         entity.add(netId).add(transform).add(health)
             .add(input).add(sync).add(render);
 
-        localPlayer = entity;
+        if (localPlayer == null) {localPlayer = entity;}
         this.engine.addEntity(entity);
     }
 
@@ -367,7 +369,7 @@ public class GameWorld implements IReadOnlyGameWorld {
     public boolean isThePlayFinish() {
         // TODO Finish implementation of this method
         i++;
-        return i >=300;
+        return i >=4000;
     }
 
     public void populateGameState(GameState gameState) {
