@@ -1,6 +1,7 @@
 package com.fatpiggies.game.controller;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.model.GameWorld;
@@ -25,7 +26,6 @@ import java.util.Map;
 public class HostPlayController implements IPlayController {
 
     private final IPlayActions actions;
-
     private final Map<String, Float> lastInputTimestamps = new HashMap<>();
     private final GameState gameState = new GameState();
 
@@ -53,7 +53,9 @@ public class HostPlayController implements IPlayController {
     }
 
     @Override
-    public GameWorld getWorld() { return world;}
+    public GameWorld getWorld() {
+        return world;
+    }
 
     @Override
     public void startGame(DatabaseService db) {
@@ -61,19 +63,21 @@ public class HostPlayController implements IPlayController {
         gameRunning = true;
 
         String currentUser = actions.getCurrentUserId();
+        Map<String, PlayerSetup> playerSetups = actions.getLobbyModel().getPlayerSetups();
 
-        for (Map.Entry<String, PlayerSetup> entry :
-            actions.getLobbyModel().getPlayerSetups().entrySet()) {
+        world.setPlayersSetup(playerSetups);
 
+        for (Map.Entry<String, PlayerSetup> entry : playerSetups.entrySet()) {
             String playerId = entry.getKey();
             PlayerSetup setup = entry.getValue();
 
             TextureId texture = TextureManager.getPigTexture(setup.color);
 
+            Entity pig = world.createHostPig(playerId, texture);
+
+            // On définit explicitement le joueur local du host
             if (playerId.equals(currentUser)) {
-                world.createHostPig(playerId, texture); // joueur local
-            } else {
-                world.createHostPig(playerId, texture); // remote (mais sans écraser local)
+                world.setLocalPlayer(pig);
             }
         }
 
@@ -99,7 +103,7 @@ public class HostPlayController implements IPlayController {
 
         world.update(dt);
 
-        if (world.isThePlayFinish()) {
+        if (world.isGameFinished()) {
             actions.onGameFinishedByHost();
         }
     }
@@ -127,20 +131,23 @@ public class HostPlayController implements IPlayController {
             @Override
             public void onInputsReceived(Map<String, PlayerInput> inputs) {
                 Gdx.app.postRunnable(() -> {
-
-                    // SAFETY
                     if (!gameRunning || world == null) return;
 
-                    for (Map.Entry<String, PlayerInput> entry : inputs.entrySet()) {
+                    String currentUser = actions.getCurrentUserId();
 
+                    for (Map.Entry<String, PlayerInput> entry : inputs.entrySet()) {
                         String playerId = entry.getKey();
                         PlayerInput input = entry.getValue();
 
                         if (playerId == null || input == null) continue;
 
-                        float lastKnownTs = lastInputTimestamps.getOrDefault(playerId, -1f);
+                        // ❗ ne jamais appliquer l’input réseau du host sur lui-même
+                        if (playerId.equals(currentUser)) continue;
 
-                        if (input.ts > lastKnownTs) {
+                        float lastTs = lastInputTimestamps.getOrDefault(playerId, -1f);
+
+                        // ✅ tolérance pour éviter freeze réseau
+                        if (input.ts > lastTs || lastTs == -1f) {
                             lastInputTimestamps.put(playerId, input.ts);
                             world.applyRemoteInput(playerId, input);
                         }

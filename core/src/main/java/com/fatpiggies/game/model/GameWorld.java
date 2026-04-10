@@ -53,19 +53,18 @@ import com.fatpiggies.game.view.TextureId;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class GameWorld implements IReadOnlyGameWorld {
     // Reusable sets to track active entities per frame without memory allocation
     private final java.util.Set<String> activePlayersTracker = new java.util.HashSet<>();
     private final java.util.Set<String> activePowerupsTracker = new java.util.HashSet<>();
     // Fast lookup map for powerups spawned remotely by the Host
     private final Map<String, Entity> clientRemotePowerups = new HashMap<>();
+
     private Engine engine;
     private Entity localPlayer;
     private String lobbyId;
     private String lobbyCode;
     private Map<String, PlayerSetup> playersSetup;
-    private int i = 0; // For testing
 
     public GameWorld(Engine engine) {
         this.engine = engine;
@@ -87,18 +86,24 @@ public class GameWorld implements IReadOnlyGameWorld {
 
         PlayerInputComponent input = localPlayer.getComponent(PlayerInputComponent.class);
         if (input != null) {
-            input.joystickPercentageX = x;
-            input.joystickPercentageY = y;
+            input.joystickPercentageX = MathUtils.clamp(x, -1.0f, 1.0f);
+            input.joystickPercentageY = MathUtils.clamp(y, -1.0f, 1.0f);
         }
     }
 
     /**
      * Creates a pig for the Host. It contains ALL physics and collision logic.
+     * The host simulates all players.
+     *
+     * IMPORTANT:
+     * This method does NOT set localPlayer automatically.
+     * The controller must call setLocalPlayer(...) explicitly.
      *
      * @param networkId Unique ID of the player
      * @param textureId Texture ID of the pig
+     * @return the created entity
      */
-    public void createHostPig(String networkId, TextureId textureId) {
+    public Entity createHostPig(String networkId, TextureId textureId) {
         Entity entity = engine.createEntity();
 
         // Identity and Base Data
@@ -129,8 +134,8 @@ public class GameWorld implements IReadOnlyGameWorld {
         entity.add(netId).add(transform).add(health).add(render)
             .add(input).add(collider).add(collisions).add(spawn);
 
-        localPlayer = entity;
         this.engine.addEntity(entity);
+        return entity;
     }
 
     /**
@@ -149,12 +154,12 @@ public class GameWorld implements IReadOnlyGameWorld {
         TransformComponent transform = new TransformComponent();
 
         HealthComponent health = new HealthComponent();
+        health.currentLife = BASE_LIFE;
 
         attachPhysicComponents(entity);
 
         PlayerInputComponent input = new PlayerInputComponent();
         input.multiplier = 1;
-
 
         NetworkSyncComponent sync = new NetworkSyncComponent();
 
@@ -167,13 +172,16 @@ public class GameWorld implements IReadOnlyGameWorld {
         entity.add(netId).add(transform).add(health)
             .add(input).add(sync).add(render);
 
-        if (localPlayer == null) {localPlayer = entity;}
+        if (localPlayer == null) {
+            localPlayer = entity;
+        }
+
         this.engine.addEntity(entity);
     }
 
     /**
      * Creates a remote pig for the Client.
-     * This pig will be controlled by the Network Lerp System .
+     * This pig will be controlled by the Network Lerp System.
      *
      * @param playerId  Unique ID of the player
      * @param textureId Texture ID of the pig
@@ -193,7 +201,6 @@ public class GameWorld implements IReadOnlyGameWorld {
         render.width = PIG_WIDTH;
         render.height = PIG_HEIGHT;
         render.angleOffset = PIG_ANGLE_OFFSET;
-
 
         entity.add(netId).add(transform).add(sync).add(render);
 
@@ -360,16 +367,36 @@ public class GameWorld implements IReadOnlyGameWorld {
     }
 
     public void cleanUpWorld() {
+        clientRemotePowerups.clear();
+        localPlayer = null;
+        playersSetup = null;
+
         if (engine != null) {
             engine.removeAllEntities();
             engine = null;
         }
     }
 
-    public boolean isThePlayFinish() {
-        // TODO Finish implementation of this method
-        i++;
-        return i >=4000;
+    public boolean isGameFinished() {
+        int alivePlayers = 0;
+
+        for (Entity entity : engine.getEntities()) {
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+            HealthComponent health = entity.getComponent(HealthComponent.class);
+
+            // Players
+            if (netId != null && netId.playerId != null && health != null && health.currentLife > 0) {
+                alivePlayers++;
+
+                // More than one players
+                if (alivePlayers > 1) {
+                    return false;
+                }
+            }
+        }
+
+        // Only one player
+        return true;
     }
 
     public void populateGameState(GameState gameState) {
@@ -406,7 +433,6 @@ public class GameWorld implements IReadOnlyGameWorld {
                     pd.x = roundToOneDecimal(transform.x);
                     pd.y = roundToOneDecimal(transform.y);
                     pd.hp = (health != null) ? health.currentLife : 0;
-
                 }
             }
 
@@ -448,11 +474,15 @@ public class GameWorld implements IReadOnlyGameWorld {
             input.jy = 0f;
             return;
         }
+
         PlayerInputComponent inputComponent = localPlayer.getComponent(PlayerInputComponent.class);
 
         if (inputComponent != null) {
             input.jx = roundToTwoDecimals(inputComponent.joystickPercentageX);
             input.jy = roundToTwoDecimals(inputComponent.joystickPercentageY);
+        } else {
+            input.jx = 0f;
+            input.jy = 0f;
         }
     }
 
@@ -500,7 +530,6 @@ public class GameWorld implements IReadOnlyGameWorld {
         }
     }
 
-
     /**
      * Applies the GameState received from the Host to the local ECS entities.
      * Use this ONLY on the Client controllers!
@@ -519,7 +548,6 @@ public class GameWorld implements IReadOnlyGameWorld {
 
                 if (pd != null) {
                     NetworkSyncComponent sync = entity.getComponent(NetworkSyncComponent.class);
-                    TransformComponent transform = entity.getComponent(TransformComponent.class);
                     HealthComponent health = entity.getComponent(HealthComponent.class);
 
                     if (sync != null) {
