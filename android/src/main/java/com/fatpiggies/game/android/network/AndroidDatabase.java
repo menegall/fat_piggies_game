@@ -266,9 +266,6 @@ public class AndroidDatabase implements DatabaseService {
         gameStateRef = lobbiesRef.child(lobbyId).child("game_state");
         // Write the game state data to the database
         gameStateRef.setValue(state);
-        // TODO only host can push game state
-
-        // For fast push (10/s) no need of listener, it will only slow the system
     }
 
     @Override
@@ -331,8 +328,6 @@ public class AndroidDatabase implements DatabaseService {
                     // Node doesn't exist anymore! Host or server deleted it.
                     Log.w(TAG_DATABASE, "Lobby was destroyed by host or server.");
                     callback.onError(NetworkError.LOBBY_NOT_FOUND);
-
-                    // TODO Controller Must call databaseService.stopListening() to destroy listener.
                 }
             }
 
