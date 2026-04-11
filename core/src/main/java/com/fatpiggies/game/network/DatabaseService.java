@@ -171,38 +171,38 @@ public interface DatabaseService {
     interface LobbyCallback {
         void onSuccess(String lobbyId);
 
-        void onError(NetworkError error, String errorMessage);
+        void onError(NetworkError error);
     }
 
     interface LobbyStatusCallback {
         void onStatusUpdated(String status);
 
-        void onError(NetworkError error, String errorMessage);
+        void onError(NetworkError error);
     }
 
     interface PlayersSetupCallback {
         void onPlayersSetupUpdated(Map<String, PlayerSetup> playersSetup);
 
-        void onError(NetworkError error, String errorMessage);
+        void onError(NetworkError error);
     }
 
     interface InputsCallback {
         void onInputsReceived(Map<String, PlayerInput> inputs);
 
-        void onError(NetworkError error, String errorMessage);
+        void onError(NetworkError error);
     }
 
     interface GameStateCallback {
         void onDataReceived(GameState data);
 
-        void onError(NetworkError error, String errorMessage);
+        void onError(NetworkError error);
 
     }
 
     interface CodeCallback {
         void onCodeRetrieved(String code);
 
-        void onError(String errorMessage);
+        void onError(NetworkError error);;
     }
 
 

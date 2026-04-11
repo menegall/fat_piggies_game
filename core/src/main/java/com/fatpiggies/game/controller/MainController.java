@@ -10,6 +10,7 @@ import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.model.LobbyModel;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
+import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.states.GameStateManager;
@@ -179,8 +180,8 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     }
 
     @Override
-    public void showError(String message) {
-        gsm.showError(message);
+    public void showError(NetworkError error) {
+        gsm.showError(error);
     }
 
     // ================= PLAY ACTIONS =================

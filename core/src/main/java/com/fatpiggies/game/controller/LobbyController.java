@@ -1,5 +1,7 @@
 package com.fatpiggies.game.controller;
 
+import static com.fatpiggies.game.network.NetworkError.HOST_LEFT_LOBBY;
+
 import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.controller.mainControllerInterfaces.ILobbyActions;
 import com.fatpiggies.game.model.LobbyModel;
@@ -40,8 +42,8 @@ public class LobbyController {
             }
 
             @Override
-            public void onError(NetworkError error, String errorMessage) {
-                showError(errorMessage);
+            public void onError(NetworkError error) {
+                showError(error);
             }
         });
     }
@@ -59,8 +61,8 @@ public class LobbyController {
             }
 
             @Override
-            public void onError(NetworkError error, String errorMessage) {
-                showError(errorMessage);
+            public void onError(NetworkError error) {
+                showError(error);
             }
         });
     }
@@ -98,8 +100,8 @@ public class LobbyController {
             }
 
             @Override
-            public void onError(String errorMessage) {
-                showError(errorMessage);
+            public void onError(NetworkError error) {
+                showError(error);
             }
         });
 
@@ -110,8 +112,8 @@ public class LobbyController {
             }
 
             @Override
-            public void onError(NetworkError error, String errorMessage) {
-                showError(errorMessage);
+            public void onError(NetworkError error) {
+                showError(error);
             }
         });
 
@@ -150,9 +152,9 @@ public class LobbyController {
                 }
 
                 @Override
-                public void onError(NetworkError error, String errorMessage) {
+                public void onError(NetworkError error) {
                     Gdx.app.postRunnable(() -> {
-                        actions.showError("Host left the lobby");
+                        actions.showError(HOST_LEFT_LOBBY);
                         actions.goToMenuState();
                     });
                 }
@@ -162,7 +164,7 @@ public class LobbyController {
         actions.goToLobbyState(lobbyModel, lobbyModel.getIsHost());
     }
 
-    private void showError(String message) {
-        Gdx.app.postRunnable(() -> actions.showError(message));
+    private void showError(NetworkError error) {
+        Gdx.app.postRunnable(() -> actions.showError(error));
     }
 }

@@ -1,5 +1,12 @@
 package com.fatpiggies.game.view.states;
 
+import static com.fatpiggies.game.network.NetworkError.COLOR_ALREADY_TAKEN;
+import static com.fatpiggies.game.network.NetworkError.DATABASE_ERROR;
+import static com.fatpiggies.game.network.NetworkError.LOBBY_ALREADY_STARTED;
+import static com.fatpiggies.game.network.NetworkError.LOBBY_FULL;
+import static com.fatpiggies.game.network.NetworkError.LOBBY_NOT_FOUND;
+import static com.fatpiggies.game.network.NetworkError.NAME_ALREADY_EXIST;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -15,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.setting.MusicManager;
 import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
@@ -37,6 +45,11 @@ public class MenuState extends State {
     private static final float PANEL_WIDTH_RATIO = 0.1f;
     private static final float PANEL_HEIGHT_RATIO = 0.65f;
 
+    private static final float ERROR_Y_RATIO = 0.81f;
+    private static final float CROSS_SIZE_RATIO = 0.04f;
+    private static final float CROSS_X_RATIO = 0.26f;
+    private static final float CROSS_Y_RATIO = 0.55f;
+
     private static final float MENU_SIZE_RATIO = 0.79f;
 
     private static final float FIELD_WIDTH_RATIO = 0.18f;
@@ -58,12 +71,14 @@ public class MenuState extends State {
     private TextButton hostButton;
     private ImageButton colorButton;
     private TextureId currentPig = TextureId.OVER_BLUE_PIG;
+    private boolean showCrossOnPigSelection = false;
     private CheckBox musicButton;
     private CheckBox soundButton;
     private CheckBox vibrationButton;
 
     private final TextureRegion menuBackground;
     private final TextureRegion playBackground;
+    private final TextureRegion cross;
 
     private Label errorLabel;
 
@@ -74,6 +89,7 @@ public class MenuState extends State {
         super(viewActions);
         menuBackground = TextureManager.getFrame(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getFrame(TextureId.PLAY_BACKGROUND);
+        cross = TextureManager.getFrame(TextureId.CROSS);
 
         createUI("");
     }
@@ -201,6 +217,7 @@ public class MenuState extends State {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 currentPig = TextureManager.nextPig(currentPig);
+                showCrossOnPigSelection = false;
                 updateColorButton();
             }
         });
@@ -347,17 +364,25 @@ public class MenuState extends State {
         sb.end();
 
         stage.draw();
+
+        sb.begin();
+        if (showCrossOnPigSelection){
+            size = screenWidth * CROSS_SIZE_RATIO;
+            sb.draw(cross, screenWidth * CROSS_X_RATIO, screenHeight * CROSS_Y_RATIO, size, size);
+        }
+
+        sb.end();
     }
 
     @Override
-    public void showError(String message) {
+    public void showError(NetworkError error) {
         SoundsManager.playError(3f);
 
         errorLabel.clearActions();
-        errorLabel.setText(message);
+        errorLabel.setText(getErrorMessage(error));
         errorLabel.setVisible(true);
 
-        float targetY = screenHeight * 0.93f;
+        float targetY = screenHeight * ERROR_Y_RATIO;
 
         errorLabel.addAction(Actions.sequence(
             Actions.moveTo(screenWidth * ERROR_X_RATIO, targetY, 0.3f, Interpolation.swingIn),
@@ -365,12 +390,43 @@ public class MenuState extends State {
             Actions.moveTo(screenWidth * ERROR_X_RATIO, -screenHeight, 0.1f),
             Actions.run(() -> errorLabel.setVisible(false))
         ));
+
+        if(error == COLOR_ALREADY_TAKEN) {
+            showCrossOnPigSelection = true;
+        }
+    }
+
+    private String getErrorMessage(NetworkError error) {
+        switch (error) {
+
+            case NAME_ALREADY_EXIST:
+                return "That name's taken";
+
+            case COLOR_ALREADY_TAKEN:
+                return "That pig's taken";
+
+            case LOBBY_NOT_FOUND:
+                return "Can't find that lobby";
+
+            case LOBBY_FULL:
+                return "That lobby is full";
+
+            case LOBBY_ALREADY_STARTED:
+                return "The game already started";
+
+            case DATABASE_ERROR:
+                return "Connection error - try again";
+
+            default:
+                return "Something went wrong";
+        }
     }
 
     @Override
     public void show() {
         super.show();
         stage.clear();
+        showCrossOnPigSelection = false;
         createUI(lastNameField);
     }
 }

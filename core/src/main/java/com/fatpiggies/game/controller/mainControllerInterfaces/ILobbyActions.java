@@ -1,6 +1,7 @@
 package com.fatpiggies.game.controller.mainControllerInterfaces;
 
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
+import com.fatpiggies.game.network.NetworkError;
 
 public interface ILobbyActions {
 
@@ -14,5 +15,5 @@ public interface ILobbyActions {
 
     void goToOverState();
 
-    void showError(String message);
+    void showError(NetworkError error);
 }

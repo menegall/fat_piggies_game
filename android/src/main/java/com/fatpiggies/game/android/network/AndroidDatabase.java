@@ -68,14 +68,14 @@ public class AndroidDatabase implements DatabaseService {
             })
             .addOnFailureListener(e -> {
                 Log.e(TAG_DATABASE, "Error creating lobby: " + e.getMessage());
-                callback.onError(NetworkError.DATABASE_ERROR, e.getMessage());
+                callback.onError(NetworkError.DATABASE_ERROR);
             });
     }
 
     @Override
     public void joinLobby(String lobbyCode, String playerId, String playerName, PlayerColor playerColor, LobbyCallback callback) {
         final long startTime = System.currentTimeMillis();
-        Log.i(TAG_DATABASE, playerName + "join lobby " + lobbyCode);
+        Log.i(TAG_DATABASE, playerName + " join lobby " + lobbyCode);
         // Find lobby by code
         lobbiesRef.orderByChild("info/code").equalTo(lobbyCode).get()
             .addOnCompleteListener(task -> {
@@ -116,8 +116,7 @@ public class AndroidDatabase implements DatabaseService {
                         })
                         .addOnFailureListener(e -> {
                             Log.e(TAG_DATABASE, "Error joining lobby: " + lobbyId + ". " + e.getMessage());
-                            callback.onError(NetworkError.DATABASE_ERROR,
-                                "Error writing to database: " + e.getMessage());
+                            callback.onError(NetworkError.DATABASE_ERROR);
                         });
                 }
             });
@@ -196,13 +195,13 @@ public class AndroidDatabase implements DatabaseService {
                     }
                 }
                 if (!snapshot.exists()) {
-                    callback.onError(NetworkError.LOBBY_NOT_FOUND, "Lobby deleted");
+                    callback.onError(NetworkError.LOBBY_NOT_FOUND);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
-                callback.onError(NetworkError.DATABASE_ERROR, error.getMessage());
+                callback.onError(NetworkError.DATABASE_ERROR);
             }
         };
 
@@ -225,13 +224,13 @@ public class AndroidDatabase implements DatabaseService {
                     }
                 }
                 if (!snapshot.exists()) {
-                    callback.onError(NetworkError.LOBBY_NOT_FOUND, "Lobby deleted");
+                    callback.onError(NetworkError.LOBBY_NOT_FOUND);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
-                callback.onError(NetworkError.DATABASE_ERROR, error.getMessage());
+                callback.onError(NetworkError.DATABASE_ERROR);
             }
         };
 
@@ -248,17 +247,16 @@ public class AndroidDatabase implements DatabaseService {
         codeRef.get().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.e(TAG_DATABASE, "Error getting lobby code", task.getException());
-                callback.onError(task.getException().getMessage());
+                callback.onError(NetworkError.DATABASE_ERROR);
                 return;
             }
 
-            // Task successful, extract the snapshot
             com.google.firebase.database.DataSnapshot snapshot = task.getResult();
             if (snapshot.exists()) {
                 String code = snapshot.getValue(String.class);
                 callback.onCodeRetrieved(code);
             } else {
-                callback.onError("Code node does not exist.");
+                callback.onError(NetworkError.LOBBY_NOT_FOUND);
             }
         });
     }
@@ -298,7 +296,7 @@ public class AndroidDatabase implements DatabaseService {
 
             @Override
             public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
-                callback.onError(NetworkError.DATABASE_ERROR, error.getMessage());
+                callback.onError(NetworkError.DATABASE_ERROR);
             }
         };
 
@@ -332,7 +330,7 @@ public class AndroidDatabase implements DatabaseService {
                 } else {
                     // Node doesn't exist anymore! Host or server deleted it.
                     Log.w(TAG_DATABASE, "Lobby was destroyed by host or server.");
-                    callback.onError(NetworkError.LOBBY_NOT_FOUND, "Lobby Closed");
+                    callback.onError(NetworkError.LOBBY_NOT_FOUND);
 
                     // TODO Controller Must call databaseService.stopListening() to destroy listener.
                 }
@@ -340,7 +338,7 @@ public class AndroidDatabase implements DatabaseService {
 
             @Override
             public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
-                callback.onError(NetworkError.DATABASE_ERROR, error.getMessage());
+                callback.onError(NetworkError.DATABASE_ERROR);
             }
         };
 
@@ -389,7 +387,7 @@ public class AndroidDatabase implements DatabaseService {
         if (!task.isSuccessful()) {
             Exception e = task.getException();
             String errorMsg = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown Error";
-            callback.onError(NetworkError.DATABASE_ERROR, "Network Error: " + errorMsg);
+            callback.onError(NetworkError.DATABASE_ERROR);
             return true;
         } else {
             return false;
@@ -400,7 +398,7 @@ public class AndroidDatabase implements DatabaseService {
                                    LobbyCallback callback,
                                    String lobbyCode) {
         if (!dataSnapshot.exists()) {
-            callback.onError(NetworkError.LOBBY_NOT_FOUND, "No lobby with code: " + lobbyCode);
+            callback.onError(NetworkError.LOBBY_NOT_FOUND);
             return true;
         } else return false;
     }
@@ -408,7 +406,7 @@ public class AndroidDatabase implements DatabaseService {
     private boolean isLobbyIdNull(String lobbyId, LobbyCallback callback) {
         if (lobbyId == null) {
             Log.d(TAG_DATABASE, "Something went wrong with lobbyId");
-            callback.onError(NetworkError.DATABASE_ERROR, "Something went wrong");
+            callback.onError(NetworkError.DATABASE_ERROR);
             return true;
         } else return false;
     }
@@ -417,7 +415,7 @@ public class AndroidDatabase implements DatabaseService {
                                 LobbyCallback callback) {
         long numPlayers = lobbySnapshot.child("info").child("playersSetup").getChildrenCount();
         if (numPlayers >= 4) {
-            callback.onError(NetworkError.LOBBY_FULL, "The lobby is full");
+            callback.onError(NetworkError.LOBBY_FULL);
             return true; // Indicates the lobby is full and the error was handled
         }
         return false;
@@ -429,7 +427,7 @@ public class AndroidDatabase implements DatabaseService {
         for (com.google.firebase.database.DataSnapshot playerSnapshot : lobbySnapshot.child("info/playersSetup").getChildren()) {
             String playerNameDB = playerSnapshot.child("name").getValue(String.class);
             if (java.util.Objects.equals(playerNameDB, playerName)) {
-                callback.onError(NetworkError.NAME_ALREADY_EXIST, "Name already exist");
+                callback.onError(NetworkError.NAME_ALREADY_EXIST);
                 return true; // Indicates the name is taken and the error was handled
             }
         }
@@ -437,12 +435,12 @@ public class AndroidDatabase implements DatabaseService {
     }
 
     private boolean isPlayerColorTaken(com.google.firebase.database.DataSnapshot lobbySnapshot,
-                                      PlayerColor playerColor,
-                                      LobbyCallback callback) {
+                                       PlayerColor playerColor,
+                                       LobbyCallback callback) {
         for (com.google.firebase.database.DataSnapshot playerSnapshot : lobbySnapshot.child("info/playersSetup").getChildren()) {
             String colorStr = playerSnapshot.child("color").getValue(String.class);
             if (colorStr != null && colorStr.equals(playerColor.name())) {
-                callback.onError(NetworkError.COLOR_ALREADY_TAKEN, "Color already taken");
+                callback.onError(NetworkError.COLOR_ALREADY_TAKEN);
                 return true;
             }
         }
@@ -453,7 +451,7 @@ public class AndroidDatabase implements DatabaseService {
                                          LobbyCallback callback) {
         String status = lobbySnapshot.child("info").child("status").getValue(String.class);
         if (!"waiting".equals(status)) {
-            callback.onError(NetworkError.LOBBY_ALREADY_STARTED, "The game already started");
+            callback.onError(NetworkError.LOBBY_ALREADY_STARTED);
             return true; // Indicates the game is not waiting and the error was handled
         }
         return false;

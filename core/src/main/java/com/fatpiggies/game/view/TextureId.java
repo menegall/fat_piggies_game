@@ -6,6 +6,7 @@ public enum TextureId {
     PLAY_BACKGROUND,
     OVER_BACKGROUND,
     PODIUM,
+    CROSS,
     BLUE_PIG,
     GREEN_PIG,
     RED_PIG,

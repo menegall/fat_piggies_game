@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyGameWorld;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
+import com.fatpiggies.game.network.NetworkError;
 
 import java.util.Stack;
 
@@ -116,9 +117,9 @@ public class GameStateManager {
     // Error handling
     // ========================
 
-    public void showError(String message) {
+    public void showError(NetworkError error) {
         if (!states.isEmpty()) {
-            states.peek().showError(message);
+            states.peek().showError(error);
         }
     }
 }

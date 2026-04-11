@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
+import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.view.TextureManager;
 
 public abstract class State {
@@ -38,7 +39,7 @@ public abstract class State {
         stage.dispose();
     }
 
-    public void showError(String message){};
+    public void showError(NetworkError error){};
 
     public void show() {Gdx.input.setInputProcessor(getInputProcessor());}
 

@@ -1,6 +1,7 @@
 package com.fatpiggies.game.controller.mainControllerInterfaces;
 
 import com.fatpiggies.game.model.LobbyModel;
+import com.fatpiggies.game.network.NetworkError;
 
 public interface IPlayActions {
 
@@ -10,5 +11,5 @@ public interface IPlayActions {
 
     void onGameFinishedByHost();
 
-    void showError(String message);
+    void showError(NetworkError error);
 }

@@ -177,8 +177,8 @@ public class ClientPlayController implements IPlayController {
             }
 
             @Override
-            public void onError(NetworkError error, String errorMessage) {
-                actions.showError(errorMessage);
+            public void onError(NetworkError error) {
+                actions.showError(error);
             }
         });
     }
