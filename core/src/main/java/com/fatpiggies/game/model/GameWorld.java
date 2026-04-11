@@ -333,16 +333,6 @@ public class GameWorld implements IReadOnlyGameWorld {
         entity.add(velocity).add(accel).add(mass);
     }
 
-    @Override
-    public Engine getEngine() {
-        return engine;
-    }
-
-    @Override
-    public Entity getLocalPlayer() {
-        return localPlayer;
-    }
-
     public void setLocalPlayer(Entity localPlayer) {
         this.localPlayer = localPlayer;
     }
@@ -548,7 +538,6 @@ public class GameWorld implements IReadOnlyGameWorld {
             NetworkSyncComponent sync = entity.getComponent(NetworkSyncComponent.class);
             HealthComponent health = entity.getComponent(HealthComponent.class);
 
-            // ✅ SYNC HP (TOUJOURS)
             if (health != null) {
                 health.currentLife = pd.hp;
             }
@@ -642,4 +631,39 @@ public class GameWorld implements IReadOnlyGameWorld {
                 health.currentLife = pd.hp;
             }
         }
-    }}
+    }
+
+    @Override
+    public Engine getEngine() {
+        return engine;
+    }
+
+    @Override
+    public Entity getLocalPlayer() {
+        return localPlayer;
+    }
+
+    @Override
+    public int getLocalPlayerLife() {
+        if (localPlayer == null) return 0;
+
+        HealthComponent hc = localPlayer.getComponent(HealthComponent.class);
+        return hc != null ? hc.currentLife : 0;
+    }
+
+    @Override
+    public TextureId getLocalPlayerTexture() {
+        if (localPlayer == null) return null;
+
+        RenderComponent rc = localPlayer.getComponent(RenderComponent.class);
+        return rc != null ? rc.textureId : null;
+    }
+
+    @Override
+    public boolean isLocalPlayerAlive() {
+        if (localPlayer == null) return false;
+
+        HealthComponent hc = localPlayer.getComponent(HealthComponent.class);
+        return hc != null && hc.currentLife > 0;
+    }
+}

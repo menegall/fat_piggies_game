@@ -32,7 +32,7 @@ public class HostPlayController implements IPlayController {
     private final Map<String, Float> remoteInputFreshness = new HashMap<>();
     private static final float INPUT_TIMEOUT = 0.2f;
 
-    // 🔥 INPUT DELAY SYSTEM
+    // Delay
     private static class BufferedInput {
         String playerId;
         PlayerInput input;

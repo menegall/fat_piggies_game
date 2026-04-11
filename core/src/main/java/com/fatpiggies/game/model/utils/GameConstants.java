@@ -23,7 +23,7 @@ public final class GameConstants {
     public static final float PLAYER_BASE_ACCELERATION = 200f;
     public static final float PLAYER_BASE_MASS = 10f;
     public static final int MAX_PLAYERS = 4;
-    public static final int BASE_LIFE = 4;
+    public static final int BASE_LIFE = 5;
     public static final float LERP_FACTOR = 20f;
     public static final int PLAYER_COLLISION_RADIUS = 95;
     public static final float PLAYER_BOUNCINESS = 0.8f;

@@ -1,14 +1,17 @@
 package com.fatpiggies.game.view.states;
 
-import static com.fatpiggies.game.model.utils.GameConstants.JOYSTICK_DEADZONE;
-import static com.fatpiggies.game.model.utils.GameConstants.WORLD_HEIGHT;
-import static com.fatpiggies.game.model.utils.GameConstants.WORLD_WIDTH;
+import static com.fatpiggies.game.model.utils.GameConstants.*;
 
+import com.badlogic.ashley.core.*;
+import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyGameWorld;
@@ -18,24 +21,16 @@ import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.setting.VibrationManager;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
-import com.badlogic.ashley.core.*;
-import com.badlogic.ashley.utils.ImmutableArray;
 
 public class PlayState extends State {
 
-    // ================= CONSTANTS =================
-    private static final float JOYSTICK_X = 0.125f;
-    private static final float JOYSTICK_Y = 0.1f;
+    // ================= CONST =================
     private static final float JOYSTICK_SIZE = 0.15f;
-
     private static final float BACK_SIZE = 0.08f;
     private static final float BACK_MARGIN_X = 0.03f;
     private static final float BACK_MARGIN_Y = 0.03f;
 
-    private static final float INPUT_THRESHOLD = 0.01f;
-
     private static final int MAX_LIFE = 5;
-
     private static final float LIFE_WIDTH = 0.06f;
     private static final float LIFE_HEIGHT = 0.12f;
     private static final float LIFE_START_X = 0.05f;
@@ -43,94 +38,157 @@ public class PlayState extends State {
     private static final float LIFE_Y = 0.8f;
 
     // ================= DATA =================
+    private final IReadOnlyGameWorld gameWorld;
     private final boolean isHost;
-    private final String playerId;
 
-    private final ImmutableArray<Entity> renderableEntities;
-    private final ImmutableArray<Entity> networkEntities;
+    private final ImmutableArray<Entity> renderables;
 
     private final ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
     private final ComponentMapper<RenderComponent> rm = ComponentMapper.getFor(RenderComponent.class);
-    private final ComponentMapper<NetworkIdentityComponent> nm = ComponentMapper.getFor(NetworkIdentityComponent.class);
-    private final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
     // ================= UI =================
     private Touchpad touchpad;
     private Button backButton;
-    private int remainingLife = MAX_LIFE;
-    private TextureId playerTexture = null;
+    private InputMultiplexer multiplexer;
 
-    private final TextureRegion playBackground;
+    private boolean joystickActive = false;
+    private int joystickPointer = -1;
+
+    private final TextureRegion bg;
 
     public PlayState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, String playerId, boolean isHost) {
         super(viewActions);
-        this.playerId = playerId;
+
+        this.gameWorld = gameWorld;
         this.isHost = isHost;
 
         Engine engine = gameWorld.getEngine();
-
-        this.renderableEntities = engine.getEntitiesFor(
+        this.renderables = engine.getEntitiesFor(
             Family.all(TransformComponent.class, RenderComponent.class).get()
         );
 
-        this.networkEntities = engine.getEntitiesFor(
-            Family.all(NetworkIdentityComponent.class).get()
-        );
-
-        playBackground = TextureManager.getFrame(TextureId.PLAY_BACKGROUND);
+        bg = TextureManager.getFrame(TextureId.PLAY_BACKGROUND);
 
         createUI();
+        setupInput();
     }
 
+    // ================= UI =================
     private void createUI() {
-        // Joystick
+
         touchpad = new Touchpad(
             JOYSTICK_DEADZONE,
             skin.get("touchpad", Touchpad.TouchpadStyle.class)
         );
 
         float size = screenWidth * JOYSTICK_SIZE;
+        touchpad.setSize(size, size);
 
-        touchpad.setBounds(
-            screenWidth * JOYSTICK_X,
-            screenHeight * JOYSTICK_Y,
-            size,
-            size
-        );
+        touchpad.setVisible(true);
+        touchpad.setTouchable(Touchable.enabled);
+        touchpad.getColor().a = 0f;
+        touchpad.setResetOnTouchUp(true);
 
         stage.addActor(touchpad);
 
-        // Back button
-        float backSize = screenWidth * BACK_SIZE;
+        if (isHost) {
+            float s = screenWidth * BACK_SIZE;
 
-        float x = screenWidth - backSize - screenWidth * BACK_MARGIN_X;
-        float y = screenHeight - backSize - screenHeight * BACK_MARGIN_Y;
+            backButton = new Button(skin, "backButton");
+            backButton.setSize(s, s);
+            backButton.setPosition(
+                screenWidth - s - screenWidth * BACK_MARGIN_X,
+                screenHeight - s - screenHeight * BACK_MARGIN_Y
+            );
 
-        backButton = new Button(skin, "backButton");
-        backButton.setSize(backSize, backSize);
-        backButton.setPosition(x, y);
+            backButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    viewActions.onLobbyClicked();
+                    VibrationManager.vibrate(200);
+                    SoundsManager.playButton(1f);
+                }
+            });
 
-        backButton.addListener(new ChangeListener() {
+            stage.addActor(backButton);
+        }
+    }
+
+    // ================= INPUT =================
+    private void setupInput() {
+
+        InputAdapter input = new InputAdapter() {
+
             @Override
-            public void changed(ChangeListener.ChangeEvent event, Actor actor) {
-                viewActions.onLobbyClicked();
-                VibrationManager.vibrate(200);
-                SoundsManager.playButton(1f);
-            }
-        });
+            public boolean touchDown(int x, int y, int pointer, int button) {
 
-        if(isHost) stage.addActor(backButton);
+                if (!gameWorld.isLocalPlayerAlive()) return false;
+                Vector2 pos = screenToStage(x, y);
+
+                Actor hit = stage.hit(pos.x, pos.y, true);
+                if (hit != null && hit != touchpad) return false;
+
+                if (joystickActive) return false;
+
+                joystickActive = true;
+                joystickPointer = pointer;
+
+                touchpad.setPosition(
+                    pos.x - touchpad.getWidth() / 2f,
+                    pos.y - touchpad.getHeight() / 2f
+                );
+
+                touchpad.getColor().a = 1f;
+                return false;
+            }
+
+            @Override
+            public boolean touchUp(int x, int y, int pointer, int button) {
+
+                if (pointer != joystickPointer) return false;
+
+                joystickActive = false;
+                joystickPointer = -1;
+
+                touchpad.getColor().a = 0f;
+                viewActions.onJoystickMoved(0f, 0f);
+
+                return false;
+            }
+        };
+
+        multiplexer = new InputMultiplexer(input, stage);
+    }
+
+    @Override
+    public InputProcessor getInputProcessor() {
+        return multiplexer;
+    }
+
+    private Vector2 screenToStage(int x, int y) {
+        return stage.screenToStageCoordinates(new Vector2(x, y));
     }
 
     // ================= UPDATE =================
     @Override
     public void update(float dt) {
 
-        float joyX = touchpad.getKnobPercentX();
-        float joyY = touchpad.getKnobPercentY();
+        boolean isAlive = gameWorld.isLocalPlayerAlive();
 
-        viewActions.onJoystickMoved(joyX, joyY);
+        if (!isAlive && joystickActive) {
+            joystickActive = false;
+            joystickPointer = -1;
 
+            touchpad.getColor().a = 0f;
+            viewActions.onJoystickMoved(0f, 0f);
+        }
+
+        if (joystickActive && isAlive) {
+            viewActions.onJoystickMoved(
+                touchpad.getKnobPercentX(),
+                touchpad.getKnobPercentY()
+            );
+        }
 
         stage.act(dt);
     }
@@ -139,35 +197,29 @@ public class PlayState extends State {
     @Override
     public void render(SpriteBatch sb) {
 
-        // BACKGROUND
+        // BG
         sb.begin();
-        sb.draw(playBackground, 0, 0, screenWidth, screenHeight);
+        sb.draw(bg, 0, 0, screenWidth, screenHeight);
         sb.end();
 
-        // ================= ECS DRAW (READ ONLY) =================
+        // ENTITIES
         sb.begin();
 
-        float scaleX = screenWidth / WORLD_WIDTH;
-        float scaleY = screenHeight / WORLD_HEIGHT;
+        float sx = screenWidth / WORLD_WIDTH;
+        float sy = screenHeight / WORLD_HEIGHT;
 
-        for (int i = 0; i < renderableEntities.size(); ++i) {
-            Entity e = renderableEntities.get(i);
-
+        for (Entity e : renderables) {
             TransformComponent t = tm.get(e);
             RenderComponent r = rm.get(e);
 
             sb.draw(
                 TextureManager.getFrame(r.textureId),
-
-                (t.x - r.width / 2f) * scaleX,
-                (t.y - r.height / 2f) * scaleY,
-
-                (r.width / 2f) * scaleX,
-                (r.height / 2f) * scaleY,
-
-                r.width * scaleX,
-                r.height * scaleY,
-
+                (t.x - r.width / 2f) * sx,
+                (t.y - r.height / 2f) * sy,
+                (r.width / 2f) * sx,
+                (r.height / 2f) * sy,
+                r.width * sx,
+                r.height * sy,
                 1f, 1f,
                 t.angle + r.angleOffset
             );
@@ -175,54 +227,43 @@ public class PlayState extends State {
 
         sb.end();
 
-        // ================= LIFE UI =================
+        // UI LIFE
         sb.begin();
 
-        for (int i = 0; i < networkEntities.size(); ++i) {
-            Entity e = networkEntities.get(i);
+        int life = gameWorld.getLocalPlayerLife();
+        TextureId tex = gameWorld.getLocalPlayerTexture();
+        boolean isAlive = gameWorld.isLocalPlayerAlive();
 
-            if (nm.get(e).playerId.equals(playerId)) {
-
-                remainingLife = hm.get(e).currentLife;
-
-                RenderComponent r = rm.get(e);
-                if (r != null) {
-                    playerTexture = r.textureId;
-                }
-
-                break;
-            }
+        if (!isAlive) {
+            sb.setColor(0f, 0f, 0f, 0.5f);
+            sb.draw(bg, 0, 0, screenWidth, screenHeight);
+            sb.setColor(1f, 1f, 1f, 1f);
         }
 
-        float width = screenWidth * LIFE_WIDTH;
-        float height = screenHeight * LIFE_HEIGHT;
+        float w = screenWidth * LIFE_WIDTH;
+        float h = screenHeight * LIFE_HEIGHT;
 
         for (int i = 1; i <= MAX_LIFE; i++) {
 
-            boolean alive = i <= remainingLife;
+            boolean heartAlive = i <= life;
 
-            TextureRegion frame = alive
-                ? TextureManager.getFrame(TextureManager.getLifeTextureId(playerTexture))
-                : TextureManager.getFrame(TextureManager.getLifeTextureId(playerTexture), 3);
+            TextureRegion frame = heartAlive
+                ? TextureManager.getFrame(TextureManager.getLifeTextureId(tex))
+                : TextureManager.getFrame(TextureManager.getLifeTextureId(tex), 3);
 
-            if (!alive) {
-                sb.setColor(0.3f, 0.3f, 0.3f, 1f);
-            }
+            if (!heartAlive) sb.setColor(0.3f, 0.3f, 0.3f, 1f);
 
             sb.draw(
                 frame,
                 screenWidth * LIFE_START_X + i * screenWidth * LIFE_SPACING,
                 screenHeight * LIFE_Y,
-                width,
-                height
+                w, h
             );
 
             sb.setColor(1f, 1f, 1f, 1f);
         }
-
         sb.end();
 
-        // ================= UI =================
         stage.draw();
     }
 }

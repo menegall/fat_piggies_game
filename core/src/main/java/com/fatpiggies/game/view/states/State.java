@@ -1,6 +1,7 @@
 package com.fatpiggies.game.view.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
@@ -39,7 +40,7 @@ public abstract class State {
 
     public void showError(String message){};
 
-    public void show() {
-        Gdx.input.setInputProcessor(stage);
-    }
+    public void show() {Gdx.input.setInputProcessor(getInputProcessor());}
+
+    public InputProcessor getInputProcessor() {return stage;}
 }
