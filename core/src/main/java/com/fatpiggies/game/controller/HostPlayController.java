@@ -1,5 +1,7 @@
 package com.fatpiggies.game.controller;
 
+import static com.fatpiggies.game.model.utils.GameConstants.POWERUP_SPAWN_INTERVAL;
+
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
@@ -22,7 +24,11 @@ import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class HostPlayController implements IPlayController {
 
@@ -31,6 +37,7 @@ public class HostPlayController implements IPlayController {
 
     private final Map<String, Float> remoteInputFreshness = new HashMap<>();
     private static final float INPUT_TIMEOUT = 0.2f;
+    private float powerupTimer = POWERUP_SPAWN_INTERVAL;
 
     // Delay
     private static class BufferedInput {
@@ -77,6 +84,8 @@ public class HostPlayController implements IPlayController {
         remoteInputFreshness.clear();
         inputBuffer.clear();
 
+        powerupTimer = POWERUP_SPAWN_INTERVAL;
+
         String currentUser = actions.getCurrentUserId();
         Map<String, PlayerSetup> playerSetups = actions.getLobbyModel().getPlayerSetups();
 
@@ -119,9 +128,16 @@ public class HostPlayController implements IPlayController {
 
         String currentUser = actions.getCurrentUserId();
 
-        // Apply delay
-        float currentTime = gameState.ts;
+        // Creating PowerUp Logic
+        powerupTimer -= dt;
+        if (powerupTimer <= 0f) {
+            world.createRandomPowerUp();
+            powerupTimer = POWERUP_SPAWN_INTERVAL;
+        }
 
+        float currentTime = actions.getTimerNetwork();
+
+        // TODO: Why this logic??
         Iterator<BufferedInput> it = inputBuffer.iterator();
         while (it.hasNext()) {
             BufferedInput bi = it.next();

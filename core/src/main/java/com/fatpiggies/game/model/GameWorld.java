@@ -63,7 +63,6 @@ public class GameWorld implements IReadOnlyGameWorld {
     private Engine engine;
     private Entity localPlayer;
     private String lobbyId;
-    private String lobbyCode;
     private Map<String, PlayerSetup> playersSetup;
 
     public GameWorld(Engine engine) {
@@ -94,7 +93,6 @@ public class GameWorld implements IReadOnlyGameWorld {
     /**
      * Creates a pig for the Host. It contains ALL physics and collision logic.
      * The host simulates all players.
-     *
      * IMPORTANT:
      * This method does NOT set localPlayer automatically.
      * The controller must call setLocalPlayer(...) explicitly.
@@ -205,12 +203,29 @@ public class GameWorld implements IReadOnlyGameWorld {
     }
 
     /**
+     * Creates a random power-up in the game world.
+     */
+    public void createRandomPowerUp() {
+        // Get all possible power-up types
+        PowerUpType[] types = PowerUpType.values();
+
+        // Ensure there are types available to avoid crashes
+        if (types.length == 0) return;
+
+        // Pick a random index
+        int randomIndex = MathUtils.random(0, types.length - 1);
+
+        // Create the power-up using the existing method
+        createPowerUp(types[randomIndex]);
+    }
+
+    /**
      * Creates a collectible power-up for the Host.
      * Randomizes position and lifetime.
      *
      * @param type The type of power-up to create, follow the PowerUpType enum.
      */
-    public void createPowerUp(PowerUpType type) {
+    private void createPowerUp(PowerUpType type) {
         Entity entity = engine.createEntity();
 
         TransformComponent transform = new TransformComponent();
@@ -345,9 +360,6 @@ public class GameWorld implements IReadOnlyGameWorld {
         this.lobbyId = lobbyId;
     }
 
-    public void setLobbyCode(String lobbyCode) {
-        this.lobbyCode = lobbyCode;
-    }
 
     public void setPlayersSetup(Map<String, PlayerSetup> playersSetup) {
         this.playersSetup = playersSetup;

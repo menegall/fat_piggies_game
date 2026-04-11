@@ -208,4 +208,9 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         quitPlayState();
         gsm.pushOverState(this, lobbyModel, lobbyModel.getIsHost());
     }
+
+    @Override
+    public float getTimerNetwork() {
+        return timerNetwork;
+    }
 }

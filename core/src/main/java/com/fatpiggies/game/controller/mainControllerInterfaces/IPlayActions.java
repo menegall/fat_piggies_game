@@ -9,6 +9,8 @@ public interface IPlayActions {
 
     LobbyModel getLobbyModel();
 
+    float getTimerNetwork();
+
     void onGameFinishedByHost();
 
     void showError(NetworkError error);
