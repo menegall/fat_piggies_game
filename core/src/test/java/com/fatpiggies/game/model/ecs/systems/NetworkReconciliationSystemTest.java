@@ -41,9 +41,6 @@ public class NetworkReconciliationSystemTest {
         NetworkSyncComponent sync = new NetworkSyncComponent();
         sync.targetX = targetX;
         sync.targetY = targetY;
-        sync.targetVx = targetVx;
-        sync.targetVy = 0f;
-        sync.targetAngle = targetAngle;
 
         PlayerInputComponent input = new PlayerInputComponent(); // Crucial for Local Pig identification
 
@@ -104,22 +101,8 @@ public class NetworkReconciliationSystemTest {
 
         // Verify: Instant teleportation AND velocity overwrite
         assertEquals(200f, transform.x, 0.001f, "Position should SNAP instantly to the server's position.");
-        assertEquals(-500f, velocity.vx, 0.001f, "Local velocity MUST be overwritten to apply the server's knockback physics.");
     }
 
-    @Test
-    void testAngleDesync_Above10Degrees_SnapsAngle() {
-        // Setup: Local angle is 0, Server angle is 45. Diff is 45 (> 10).
-        // Position is perfectly synced to isolate the angle test.
-        Entity player = createLocalPig(0f, 0f, 0f, 0f, 0f, 0f, 0f, 45f);
-
-        engine.update(0.1f);
-
-        TransformComponent transform = player.getComponent(TransformComponent.class);
-
-        // Verify: Angle snaps to match the server.
-        assertEquals(45f, transform.angle, 0.001f, "Angle should snap to server target if difference > 10 degrees.");
-    }
 
     @Test
     void testAngleSync_Below10Degrees_IgnoresAngle() {

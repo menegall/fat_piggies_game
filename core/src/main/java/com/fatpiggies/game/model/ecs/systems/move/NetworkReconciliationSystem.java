@@ -74,10 +74,6 @@ public class NetworkReconciliationSystem extends IteratingSystem {
                 transform.x = sync.targetX;
                 transform.y = sync.targetY;
 
-                // Overwrite the local velocity with the server's velocity!
-//                velocity.vx = sync.targetVx;
-//                velocity.vy = sync.targetVy;
-
             } else {
                 // MEDIUM DESYNC: We are drifting slightly out of sync.
                 // Apply a soft correction (Lerp) to realign without a violent camera snap.
@@ -87,10 +83,5 @@ public class NetworkReconciliationSystem extends IteratingSystem {
                 transform.y += correction.y * CORRECTION_LERP * deltaTime;
             }
         }
-
-        // Synchronize the rotation angle to ensure we are facing the correct direction.
-//        if (Math.abs(transform.angle - sync.targetAngle) > 10f) {
-//            transform.angle = sync.targetAngle;
-//        }
     }
 }

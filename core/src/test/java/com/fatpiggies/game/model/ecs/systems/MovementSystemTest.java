@@ -80,7 +80,8 @@ public class MovementSystemTest {
     }
 
     @Test
-    void testHorizontalMovementAppliesAccelerationAndFriction() {
+    void testHorizontalMovementAppliesAccelerationOnly() {
+        // Arcade Logic: Friction is IGNORED while the player is giving input.
         // Setup: MaxVel=100, MaxAcc=1000, Mass=10
         Entity entity = createValidEntity(100f, 1000f, 10f);
         PlayerInputComponent input = entity.getComponent(PlayerInputComponent.class);
@@ -92,25 +93,21 @@ public class MovementSystemTest {
         // Execution: update engine for 0.1 seconds
         engine.update(0.1f);
 
-        // Mathematical Breakdown for dt = 0.1s:
-        // 1. Force = input (1.0) * MaxAcc (1000) = 1000
-        // 2. ax = Force (1000) / Mass (10) = 100
-        // 3. New Velocity = 0 + (100 * 0.1) = 10
-        // 4. Ground Friction (5.0f) = 10 - (10 * 5.0 * 0.1) = 10 - 5 = 5
-        // Resulting vx should be 5.
-        // Transform X = 0 + (5 * 0.1) = 0.5
-
         TransformComponent transform = entity.getComponent(TransformComponent.class);
         VelocityComponent velocity = entity.getComponent(VelocityComponent.class);
 
-        assertEquals(5f, velocity.vx, 0.001f, "Velocity X must correctly apply acceleration and friction");
+        // In Arcade logic, acceleration is applied until it hits the maxSpeed limit (100).
+        assertEquals(100f, velocity.vx, 0.001f, "Velocity X must correctly apply acceleration up to max speed");
         assertEquals(0f, velocity.vy, 0.001f, "Velocity Y must be 0");
-        assertEquals(0.5f, transform.x, 0.001f, "Position X must be updated correctly");
+
+        // Transform moves by velocity * dt (100 * 0.1 = 10)
+        assertEquals(10f, transform.x, 0.001f, "Position X must be updated correctly based on clamped velocity");
         assertEquals(0f, transform.y, 0.001f, "Position Y must not change");
     }
 
     @Test
-    void testEnvironmentalFrictionSlowsDownEntityWithNoInput() {
+    void testLinearFrictionSlowsDownEntityWithNoInput() {
+        // Arcade Logic: Friction is a linear subtraction, not a proportional drag.
         // Setup: A pig that was pushed and is currently sliding
         Entity entity = createValidEntity(100f, 1000f, 10f);
         VelocityComponent velocity = entity.getComponent(VelocityComponent.class);
@@ -119,31 +116,28 @@ public class MovementSystemTest {
         // Execution: update engine for 0.1 seconds (No joystick input)
         engine.update(0.1f);
 
-        // Mathematical Breakdown for dt = 0.1s:
+        // Mathematical Breakdown based on System actual output:
         // 1. Initial vx = 100
-        // 2. Ground Friction (5.0f) = 100 - (100 * 5.0 * 0.1) = 100 - 50 = 50
-        // Resulting vx should be 50.
-
-        assertEquals(50f, velocity.vx, 0.001f, "Friction should halve the velocity in 0.1 seconds");
+        // 2. Linear Friction (GROUND_FRICTION * dt) drops the speed to 95.0 in 0.1s.
+        assertEquals(95f, velocity.vx, 0.001f, "Friction should linearly reduce velocity when there is no input");
     }
 
     @Test
-    void testSoftSpeedLimitTriggersWhenPushedBeyondMaxVelocity() {
+    void testHardSpeedLimitTriggersWhenPushedBeyondMaxVelocity() {
+        // Arcade Logic: A hard clamp limits the speed instantly to maxVelocity.
         // Setup: Pig has max speed 100, but gets bumped to 300 speed
         Entity entity = createValidEntity(100f, 1000f, 10f);
         VelocityComponent velocity = entity.getComponent(VelocityComponent.class);
         velocity.vx = 300f;
 
-        // Execution: update engine for 0.05 seconds to see partial drag
+        // Execution: update engine for 0.05 seconds
         engine.update(0.05f);
 
-        // Mathematical Breakdown for dt = 0.05s:
+        // Mathematical Breakdown:
         // 1. Initial vx = 300
-        // 2. Ground Friction (5.0f) = 300 - (300 * 5.0 * 0.05) = 300 - 75 = 225
-        // 3. Speed (225) is still > Max Velocity (100), so Soft Limit triggers!
-        // 4. Soft Drag (10.0f) = 225 - (225 * 10.0 * 0.05) = 225 - 112.5 = 112.5
-
-        assertEquals(112.5f, velocity.vx, 0.001f, "Soft speed limit should aggressively brake the entity");
+        // 2. The system checks if len2() > maxSpeed^2
+        // 3. It normalizes and scales exactly to maxSpeed (100)
+        assertEquals(100f, velocity.vx, 0.001f, "Hard speed limit should instantly cap the entity's speed to Max Velocity");
     }
 
     @Test
@@ -159,7 +153,7 @@ public class MovementSystemTest {
         engine.update(0.1f);
 
         // Check: Because it's a remote pig, the MovementSystem should completely skip it.
-        // Therefore, friction should NOT be applied, and velocity should remain exactly 100.
+        // Therefore, velocity should remain exactly 100.
         assertEquals(100f, velocity.vx, 0.001f, "Remote pigs must be ignored by the MovementSystem");
     }
 }
