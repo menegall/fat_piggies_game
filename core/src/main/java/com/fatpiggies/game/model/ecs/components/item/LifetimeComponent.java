@@ -1,0 +1,7 @@
+package com.fatpiggies.game.model.ecs.components.item;
+
+import com.badlogic.ashley.core.Component;
+
+public class LifetimeComponent implements Component {
+    public float timeLeft; // Seconds for deltaTime
+}
