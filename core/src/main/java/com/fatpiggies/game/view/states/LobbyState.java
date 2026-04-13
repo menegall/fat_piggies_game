@@ -26,7 +26,8 @@ import java.util.Map;
 public class LobbyState extends State {
 
     // ================= CONSTANTS =================
-    private static final float MENU_SIZE_RATIO = 0.75f;
+    private static final float MENU_SIZE_X_RATIO = 0.35f;
+    private static final float MENU_SIZE_Y_RATIO = 0.79f;
 
     private static final float BUTTON_WIDTH_RATIO = 0.2f;
     private static final float BUTTON_HEIGHT_RATIO = 0.12f;
@@ -36,12 +37,13 @@ public class LobbyState extends State {
 
     private static final float TITLE_SCALE = 0.002f;
     private static final float SUBTITLE_SCALE = 0.0015f;
-    private static final float IMAGE_SIZE = 0.03f;
+    private static final float IMAGE_SIZE_X = 0.04f;
+    private static final float IMAGE_SIZE_Y = 0.1f;
     private static final float PAD_LEFT = 0.03f;
     private static final float CODE_SCALE = 0.0025f;
     private static final float BUTTON_TEXT_SCALE = 0.0015f;
 
-    private static final float CODE_X_RATIO = 0.69f;
+    private static final float CODE_X_RATIO = 0.73f;
     private static final float CODE_Y_RATIO = 0.5f;
 
     private static final float COPY_DURATION = 1.5f;
@@ -125,12 +127,13 @@ public class LobbyState extends State {
         stage.addActor(root);
 
         // ================= LOBBY CODE =================
-        lobbyCodeLabel = new Label("CODE : ----", skin);
+        lobbyCodeLabel = new Label("CODE ----", skin);
         lobbyCodeLabel.setFontScale(screenHeight * CODE_SCALE);
         lobbyCodeLabel.setPosition(
             screenWidth * CODE_X_RATIO,
             screenHeight * CODE_Y_RATIO
         );
+        lobbyCodeLabel.setWrap(true);
 
         lobbyCodeLabel.addListener(new ClickListener() {
             @Override
@@ -168,13 +171,13 @@ public class LobbyState extends State {
 
         if (lobbyModel.getPlayerSetups() != null) {
             updatePlayers(lobbyModel.getPlayerSetups());
-            lobbyCodeLabel.setText("CODE : " + lobbyModel.getLobbyCode());
+            lobbyCodeLabel.setText("CODE \n" + lobbyModel.getLobbyCode());
         }
 
         if (copyTimer > 0) {
             copyTimer -= dt;
             if (copyTimer <= 0) {
-                lobbyCodeLabel.setText("CODE : " + lobbyModel.getLobbyCode());
+                lobbyCodeLabel.setText("CODE \n" + lobbyModel.getLobbyCode());
             }
         }
 
@@ -187,12 +190,13 @@ public class LobbyState extends State {
 
         sb.begin();
 
-        float size = Math.min(screenWidth, screenHeight) * MENU_SIZE_RATIO;
-        float x = (screenWidth - size) / 2f;
-        float y = (screenHeight - size) / 2f;
+        float sizeX = screenWidth * MENU_SIZE_X_RATIO;
+        float sizeY = screenHeight * MENU_SIZE_Y_RATIO;
+        float x = (screenWidth - sizeX) / 2f;
+        float y = (screenHeight - sizeY) / 2f;
 
         sb.draw(playBackground, 0, 0, screenWidth, screenHeight);
-        sb.draw(menuBackground, x, y, size, size);
+        sb.draw(menuBackground, x, y, sizeX, sizeY);
 
         sb.end();
 
@@ -217,12 +221,13 @@ public class LobbyState extends State {
                 TextureManager.getLifeTextureId(TextureManager.getPigTexture(setup.color)
             )));
 
-            float size = screenWidth * IMAGE_SIZE;
+            float sizeX = screenWidth * IMAGE_SIZE_X;
+            float sizeY = screenHeight * IMAGE_SIZE_Y;
 
             Label label = new Label(setup.name, skin);
             label.setFontScale(screenHeight * SUBTITLE_SCALE);
 
-            playersTable.add(pig).size(size, size);
+            playersTable.add(pig).size(sizeX, sizeY);
             playersTable.add(label).padLeft(screenHeight * PAD_LEFT).row();
         }
     }

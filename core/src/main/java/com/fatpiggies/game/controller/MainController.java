@@ -105,6 +105,10 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         timerNetwork = 0f;
     }
 
+    public void resize(int width, int height) {
+        gsm.resize(width, height);
+    }
+
     // ================= VIEW ACTIONS =================
 
     @Override

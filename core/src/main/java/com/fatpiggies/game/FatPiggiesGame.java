@@ -64,9 +64,15 @@ public class FatPiggiesGame extends ApplicationAdapter {
         float dt = Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
-        // FOR TESTING
+        // Main loop
         main.update(batch, dt);
     }
+
+    @Override
+    public void resize(int width, int height) {
+        main.resize(width, height);
+    }
+
 
     @Override
     public void dispose() {

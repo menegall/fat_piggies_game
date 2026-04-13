@@ -25,6 +25,7 @@ public enum TextureId {
     LIFE,
     APPLE,
     BONUS,
+    BUBBLE,
     BUMP_EFFECT
 
 }

@@ -53,7 +53,7 @@ public class TextureManager {
         textures.put(TextureId.OVER_BACKGROUND, new Texture("backgrounds/overBackground.png"));
         textures.put(TextureId.PODIUM, new Texture("backgrounds/podium.png"));
         textures.put(TextureId.CROSS, new Texture("uiAssets/cross.png"));
-
+        textures.put(TextureId.BUBBLE, new Texture("uiAssets/bubble.png"));
         textures.put(TextureId.BONUS, new Texture("events/items.png"));
 
         // ========================

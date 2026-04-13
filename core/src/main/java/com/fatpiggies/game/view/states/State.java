@@ -15,12 +15,11 @@ import com.fatpiggies.game.view.TextureManager;
 public abstract class State {
     protected OrthographicCamera cam;
     protected Vector3 touchPoint;
-    protected final float screenWidth = Gdx.graphics.getWidth();
-    protected final float screenHeight = Gdx.graphics.getHeight();
+    protected float screenWidth;
+    protected float screenHeight;
     protected Stage stage;
     protected Skin skin;
     protected IViewActions viewActions;
-
 
     protected State(IViewActions viewActions) {
         cam = new OrthographicCamera();
@@ -29,6 +28,9 @@ public abstract class State {
 
         stage = new Stage(new ScreenViewport());
         skin = TextureManager.getSkin();
+
+        screenWidth = Gdx.graphics.getWidth();
+        screenHeight = Gdx.graphics.getHeight();
     }
 
     public abstract void update(float dt);
@@ -44,4 +46,10 @@ public abstract class State {
     public void show() {Gdx.input.setInputProcessor(getInputProcessor());}
 
     public InputProcessor getInputProcessor() {return stage;}
+
+    public void resize(int width, int height) {
+        screenWidth = width;
+        screenHeight = height;
+        stage.getViewport().update(width, height, true);
+    }
 }

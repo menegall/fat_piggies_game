@@ -1,11 +1,6 @@
 package com.fatpiggies.game.view.states;
 
 import static com.fatpiggies.game.network.NetworkError.COLOR_ALREADY_TAKEN;
-import static com.fatpiggies.game.network.NetworkError.DATABASE_ERROR;
-import static com.fatpiggies.game.network.NetworkError.LOBBY_ALREADY_STARTED;
-import static com.fatpiggies.game.network.NetworkError.LOBBY_FULL;
-import static com.fatpiggies.game.network.NetworkError.LOBBY_NOT_FOUND;
-import static com.fatpiggies.game.network.NetworkError.NAME_ALREADY_EXIST;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -34,7 +29,8 @@ import com.fatpiggies.game.view.TextureManager;
 public class MenuState extends State {
 
     // ================= UI CONSTANTS =================
-    private static final float BTN_SIZE_RATIO = 0.09f;
+    private static final float BTN_SIZE_X_RATIO = 0.09f;
+    private static final float BTN_SIZE_Y_RATIO = 0.21f;
 
     private static final float BTN_X_RATIO = 0.22f;
     private static final float COLOR_Y_RATIO = 0.53f;
@@ -46,11 +42,17 @@ public class MenuState extends State {
     private static final float PANEL_HEIGHT_RATIO = 0.65f;
 
     private static final float ERROR_Y_RATIO = 0.81f;
-    private static final float CROSS_SIZE_RATIO = 0.04f;
+    private static final float CROSS_SIZE_X_RATIO = 0.04f;
+    private static final float CROSS_SIZE_Y_RATIO = 0.1f;
     private static final float CROSS_X_RATIO = 0.26f;
     private static final float CROSS_Y_RATIO = 0.55f;
+    private static final float BUBBLE_SIZE_X_RATIO = 0.19f;
+    private static final float BUBBLE_SIZE_Y_RATIO = 0.35f;
+    private static final float BUBBLE_X_RATIO = 0.05f;
+    private static final float BUBBLE_Y_RATIO = 0.52f;
 
-    private static final float MENU_SIZE_RATIO = 0.79f;
+    private static final float MENU_SIZE_X_RATIO = 0.35f;
+    private static final float MENU_SIZE_Y_RATIO = 0.79f;
 
     private static final float FIELD_WIDTH_RATIO = 0.18f;
     private static final float FIELD_HEIGHT_RATIO = 0.18f;
@@ -71,7 +73,7 @@ public class MenuState extends State {
     private TextButton hostButton;
     private ImageButton colorButton;
     private TextureId currentPig = TextureId.OVER_BLUE_PIG;
-    private boolean showCrossOnPigSelection = false;
+    private boolean showPigSelectionInfo = false;
     private CheckBox musicButton;
     private CheckBox soundButton;
     private CheckBox vibrationButton;
@@ -79,17 +81,19 @@ public class MenuState extends State {
     private final TextureRegion menuBackground;
     private final TextureRegion playBackground;
     private final TextureRegion cross;
+    private final TextureRegion bubble;
 
     private Label errorLabel;
 
     private String lastNameField;
-    private float btnSize;
+    private float btnSizeX;
 
     public MenuState(IViewActions viewActions) {
         super(viewActions);
         menuBackground = TextureManager.getFrame(TextureId.MENU_BACKGROUND);
         playBackground = TextureManager.getFrame(TextureId.PLAY_BACKGROUND);
         cross = TextureManager.getFrame(TextureId.CROSS);
+        bubble = TextureManager.getFrame(TextureId.BUBBLE);
 
         createUI("");
     }
@@ -165,7 +169,7 @@ public class MenuState extends State {
         Table table = new Table();
         table.setFillParent(true);
 
-        Label nameLabel = new Label("Name", skin);
+        Label nameLabel = new Label("Click Me!", skin);
         nameLabel.setFontScale(screenHeight * 0.0015f);
 
         table.add(nameLabel).left();
@@ -201,12 +205,13 @@ public class MenuState extends State {
         updateHostButton();
 
         // ================= SETTINGS BUTTONS =================
-        btnSize = screenWidth * BTN_SIZE_RATIO;
+        btnSizeX = screenWidth * BTN_SIZE_X_RATIO;
+        float btnSizeY = screenHeight * BTN_SIZE_Y_RATIO;
 
         TextureRegionDrawable drawable = new TextureRegionDrawable(TextureManager.getFrame(currentPig));
         colorButton = new ImageButton(drawable);
 
-        colorButton.setSize(btnSize, btnSize);
+        colorButton.setSize(btnSizeX, btnSizeY);
         colorButton.setPosition(
             screenWidth * BTN_X_RATIO,
             screenHeight * COLOR_Y_RATIO
@@ -217,7 +222,7 @@ public class MenuState extends State {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 currentPig = TextureManager.nextPig(currentPig);
-                showCrossOnPigSelection = false;
+                showPigSelectionInfo = false;
                 updateColorButton();
             }
         });
@@ -225,7 +230,7 @@ public class MenuState extends State {
         updateColorButton();
 
         musicButton = new CheckBox("", skin, "musicButton");
-        musicButton.setSize(btnSize, btnSize);
+        musicButton.setSize(btnSizeX, btnSizeY);
         musicButton.setPosition(
             screenWidth * BTN_X_RATIO,
             screenHeight * MUSIC_Y_RATIO
@@ -246,7 +251,7 @@ public class MenuState extends State {
         stage.addActor(musicButton);
 
         soundButton = new CheckBox("", skin, "soundButton");
-        soundButton.setSize(btnSize, btnSize);
+        soundButton.setSize(btnSizeX, btnSizeY);
         soundButton.setPosition(
             screenWidth * BTN_X_RATIO,
             screenHeight * SOUND_Y_RATIO
@@ -266,7 +271,7 @@ public class MenuState extends State {
         stage.addActor(soundButton);
 
         vibrationButton = new CheckBox("", skin, "vibrationButton");
-        vibrationButton.setSize(btnSize, btnSize);
+        vibrationButton.setSize(btnSizeX, btnSizeY);
         vibrationButton.setPosition(
             screenWidth * BTN_X_RATIO,
             screenHeight * VIBRATE_Y_RATIO
@@ -347,17 +352,18 @@ public class MenuState extends State {
 
         sb.draw(playBackground, 0, 0, screenWidth, screenHeight);
 
-        float size = Math.min(screenWidth, screenHeight) * MENU_SIZE_RATIO;
-        float x = (screenWidth - size) * 0.5f;
-        float y = (screenHeight - size) * 0.5f;
+        float sizeX = screenWidth * MENU_SIZE_X_RATIO;
+        float sizeY = screenHeight * MENU_SIZE_Y_RATIO;
+        float x = (screenWidth - sizeX) * 0.5f;
+        float y = (screenHeight - sizeY) * 0.5f;
 
-        sb.draw(menuBackground, x, y, size, size);
+        sb.draw(menuBackground, x, y, sizeX, sizeY);
 
         float panelWidth = screenWidth * PANEL_WIDTH_RATIO;
         float panelHeight = screenHeight * PANEL_HEIGHT_RATIO;
 
-        x = screenWidth * BTN_X_RATIO - (panelWidth - btnSize) * 0.5f;
-        y = (screenHeight - size) * 0.5f;
+        x = screenWidth * BTN_X_RATIO - (panelWidth - btnSizeX) * 0.5f;
+        y = (screenHeight - sizeY) * 0.5f;
 
         sb.draw(menuBackground, x, y, panelWidth, panelHeight);
 
@@ -366,9 +372,14 @@ public class MenuState extends State {
         stage.draw();
 
         sb.begin();
-        if (showCrossOnPigSelection){
-            size = screenWidth * CROSS_SIZE_RATIO;
-            sb.draw(cross, screenWidth * CROSS_X_RATIO, screenHeight * CROSS_Y_RATIO, size, size);
+        if (showPigSelectionInfo){
+            sizeX = screenWidth * CROSS_SIZE_X_RATIO;
+            sizeY = screenHeight * CROSS_SIZE_Y_RATIO;
+            sb.draw(cross, screenWidth * CROSS_X_RATIO, screenHeight * CROSS_Y_RATIO, sizeX, sizeY);
+            sizeX = screenWidth * BUBBLE_SIZE_X_RATIO;
+            sizeY = screenHeight * BUBBLE_SIZE_Y_RATIO;
+            sb.draw(bubble, screenWidth * BUBBLE_X_RATIO, screenHeight * BUBBLE_Y_RATIO, sizeX, sizeY);
+
         }
 
         sb.end();
@@ -392,7 +403,7 @@ public class MenuState extends State {
         ));
 
         if(error == COLOR_ALREADY_TAKEN) {
-            showCrossOnPigSelection = true;
+            showPigSelectionInfo = true;
         }
     }
 
@@ -426,7 +437,7 @@ public class MenuState extends State {
     public void show() {
         super.show();
         stage.clear();
-        showCrossOnPigSelection = false;
+        showPigSelectionInfo = false;
         createUI(lastNameField);
     }
 }

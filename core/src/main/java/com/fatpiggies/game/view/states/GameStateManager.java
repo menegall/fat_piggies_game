@@ -122,4 +122,14 @@ public class GameStateManager {
             states.peek().showError(error);
         }
     }
+
+    // ========================
+    // Size
+    // ========================
+
+    public void resize(int width, int height) {
+        if (!states.isEmpty()) {
+            states.peek().resize(width, height);
+        }
+    }
 }

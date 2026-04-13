@@ -29,7 +29,7 @@ public class OverState extends State {
     private static final float SCORE_PAD_TOP = 0.08f;
     private static final float SCORE_PAD_LEFT = 0.03f;
 
-    private static final float PODIUM_WIDTH = 1.2f;
+    private static final float PODIUM_WIDTH = 0.53f;
     private static final float PODIUM_HEIGHT = 0.7f;
     private static final float PODIUM_ANCHOR_X = 0.5f;
     private static final float PODIUM_ANCHOR_Y = 0.15f;
@@ -49,11 +49,13 @@ public class OverState extends State {
     private static final float CROWN_Y = 0.98f;
     private static final float CROWN_HEIGHT_RATIO = 0.6f;
 
-    private static final float SCORE_SIZE = 0.6f;
-    private static final float SCORE_ANCHOR_X = 0.15f;
-    private static final float SCORE_ANCHOR_Y = 0.65f;
+    private static final float SCORE_SIZE_X = 0.33f;
+    private static final float SCORE_SIZE_Y = 0.6f;
+    private static final float SCORE_ANCHOR_X = 0.03f;
+    private static final float SCORE_ANCHOR_Y = 0.35f;
 
-    private static final float MENU_SIZE = 0.3f;
+    private static final float MENU_SIZE_X = 0.17f;
+    private static final float MENU_SIZE_Y = 0.3f;
     private static final float MENU_ANCHOR_X = 0.9f;
     private static final float MENU_ANCHOR_Y = 0.25f;
 
@@ -183,14 +185,12 @@ public class OverState extends State {
 
         sb.begin();
 
-        float base = Math.min(screenWidth, screenHeight);
-
         // Background
         sb.draw(playBackground, 0, 0, screenWidth, screenHeight);
 
         // Podium
-        float podiumW = base * PODIUM_WIDTH;
-        float podiumH = base * PODIUM_HEIGHT;
+        float podiumW = screenWidth * PODIUM_WIDTH;
+        float podiumH = screenHeight * PODIUM_HEIGHT;
 
         float podiumX = screenWidth * PODIUM_ANCHOR_X - podiumW / 2f;
         float podiumY = screenHeight * PODIUM_ANCHOR_Y - podiumH / 4f;
@@ -233,18 +233,20 @@ public class OverState extends State {
         );
 
         // Score panel
-        float scoreSize = base * SCORE_SIZE;
-        float scoreX = screenWidth * SCORE_ANCHOR_X - scoreSize / 2f;
-        float scoreY = screenHeight * SCORE_ANCHOR_Y - scoreSize / 2f;
+        float scoreSizeX = screenWidth * SCORE_SIZE_X;
+        float scoreSizeY = screenHeight * SCORE_SIZE_Y;
+        float scoreX = screenWidth * SCORE_ANCHOR_X;
+        float scoreY = screenHeight * SCORE_ANCHOR_Y;
 
-        sb.draw(overBackground, scoreX, scoreY, scoreSize, scoreSize);
+        sb.draw(overBackground, scoreX, scoreY, scoreSizeX, scoreSizeY);
 
         // Menu panel
-        float menuSize = base * MENU_SIZE;
-        float menuX = screenWidth * MENU_ANCHOR_X - menuSize / 2f;
-        float menuY = screenHeight * MENU_ANCHOR_Y - menuSize / 2f;
+        float menuSizeX = screenWidth * MENU_SIZE_X;
+        float menuSizeY = screenHeight * MENU_SIZE_Y;
+        float menuX = screenWidth * MENU_ANCHOR_X - menuSizeX / 2f;
+        float menuY = screenHeight * MENU_ANCHOR_Y - menuSizeY / 2f;
 
-        sb.draw(menuBackground, menuX, menuY, menuSize, menuSize);
+        sb.draw(menuBackground, menuX, menuY, menuSizeX, menuSizeY);
 
         sb.end();
 
