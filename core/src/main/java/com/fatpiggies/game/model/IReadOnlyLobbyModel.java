@@ -13,4 +13,6 @@ public interface IReadOnlyLobbyModel {
     Array<String> getPlayerNames();
     Array<PlayerColor> getPlayerColors();
     Map<String, PlayerSetup> getPlayerSetups();
+
+    Map<String, PlayerSetup> getFinalRanking();
 }

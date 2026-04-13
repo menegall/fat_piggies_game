@@ -4,6 +4,8 @@ import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.view.PlayerColor;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LobbyModel implements IReadOnlyLobbyModel {
@@ -13,6 +15,7 @@ public class LobbyModel implements IReadOnlyLobbyModel {
     private String lobbyCode;
     private String playerId;
     private Map<String, PlayerSetup> playerSetups;
+    private List<String> finalRanking;
 
     @Override
     public String getLobbyId() {
@@ -51,6 +54,22 @@ public class LobbyModel implements IReadOnlyLobbyModel {
 
     public Map<String, PlayerSetup> getPlayerSetups() {
         return playerSetups;
+    }
+
+    @Override
+    public Map<String, PlayerSetup> getFinalRanking() {
+        Map<String, PlayerSetup> finalRanking = new HashMap<>();
+        for (String playerId : this.finalRanking) {
+            PlayerSetup playerSetup = playerSetups.get(playerId);
+            if (playerSetup != null) {
+                finalRanking.put(playerId, playerSetup);
+            }
+        }
+        return finalRanking;
+    }
+
+    public void setFinalRanking(List<String> finalRanking) {
+        this.finalRanking = finalRanking;
     }
 
 
