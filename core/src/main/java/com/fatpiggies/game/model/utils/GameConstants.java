@@ -24,7 +24,7 @@ public final class GameConstants {
     public static final float PLAYER_BASE_MASS = 10f;
     public static final int MAX_PLAYERS = 4;
     public static final int BASE_LIFE = 5;
-    public static final float LERP_FACTOR = 15f;
+    public static final float LERP_FACTOR = 6f;
     public static final int PLAYER_COLLISION_RADIUS = 95;
     public static final float PLAYER_BOUNCINESS = 0.8f;
 
@@ -55,6 +55,9 @@ public final class GameConstants {
     public static final float POWER_UP_WIDTH = 30f;
     public static final float POWER_UP_HEIGHT = 30f;
     public static final float POWER_UP_ANGLE_OFFSET = 0;
+
+    // --- NETWORK Constants ---
+    public static final float SEND_THRESHOLD = 1 / 20f; // 1/times per second
 
     private GameConstants() {
     }

@@ -1,6 +1,6 @@
 package com.fatpiggies.game.controller;
 
-import static com.fatpiggies.game.utils.Config.SEND_THRESHOLD;
+import static com.fatpiggies.game.model.utils.GameConstants.SEND_THRESHOLD;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.fatpiggies.game.controller.mainControllerInterfaces.ILobbyActions;
