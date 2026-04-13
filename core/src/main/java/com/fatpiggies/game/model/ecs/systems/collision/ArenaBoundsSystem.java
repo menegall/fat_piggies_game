@@ -76,14 +76,8 @@ public class ArenaBoundsSystem extends IteratingSystem {
             // Remove one life if the entity is out of bounds
             health.currentLife--;
 
-            if (health.currentLife <= 0) {
-                // DEAD: Remove components to eliminate pig.
-                entity.remove(TransformComponent.class);
-                entity.remove(RenderComponent.class);
-            } else {
-                // RESPAWN: Mark the entity for respawning
-                entity.add(new NeedsRespawnComponent());
-            }
+            // RESPAWN: Mark the entity for respawning
+            entity.add(new NeedsRespawnComponent());
         }
 
     }

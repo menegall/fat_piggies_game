@@ -5,6 +5,7 @@ import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.view.PlayerColor;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ public class LobbyModel implements IReadOnlyLobbyModel {
     private String lobbyId;
     private String lobbyCode;
     private String playerId;
-    private Map<String, PlayerSetup> playerSetups;
+    private Map<String, PlayerSetup> playerSetups = new LinkedHashMap<>();
     private List<String> finalRanking;
 
     @Override
@@ -27,45 +28,26 @@ public class LobbyModel implements IReadOnlyLobbyModel {
         return lobbyCode;
     }
 
-    @Override
-    public Array<String> getPlayerNames() {
-        Array<String> playerNames = new Array<>();
-        if(playerSetups != null) {
-            playerSetups.forEach((id, setup) -> {
-                    playerNames.add(setup.name);
-                }
-            );
-        }
-        return playerNames;
-    }
-
-    @Override
-    public Array<PlayerColor> getPlayerColors() {
-        Array<PlayerColor> playerColors = new Array<>();
-
-        if (playerSetups != null) {
-            playerSetups.forEach((id, setup) -> {
-                playerColors.add(setup.color);
-            });
-        }
-
-        return playerColors;
-    }
-
     public Map<String, PlayerSetup> getPlayerSetups() {
         return playerSetups;
     }
 
     @Override
-    public Map<String, PlayerSetup> getFinalRanking() {
-        Map<String, PlayerSetup> finalRanking = new HashMap<>();
+    public LinkedHashMap<String, PlayerSetup> getFinalRanking() {
+        LinkedHashMap<String, PlayerSetup> finalRankingMap = new LinkedHashMap<>();
+
+        if (this.finalRanking == null) {
+            return finalRankingMap;
+        }
+
         for (String playerId : this.finalRanking) {
             PlayerSetup playerSetup = playerSetups.get(playerId);
             if (playerSetup != null) {
-                finalRanking.put(playerId, playerSetup);
+                finalRankingMap.put(playerId, playerSetup);
             }
         }
-        return finalRanking;
+
+        return finalRankingMap;
     }
 
     public void setFinalRanking(List<String> finalRanking) {
@@ -97,6 +79,6 @@ public class LobbyModel implements IReadOnlyLobbyModel {
     }
 
     public void setPlayersSetup(Map<String, PlayerSetup> playersSetup) {
-        this.playerSetups = playersSetup;
+        this.playerSetups = new LinkedHashMap<>(playersSetup);
     }
 }

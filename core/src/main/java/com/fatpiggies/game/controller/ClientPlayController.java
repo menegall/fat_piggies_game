@@ -72,7 +72,7 @@ public class ClientPlayController implements IPlayController {
             String playerId = entry.getKey();
             PlayerSetup setup = entry.getValue();
 
-            TextureId texture = TextureManager.getPigTexture(setup.color);
+            TextureId texture = TextureManager.getPigTextureId(setup.color);
 
             if (playerId.equals(currentUser)) {
                 world.createLocalPig(playerId, texture);

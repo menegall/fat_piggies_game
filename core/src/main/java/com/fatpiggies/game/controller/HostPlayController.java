@@ -83,7 +83,7 @@ public class HostPlayController implements IPlayController {
             String playerId = entry.getKey();
             PlayerSetup setup = entry.getValue();
 
-            TextureId texture = TextureManager.getPigTexture(setup.color);
+            TextureId texture = TextureManager.getPigTextureId(setup.color);
             Entity pig = world.createHostPig(playerId, texture);
 
             if (playerId.equals(currentUser)) {
@@ -166,6 +166,7 @@ public class HostPlayController implements IPlayController {
                     }
                 }
             }
+            System.out.println("DEATH ORDER: " + deathOrder);
             actions.getLobbyModel().setFinalRanking(deathOrder);
             actions.onGameFinishedByHost(deathOrder);
         }

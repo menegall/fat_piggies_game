@@ -184,7 +184,7 @@ public class TextureManager {
         }
     }
 
-    public static TextureId getPigTexture(PlayerColor color) {
+    public static TextureId getPigTextureId(PlayerColor color) {
         if (color == null) return TextureId.BLUE_PIG;
 
         switch (color) {

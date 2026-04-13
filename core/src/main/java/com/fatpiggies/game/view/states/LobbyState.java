@@ -17,7 +17,6 @@ import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.setting.VibrationManager;
-import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
@@ -25,7 +24,6 @@ import java.util.Map;
 
 public class LobbyState extends State {
 
-    // ================= CONSTANTS =================
     private static final float MENU_SIZE_X_RATIO = 0.35f;
     private static final float MENU_SIZE_Y_RATIO = 0.79f;
 
@@ -48,13 +46,11 @@ public class LobbyState extends State {
 
     private static final float COPY_DURATION = 1.5f;
 
-    // ================= DATA =================
     private final boolean isHost;
     private final IReadOnlyLobbyModel lobbyModel;
 
     private final Array<String> lastNames = new Array<>();
 
-    // ================= UI =================
     private Table playersTable;
     private TextButton startButton;
     private TextButton leaveButton;
@@ -78,7 +74,6 @@ public class LobbyState extends State {
 
     private void createUI() {
 
-        // ================= BUTTONS =================
         leaveButton = new TextButton("Leave", skin);
         leaveButton.getLabel().setFontScale(screenHeight * BUTTON_TEXT_SCALE);
         leaveButton.addListener(new ChangeListener() {
@@ -98,10 +93,8 @@ public class LobbyState extends State {
             }
         });
 
-        // ================= PLAYERS TABLE =================
         playersTable = new Table();
 
-        // ================= ROOT =================
         Table root = new Table();
         root.setFillParent(true);
         root.defaults().pad(screenHeight * PADDING_RATIO);
@@ -126,7 +119,6 @@ public class LobbyState extends State {
 
         stage.addActor(root);
 
-        // ================= LOBBY CODE =================
         lobbyCodeLabel = new Label("CODE ----", skin);
         lobbyCodeLabel.setFontScale(screenHeight * CODE_SCALE);
         lobbyCodeLabel.setPosition(
@@ -152,7 +144,6 @@ public class LobbyState extends State {
         stage.addActor(lobbyCodeLabel);
     }
 
-    // ================= BUTTON ACTIONS =================
     private void onStartClicked() {
         viewActions.onStartClicked();
         VibrationManager.vibrate(200);
@@ -165,14 +156,11 @@ public class LobbyState extends State {
         SoundsManager.playButton(1f);
     }
 
-    // ================= UPDATE =================
     @Override
     public void update(float dt) {
 
-        if (lobbyModel.getPlayerSetups() != null) {
-            updatePlayers(lobbyModel.getPlayerSetups());
-            lobbyCodeLabel.setText("CODE \n" + lobbyModel.getLobbyCode());
-        }
+        updatePlayers(lobbyModel.getPlayerSetups());
+        lobbyCodeLabel.setText("CODE \n" + lobbyModel.getLobbyCode());
 
         if (copyTimer > 0) {
             copyTimer -= dt;
@@ -184,7 +172,6 @@ public class LobbyState extends State {
         stage.act(dt);
     }
 
-    // ================= RENDER =================
     @Override
     public void render(SpriteBatch sb) {
 
@@ -203,7 +190,6 @@ public class LobbyState extends State {
         stage.draw();
     }
 
-    // ================= PLAYERS =================
     private void updatePlayers(Map<String, PlayerSetup> players) {
         rebuildPlayers(players);
 
@@ -217,9 +203,13 @@ public class LobbyState extends State {
 
         for (PlayerSetup setup : players.values()) {
 
+            if (setup == null || setup.name == null) continue;
+
             Image pig = new Image(TextureManager.getFrame(
-                TextureManager.getLifeTextureId(TextureManager.getPigTexture(setup.color)
-            )));
+                TextureManager.getLifeTextureId(
+                    TextureManager.getPigTextureId(setup.color)
+                )
+            ));
 
             float sizeX = screenWidth * IMAGE_SIZE_X;
             float sizeY = screenHeight * IMAGE_SIZE_Y;
@@ -232,5 +222,3 @@ public class LobbyState extends State {
         }
     }
 }
-
-

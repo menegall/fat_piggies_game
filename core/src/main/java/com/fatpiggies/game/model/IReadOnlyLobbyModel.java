@@ -4,15 +4,13 @@ import com.badlogic.gdx.utils.Array;
 import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.view.PlayerColor;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public interface IReadOnlyLobbyModel {
     // --- Lobby ---
     String getLobbyId();
     String getLobbyCode();
-    Array<String> getPlayerNames();
-    Array<PlayerColor> getPlayerColors();
     Map<String, PlayerSetup> getPlayerSetups();
-
-    Map<String, PlayerSetup> getFinalRanking();
+    LinkedHashMap<String, PlayerSetup> getFinalRanking();
 }

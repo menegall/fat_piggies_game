@@ -169,7 +169,7 @@ public class MenuState extends State {
         Table table = new Table();
         table.setFillParent(true);
 
-        Label nameLabel = new Label("Click Me!", skin);
+        Label nameLabel = new Label("Name", skin);
         nameLabel.setFontScale(screenHeight * 0.0015f);
 
         table.add(nameLabel).left();

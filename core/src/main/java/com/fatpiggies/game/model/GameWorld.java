@@ -535,6 +535,17 @@ public class GameWorld implements IReadOnlyGameWorld {
     public void applyGameState(GameState state) {
         if (state == null) return;
 
+        // --- CLEAN PLAYERS ---
+        engine.getEntities().forEach(entity -> {
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+
+            if (netId == null || netId.playerId == null) return;
+
+            if (!state.players.containsKey(netId.playerId)) {
+                engine.removeEntity(entity);
+            }
+        });
+
         for (Entity entity : engine.getEntities()) {
             NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
 

@@ -1,6 +1,5 @@
 package com.fatpiggies.game.view.states;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -9,12 +8,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
-import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
+import com.fatpiggies.game.network.dto.PlayerSetup;
+import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.setting.VibrationManager;
+import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class OverState extends State {
 
@@ -27,7 +31,7 @@ public class OverState extends State {
     private static final float MENU_PAD_LEFT = 0.8f;
 
     private static final float SCORE_PAD_TOP = 0.08f;
-    private static final float SCORE_PAD_LEFT = 0.03f;
+    private static final float SCORE_PAD_LEFT = 0.06f;
 
     private static final float PODIUM_WIDTH = 0.53f;
     private static final float PODIUM_HEIGHT = 0.7f;
@@ -63,6 +67,7 @@ public class OverState extends State {
     private final boolean isHost;
     private final IReadOnlyLobbyModel lobbyModel;
 
+    private Array<String> rankedNames = new Array<>();
     private Array<String> lastNames = new Array<>();
 
     // ================= UI =================
@@ -89,7 +94,6 @@ public class OverState extends State {
     }
 
     private void createUI() {
-
         leaveButton = new TextButton("Leave", skin);
         leaveButton.getLabel().setFontScale(screenHeight * BUTTON_TEXT_SCALE);
         leaveButton.addListener(new ChangeListener() {
@@ -149,19 +153,35 @@ public class OverState extends State {
         SoundsManager.playButton(1f);
     }
 
+
+
+    private String getRankLabel(int index) {
+        switch (index) {
+            case 0: return "1st.";
+            case 1: return "2nd.";
+            case 2: return "3rd.";
+            default: return (index + 1) + "th.";
+        }
+    }
+
+    private TextureId getPigTextureForPlayer(String playerName) {
+        for (PlayerSetup setup : lobbyModel.getPlayerSetups().values()) {
+            if (setup != null && setup.name != null && setup.name.equals(playerName)) {
+                return TextureManager.getOverTextureId(TextureManager.getPigTextureId(setup.color));
+            }
+        }
+
+        return TextureManager.getOverTextureId(TextureManager.getPigTextureId(PlayerColor.BLUE));
+    }
+
+
+
     // ================= SCORE =================
     private void updateScoreBoard(Array<String> names) {
         scoreTable.clear();
 
         for (int i = 0; i < names.size; i++) {
-
-            String rank;
-            if (i == 0) rank = "1st.";
-            else if (i == 1) rank = "2nd.";
-            else if (i == 2) rank = "3rd.";
-            else rank = (i + 1) + "th.";
-
-            Label rankLabel = new Label(rank, skin);
+            Label rankLabel = new Label(getRankLabel(i), skin);
             Label nameLabel = new Label(names.get(i), skin);
 
             scoreTable.add(rankLabel).left().padRight(10);
@@ -169,20 +189,39 @@ public class OverState extends State {
         }
     }
 
+    private Array<String> buildRankedNames(Array<String> sourceNames) {
+        Array<String> result = new Array<>(); // First of the given list is last ranked
+        for (int i = sourceNames.size - 1; i >= 0; i--) {
+            System.out.println(sourceNames);
+            result.add(sourceNames.get(i));
+        }
+        return result;
+    }
+
     @Override
     public void update(float dt) {
-        Array<String> currentNames = lobbyModel.getPlayerNames();
+        Array<String> currentNames = new Array<>();
+
+        LinkedHashMap<String, PlayerSetup> ranking = lobbyModel.getFinalRanking();
+
+        if (ranking == null || ranking.isEmpty()) return;
+
+        for (PlayerSetup setup : ranking.values()) {
+            if (setup != null && setup.name != null) {
+                currentNames.add(setup.name);
+            }
+        }
 
         if (!currentNames.equals(lastNames)) {
             lastNames = new Array<>(currentNames);
-            updateScoreBoard(currentNames);
+            rankedNames = buildRankedNames(lastNames);
+            updateScoreBoard(rankedNames);
         }
     }
 
     // ================= RENDER =================
     @Override
     public void render(SpriteBatch sb) {
-
         sb.begin();
 
         // Background
@@ -200,37 +239,48 @@ public class OverState extends State {
         float pigSize = podiumW * PIG_SIZE_RATIO;
 
         // 1st
-        sb.draw(
-            TextureManager.getFrame(TextureId.OVER_BLUE_PIG),
-            podiumX + podiumW * FIRST_X - pigSize / 2f,
-            podiumY + podiumH * FIRST_Y,
-            pigSize, pigSize
-        );
+        if (rankedNames.size > 0) {
+            sb.draw(
+                TextureManager.getFrame(getPigTextureForPlayer(rankedNames.get(0))),
+                podiumX + podiumW * FIRST_X - pigSize / 2f,
+                podiumY + podiumH * FIRST_Y,
+                pigSize,
+                pigSize
+            );
+        }
 
         // 2nd
-        sb.draw(
-            TextureManager.getFrame(TextureId.OVER_GREEN_PIG),
-            podiumX + podiumW * SECOND_X - pigSize / 2f,
-            podiumY + podiumH * SECOND_Y,
-            pigSize, pigSize
-        );
+        if (rankedNames.size > 1) {
+            sb.draw(
+                TextureManager.getFrame(getPigTextureForPlayer(rankedNames.get(1))),
+                podiumX + podiumW * SECOND_X - pigSize / 2f,
+                podiumY + podiumH * SECOND_Y,
+                pigSize,
+                pigSize
+            );
+        }
 
         // 3rd
-        sb.draw(
-            TextureManager.getFrame(TextureId.OVER_RED_PIG),
-            podiumX + podiumW * THIRD_X - pigSize / 2f,
-            podiumY + podiumH * THIRD_Y,
-            pigSize, pigSize
-        );
+        if (rankedNames.size > 2) {
+            sb.draw(
+                TextureManager.getFrame(getPigTextureForPlayer(rankedNames.get(2))),
+                podiumX + podiumW * THIRD_X - pigSize / 2f,
+                podiumY + podiumH * THIRD_Y,
+                pigSize,
+                pigSize
+            );
+        }
 
         // Crown
-        sb.draw(
-            TextureManager.getFrame(TextureId.CROWN),
-            podiumX + podiumW * CROWN_X - pigSize / 2f,
-            podiumY + podiumH * CROWN_Y,
-            pigSize,
-            pigSize * CROWN_HEIGHT_RATIO
-        );
+        if (rankedNames.size > 0) {
+            sb.draw(
+                TextureManager.getFrame(TextureId.CROWN),
+                podiumX + podiumW * CROWN_X - pigSize / 2f,
+                podiumY + podiumH * CROWN_Y,
+                pigSize,
+                pigSize * CROWN_HEIGHT_RATIO
+            );
+        }
 
         // Score panel
         float scoreSizeX = screenWidth * SCORE_SIZE_X;
