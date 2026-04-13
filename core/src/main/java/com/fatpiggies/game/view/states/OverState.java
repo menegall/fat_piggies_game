@@ -167,7 +167,7 @@ public class OverState extends State {
     private TextureId getPigTextureForPlayer(String playerName) {
         for (PlayerSetup setup : lobbyModel.getPlayerSetups().values()) {
             if (setup != null && setup.name != null && setup.name.equals(playerName)) {
-                return TextureManager.getOverTextureId(TextureManager.getPigTextureId(setup.color));
+                return TextureManager.getOverTextureId(TextureManager.getPigTextureId(PlayerColor.valueOf(setup.color)));
             }
         }
 

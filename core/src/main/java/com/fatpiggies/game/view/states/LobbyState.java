@@ -17,6 +17,7 @@ import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyLobbyModel;
 import com.fatpiggies.game.setting.VibrationManager;
+import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
@@ -25,16 +26,16 @@ import java.util.Map;
 public class LobbyState extends State {
 
     private static final float MENU_SIZE_X_RATIO = 0.35f;
-    private static final float MENU_SIZE_Y_RATIO = 0.79f;
+    private static final float MENU_SIZE_Y_RATIO = 0.84f;
 
     private static final float BUTTON_WIDTH_RATIO = 0.2f;
-    private static final float BUTTON_HEIGHT_RATIO = 0.12f;
+    private static final float BUTTON_HEIGHT_RATIO = 0.1f;
 
     private static final float PADDING_RATIO = 0.015f;
-    private static final float START_BUTTON_TOP_PAD = 0.05f;
+    private static final float START_BUTTON_TOP_PAD = 0.02f;
 
-    private static final float TITLE_SCALE = 0.002f;
-    private static final float SUBTITLE_SCALE = 0.0015f;
+    private static final float TITLE_SCALE = 0.0018f;
+    private static final float SUBTITLE_SCALE = 0.0013f;
     private static final float IMAGE_SIZE_X = 0.04f;
     private static final float IMAGE_SIZE_Y = 0.1f;
     private static final float PAD_LEFT = 0.03f;
@@ -207,7 +208,7 @@ public class LobbyState extends State {
 
             Image pig = new Image(TextureManager.getFrame(
                 TextureManager.getLifeTextureId(
-                    TextureManager.getPigTextureId(setup.color)
+                    TextureManager.getPigTextureId(PlayerColor.valueOf(setup.color))
                 )
             ));
 

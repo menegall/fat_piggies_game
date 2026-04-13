@@ -25,7 +25,7 @@ public interface DatabaseService {
      * @param playerColor The display color chosen by the player.
      * @param callback   Triggered with the unique lobby ID on success, or a specific {@link NetworkError}.
      */
-    void createLobby(String hostId, String playerName, PlayerColor playerColor, LobbyCallback callback);
+    void createLobby(String hostId, String playerName, String playerColor, LobbyCallback callback);
 
     /**
      * Attempts to join an existing lobby using a short 6-character code.
@@ -37,7 +37,7 @@ public interface DatabaseService {
      * @param playerColor The display color chosen by the player.
      * @param callback   Triggered with the unique lobby ID on success, or a specific {@link NetworkError}.
      */
-    void joinLobby(String lobbyCode, String playerId, String playerName, PlayerColor playerColor, LobbyCallback callback);
+    void joinLobby(String lobbyCode, String playerId, String playerName, String playerColor, LobbyCallback callback);
 
     /**
      * Removes a player from the lobby.

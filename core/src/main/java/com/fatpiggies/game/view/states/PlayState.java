@@ -55,6 +55,7 @@ public class PlayState extends State {
     private int joystickPointer = -1;
 
     private final TextureRegion bg;
+    private final TextureId localTexture;
 
     public PlayState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, String playerId, boolean isHost) {
         super(viewActions);
@@ -68,6 +69,7 @@ public class PlayState extends State {
         );
 
         bg = TextureManager.getFrame(TextureId.PLAY_BACKGROUND);
+        localTexture = gameWorld.getLocalPlayerTexture();
 
         createUI();
         setupInput();
@@ -231,7 +233,6 @@ public class PlayState extends State {
         sb.begin();
 
         int life = gameWorld.getLocalPlayerLife();
-        TextureId tex = gameWorld.getLocalPlayerTexture();
         boolean isAlive = gameWorld.isLocalPlayerAlive();
 
         if (!isAlive) {
@@ -248,8 +249,8 @@ public class PlayState extends State {
             boolean heartAlive = i <= life;
 
             TextureRegion frame = heartAlive
-                ? TextureManager.getFrame(TextureManager.getLifeTextureId(tex))
-                : TextureManager.getFrame(TextureManager.getLifeTextureId(tex), 3);
+                ? TextureManager.getFrame(TextureManager.getLifeTextureId(localTexture))
+                : TextureManager.getFrame(TextureManager.getLifeTextureId(localTexture), 3);
 
             if (!heartAlive) sb.setColor(0.3f, 0.3f, 0.3f, 1f);
 

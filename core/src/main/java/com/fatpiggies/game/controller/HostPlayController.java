@@ -22,6 +22,7 @@ import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.network.dto.PlayerInput;
 import com.fatpiggies.game.network.dto.PlayerSetup;
+import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
@@ -41,7 +42,6 @@ public class HostPlayController implements IPlayController {
     private Engine engine;
     private GameWorld world;
     private boolean gameRunning = false;
-    private final List<String> deathOrder = new ArrayList<>();
 
     public HostPlayController(IPlayActions actions, String lobbyId) {
         this.actions = actions;
@@ -70,7 +70,6 @@ public class HostPlayController implements IPlayController {
         gameRunning = true;
         remoteInputFreshness.clear();
         lastProcessedInputTs.clear();
-        deathOrder.clear();
 
         powerupTimer = POWERUP_SPAWN_INTERVAL;
 
@@ -83,7 +82,7 @@ public class HostPlayController implements IPlayController {
             String playerId = entry.getKey();
             PlayerSetup setup = entry.getValue();
 
-            TextureId texture = TextureManager.getPigTextureId(setup.color);
+            TextureId texture = TextureManager.getPigTextureId(PlayerColor.valueOf(setup.color));
             Entity pig = world.createHostPig(playerId, texture);
 
             if (playerId.equals(currentUser)) {
@@ -143,32 +142,10 @@ public class HostPlayController implements IPlayController {
         // Physics update
         world.update(dt);
 
-        // Track death order
-        for (Entity entity : engine.getEntities()) {
-            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
-            HealthComponent health = entity.getComponent(HealthComponent.class);
-
-            if (netId != null && netId.playerId != null && health != null) {
-                // If dead and not yet recorded, add to death order
-                if (health.currentLife <= 0 && !deathOrder.contains(netId.playerId)) {
-                    deathOrder.add(netId.playerId);
-                }
-            }
-        }
-
         // Check end game
         if (world.isGameFinished()) {
-            for (Entity entity : engine.getEntities()) {
-                NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
-                if (netId != null && netId.playerId != null) {
-                    if (!deathOrder.contains(netId.playerId)) {
-                        deathOrder.add(netId.playerId);
-                    }
-                }
-            }
-            System.out.println("DEATH ORDER: " + deathOrder);
-            actions.getLobbyModel().setFinalRanking(deathOrder);
-            actions.onGameFinishedByHost(deathOrder);
+            actions.getLobbyModel().setFinalRanking(world.getDeathOrder());
+            actions.onGameFinishedByHost(world.getDeathOrder());
         }
     }
 

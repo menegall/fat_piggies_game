@@ -52,7 +52,7 @@ public class MenuState extends State {
     private static final float BUBBLE_Y_RATIO = 0.52f;
 
     private static final float MENU_SIZE_X_RATIO = 0.35f;
-    private static final float MENU_SIZE_Y_RATIO = 0.79f;
+    private static final float MENU_SIZE_Y_RATIO = 0.84f;
 
     private static final float FIELD_WIDTH_RATIO = 0.18f;
     private static final float FIELD_HEIGHT_RATIO = 0.18f;

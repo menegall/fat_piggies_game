@@ -50,7 +50,9 @@ import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.network.dto.PowerupData;
 import com.fatpiggies.game.view.TextureId;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameWorld implements IReadOnlyGameWorld {
@@ -61,6 +63,7 @@ public class GameWorld implements IReadOnlyGameWorld {
     private final Map<String, Entity> clientRemotePowerups = new HashMap<>();
 
     private Engine engine;
+    private final List<String> deathOrder = new ArrayList<>();
     private Entity localPlayer;
     private String lobbyId;
     private Map<String, PlayerSetup> playersSetup;
@@ -75,7 +78,24 @@ public class GameWorld implements IReadOnlyGameWorld {
      * @param dt time passed since the last frame
      */
     public void update(float dt) {
+
         engine.update(dt);
+
+        // Track death order
+        for (Entity entity : engine.getEntities()) {
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+            HealthComponent health = entity.getComponent(HealthComponent.class);
+
+            if (netId != null && netId.playerId != null && health != null) {
+                // If dead and not yet recorded, add to death order
+                if (health.currentLife <= 0 && !deathOrder.contains(netId.playerId)) {
+                    if (entity.equals(localPlayer)) localPlayer = null;
+                    deathOrder.add(netId.playerId);
+                    engine.removeEntity(entity);
+
+                }
+            }
+        }
     }
 
     public void updateLocalPlayerInput(float x, float y) {
@@ -257,7 +277,7 @@ public class GameWorld implements IReadOnlyGameWorld {
         transform.y = puData.y;
 
         RenderComponent render = new RenderComponent();
-        render.textureId = puData.textureId;
+        render.textureId = TextureId.valueOf(puData.textureId);
         render.width = POWER_UP_WIDTH;
         render.height = POWER_UP_HEIGHT;
         render.angleOffset = POWER_UP_ANGLE_OFFSET;
@@ -373,12 +393,11 @@ public class GameWorld implements IReadOnlyGameWorld {
 
     public boolean isGameFinished() {
         int alivePlayers = 0;
-
         for (Entity entity : engine.getEntities()) {
             NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
             HealthComponent health = entity.getComponent(HealthComponent.class);
 
-            // Players
+            // Players alive
             if (netId != null && netId.playerId != null && health != null && health.currentLife > 0) {
                 alivePlayers++;
 
@@ -386,6 +405,17 @@ public class GameWorld implements IReadOnlyGameWorld {
                 if (alivePlayers > 1) {
                     return false;
                 }
+            }
+        }
+
+        for (Entity entity : engine.getEntities()) {
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+
+            if (netId != null && netId.playerId != null) {
+
+                // Add the last player alive and delete him
+                deathOrder.add(netId.playerId);
+                engine.removeEntity(entity);
             }
         }
 
@@ -407,13 +437,13 @@ public class GameWorld implements IReadOnlyGameWorld {
         for (Entity entity : engine.getEntities()) {
             // --- PROCESS PLAYERS ---
             NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
-            if (netId != null && netId.playerId != null) {
+            HealthComponent health = entity.getComponent(HealthComponent.class);
+
+            if (netId != null && netId.playerId != null && health.currentLife!=0) {
                 activePlayersTracker.add(netId.playerId);
 
                 TransformComponent transform = entity.getComponent(TransformComponent.class);
                 VelocityComponent velocity = entity.getComponent(VelocityComponent.class);
-                HealthComponent health = entity.getComponent(HealthComponent.class);
-
                 if (transform != null && velocity != null) {
                     // Try to get the pooled object
                     PlayerData pd = gameState.players.get(netId.playerId);
@@ -453,7 +483,7 @@ public class GameWorld implements IReadOnlyGameWorld {
 
                     puData.x = roundToOneDecimal(transform.x);
                     puData.y = roundToOneDecimal(transform.y);
-                    puData.textureId = render.textureId;
+                    puData.textureId = render.textureId.name();
                 }
             }
         }
@@ -542,6 +572,7 @@ public class GameWorld implements IReadOnlyGameWorld {
             if (netId == null || netId.playerId == null) return;
 
             if (!state.players.containsKey(netId.playerId)) {
+                if (entity.equals(localPlayer)) localPlayer=null;
                 engine.removeEntity(entity);
             }
         });
@@ -621,6 +652,8 @@ public class GameWorld implements IReadOnlyGameWorld {
             }
         }
     }
+
+    public List<String> getDeathOrder(){ return deathOrder;}
 
     @Override
     public Engine getEngine() {

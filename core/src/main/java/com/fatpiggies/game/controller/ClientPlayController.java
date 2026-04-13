@@ -10,6 +10,7 @@ import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.network.dto.PlayerInput;
 import com.fatpiggies.game.network.dto.PlayerSetup;
+import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
@@ -72,7 +73,7 @@ public class ClientPlayController implements IPlayController {
             String playerId = entry.getKey();
             PlayerSetup setup = entry.getValue();
 
-            TextureId texture = TextureManager.getPigTextureId(setup.color);
+            TextureId texture = TextureManager.getPigTextureId(PlayerColor.valueOf(setup.color));
 
             if (playerId.equals(currentUser)) {
                 world.createLocalPig(playerId, texture);

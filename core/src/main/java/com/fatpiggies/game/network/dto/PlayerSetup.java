@@ -4,11 +4,11 @@ import com.fatpiggies.game.view.PlayerColor;
 
 public class PlayerSetup {
     public String name;
-    public PlayerColor color;
+    public String color;
 
     public PlayerSetup() {}
 
-    public PlayerSetup(String name, PlayerColor color) {
+    public PlayerSetup(String name, String color) {
         this.name = name;
         this.color = color;
     }

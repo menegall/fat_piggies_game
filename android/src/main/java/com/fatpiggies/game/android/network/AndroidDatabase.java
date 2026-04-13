@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.fatpiggies.game.model.utils.GameConstants;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.network.dto.GameState;
@@ -42,7 +43,7 @@ public class AndroidDatabase implements DatabaseService {
     }
 
     @Override
-    public void createLobby(String hostId, String playerName, PlayerColor playerColor, LobbyCallback callback) {
+    public void createLobby(String hostId, String playerName, String playerColor, LobbyCallback callback) {
         final long startTime = System.currentTimeMillis();
         Log.i(TAG_DATABASE, playerName + " create a new lobby");
         // Push new lobby node and get its ID
@@ -74,7 +75,7 @@ public class AndroidDatabase implements DatabaseService {
     }
 
     @Override
-    public void joinLobby(String lobbyCode, String playerId, String playerName, PlayerColor playerColor, LobbyCallback callback) {
+    public void joinLobby(String lobbyCode, String playerId, String playerName, String playerColor, LobbyCallback callback) {
         final long startTime = System.currentTimeMillis();
         Log.i(TAG_DATABASE, playerName + " join lobby " + lobbyCode);
         // Find lobby by code
@@ -463,7 +464,7 @@ public class AndroidDatabase implements DatabaseService {
     private boolean isLobbyFull(com.google.firebase.database.DataSnapshot lobbySnapshot,
                                 LobbyCallback callback) {
         long numPlayers = lobbySnapshot.child("info").child("playersSetup").getChildrenCount();
-        if (numPlayers >= 4) {
+        if (numPlayers >= GameConstants.MAX_PLAYERS) {
             callback.onError(NetworkError.LOBBY_FULL);
             return true; // Indicates the lobby is full and the error was handled
         }
@@ -484,11 +485,11 @@ public class AndroidDatabase implements DatabaseService {
     }
 
     private boolean isPlayerColorTaken(com.google.firebase.database.DataSnapshot lobbySnapshot,
-                                       PlayerColor playerColor,
+                                       String playerColor,
                                        LobbyCallback callback) {
         for (com.google.firebase.database.DataSnapshot playerSnapshot : lobbySnapshot.child("info/playersSetup").getChildren()) {
             String colorStr = playerSnapshot.child("color").getValue(String.class);
-            if (colorStr != null && colorStr.equals(playerColor.name())) {
+            if (colorStr != null && colorStr.equals(playerColor)) {
                 callback.onError(NetworkError.COLOR_ALREADY_TAKEN);
                 return true;
             }

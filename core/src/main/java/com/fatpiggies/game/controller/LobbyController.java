@@ -32,7 +32,7 @@ public class LobbyController {
     public void hostLobby(String playerName, PlayerColor playerColor) {
         lobbyModel.setIsHost(true);
 
-        dbs.createLobby(lobbyModel.getPlayerId(), playerName, playerColor, new DatabaseService.LobbyCallback() {
+        dbs.createLobby(lobbyModel.getPlayerId(), playerName, playerColor.name(), new DatabaseService.LobbyCallback() {
             @Override
             public void onSuccess(String lobbyId) {
                 Gdx.app.postRunnable(() -> {
@@ -51,7 +51,7 @@ public class LobbyController {
     public void joinLobby(String playerName, String lobbyCode, PlayerColor playerColor) {
         lobbyModel.setIsHost(false);
 
-        dbs.joinLobby(lobbyCode, lobbyModel.getPlayerId(), playerName, playerColor, new DatabaseService.LobbyCallback() {
+        dbs.joinLobby(lobbyCode, lobbyModel.getPlayerId(), playerName, playerColor.name(), new DatabaseService.LobbyCallback() {
             @Override
             public void onSuccess(String lobbyId) {
                 Gdx.app.postRunnable(() -> {
