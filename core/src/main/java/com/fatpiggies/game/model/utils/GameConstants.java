@@ -52,8 +52,8 @@ public final class GameConstants {
     public static final float PIG_HEIGHT = 320;
     public static final float PIG_ANGLE_OFFSET = -90;
 
-    public static final float POWER_UP_WIDTH = 30f;
-    public static final float POWER_UP_HEIGHT = 30f;
+    public static final float POWER_UP_WIDTH = 70f;
+    public static final float POWER_UP_HEIGHT = 90f;
     public static final float POWER_UP_ANGLE_OFFSET = 0;
 
     // --- NETWORK Constants ---
