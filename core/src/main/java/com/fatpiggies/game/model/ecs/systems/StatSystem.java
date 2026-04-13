@@ -1,5 +1,7 @@
 package com.fatpiggies.game.model.ecs.systems;
 
+import static com.fatpiggies.game.model.utils.GameConstants.BASE_LIFE;
+
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -163,7 +165,7 @@ public class StatSystem extends EntitySystem {
                 // Apply Health Modifier
                 if (hModMapper.has(powerup)) {
                     HealthComponent targetHealth = hm.get(targetPig);
-                    targetHealth.currentLife += 1;
+                    if (targetHealth.currentLife < BASE_LIFE) targetHealth.currentLife += 1;
                     getEngine().removeEntity(powerup);
                 }
             }
