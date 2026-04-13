@@ -14,7 +14,8 @@ import com.fatpiggies.game.model.ecs.components.TransformComponent;
 import com.fatpiggies.game.model.ecs.components.network.NetworkSyncComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
 
-/**
+/** THIS SYSTEM IS NOT USED IN THE GAME.
+ * <p><b>Description:</b><br>
  * Handles server reconciliation for the local player's entity in a Client-Side Prediction architecture.
  * <p><b>How it works internally:</b><br>
  * The local player moves instantly based on their joystick input (Client-Side Prediction).

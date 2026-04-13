@@ -156,6 +156,29 @@ public interface DatabaseService {
      */
     void listenToGameState(String lobbyId, GameStateCallback callback);
 
+    // ======================================
+    // ---- End Game & Ranking -----------
+    // ======================================
+
+    /**
+     * Pushes the final ranking of the match to the database.
+     * This MUST ONLY be called by the Host exactly when the game finishes,
+     * right before or together with calling endGame().
+     *
+     * @param lobbyId         The unique ID of the lobby.
+     * @param rankedPlayerIds A list of player IDs ordered from 1st place (index 0) to last place.
+     */
+    void pushFinalRank(String lobbyId, java.util.List<String> rankedPlayerIds);
+
+    /**
+     * Retrieves the final ranking of the match once it's over.
+     * Clients call this when transitioning to the OverState to display the leaderboard.
+     *
+     * @param lobbyId  The unique ID of the lobby.
+     * @param callback Triggered with the ordered list of player IDs.
+     */
+    void getFinalRank(String lobbyId, FinalRankCallback callback);
+
     // ==============================
     // ---- Cleanup and Callback ----
     // ==============================
@@ -203,6 +226,12 @@ public interface DatabaseService {
         void onCodeRetrieved(String code);
 
         void onError(NetworkError error);;
+    }
+
+    interface FinalRankCallback {
+        void onRankRetrieved(java.util.List<String> rankedPlayerIds);
+
+        void onError(NetworkError error);
     }
 
 

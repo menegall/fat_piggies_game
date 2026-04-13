@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -306,8 +307,6 @@ public class AndroidDatabase implements DatabaseService {
         DatabaseReference playerInputRef = lobbiesRef.child(lobbyId).child("inputs").child(playerId);
         // Write the player input data to the database
         playerInputRef.setValue(data);
-
-        // For fast push (10/s) no need of listener, it will only slow the system
     }
 
     @Override
@@ -342,6 +341,60 @@ public class AndroidDatabase implements DatabaseService {
     }
 
     @Override
+    public void pushFinalRank(String lobbyId, List<String> rankedPlayerIds) {
+        if (lobbyId == null || rankedPlayerIds == null || rankedPlayerIds.isEmpty()) {
+            Log.e(TAG_DATABASE, "Cannot push final rank: Invalid lobbyId or empty ranking list.");
+            return;
+        }
+
+        Log.i(TAG_DATABASE, "Pushing final rank to lobby " + lobbyId);
+        DatabaseReference finalRankRef = lobbiesRef.child(lobbyId).child("final_rank");
+
+        // Write the ordered list of player IDs to the database
+        finalRankRef.setValue(rankedPlayerIds)
+            .addOnSuccessListener(aVoid -> Log.d(TAG_DATABASE, "Final rank pushed successfully."))
+            .addOnFailureListener(e -> Log.e(TAG_DATABASE, "Error pushing final rank: " + e.getMessage()));
+    }
+
+    @Override
+    public void getFinalRank(String lobbyId, FinalRankCallback callback) {
+        if (lobbyId == null) {
+            callback.onError(NetworkError.DATABASE_ERROR);
+            return;
+        }
+
+        Log.i(TAG_DATABASE, "Fetching final rank for lobby " + lobbyId);
+        DatabaseReference finalRankRef = lobbiesRef.child(lobbyId).child("final_rank");
+
+        // We use a single-value listener because we only need to read the ranking once
+        // when the match is over, not listen to it continuously.
+        com.google.firebase.database.ValueEventListener patientListener = new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    GenericTypeIndicator<List<String>> typeIndicator = new GenericTypeIndicator<List<String>>() {
+                    };
+                    List<String> rankedPlayerIds = snapshot.getValue(typeIndicator);
+
+                    if (rankedPlayerIds != null) {
+                        finalRankRef.removeEventListener(this);
+                        callback.onRankRetrieved(rankedPlayerIds);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
+                Log.e(TAG_DATABASE, "Error getting final rank: " + error.getMessage());
+                finalRankRef.removeEventListener(this);
+                callback.onError(NetworkError.DATABASE_ERROR);
+            }
+        };
+
+        finalRankRef.addValueEventListener(patientListener);
+    }
+
+    @Override
     public void stopListening() {
         // Remove listener to avoid memory leak and improve performance
         if (lobbyStatusRef != null && lobbyStatusListener != null) {
@@ -364,6 +417,7 @@ public class AndroidDatabase implements DatabaseService {
             gameStateListener = null;
         }
     }
+
 
     // --- Helper Method ---
     private String generateRandomCode() {

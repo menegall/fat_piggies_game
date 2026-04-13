@@ -1,6 +1,7 @@
 package com.fatpiggies.game.model.ecs.systems.move;
 
 import static com.fatpiggies.game.model.utils.GameConstants.LERP_FACTOR;
+import static com.fatpiggies.game.model.utils.GameConstants.SNAP_THRESHOLD;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
@@ -48,25 +49,31 @@ public class NetworkLerpSystem extends IteratingSystem {
     private final ComponentMapper<NetworkSyncComponent> nsm = ComponentMapper.getFor(NetworkSyncComponent.class);
     // Variable for fluidity of interpolation. lower value = smoother interpolation
 
-
     public NetworkLerpSystem() {
-        // We take all with TransformComponent and NetworkSyncComponent but
-        // exclude PlayerInputComponent
-        super(Family.all(TransformComponent.class, NetworkSyncComponent.class)
-            .exclude(PlayerInputComponent.class).get());
+        super(Family.all(TransformComponent.class, NetworkSyncComponent.class).get());
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         TransformComponent transform = tm.get(entity);
         NetworkSyncComponent sync = nsm.get(entity);
-        // We limit the alpha value to be between 0 and 1 to avoid bigger movements
-        float lerpAlpha = MathUtils.clamp(LERP_FACTOR * deltaTime, 0f, 1f);
+
         float deltaX = sync.targetX - transform.x;
         float deltaY = sync.targetY - transform.y;
-        float targetAngle = transform.angle;
+
+        // SNAP
+        float distanceSquared = (deltaX * deltaX) + (deltaY * deltaY);
+        if (distanceSquared > SNAP_THRESHOLD * SNAP_THRESHOLD) {
+            transform.x = sync.targetX;
+            transform.y = sync.targetY;
+            return;
+        }
 
         // Linear interpolation for x and y
+        // We limit the alpha value to be between 0 and 1 to avoid bigger movements
+        float lerpAlpha = MathUtils.clamp(LERP_FACTOR * deltaTime, 0f, 1f);
+        float targetAngle = transform.angle;
+
         transform.x += (deltaX) * lerpAlpha;
         transform.y += (deltaY) * lerpAlpha;
 

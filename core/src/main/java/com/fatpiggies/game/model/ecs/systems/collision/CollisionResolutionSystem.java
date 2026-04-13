@@ -13,6 +13,7 @@ import com.fatpiggies.game.model.ecs.components.item.CollectibleComponent;
 import com.fatpiggies.game.model.ecs.components.item.LifetimeComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.AccelerationModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.HealthModifierComponent;
+import com.fatpiggies.game.model.ecs.components.modifier.InputModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.MassModifierComponent;
 import com.fatpiggies.game.model.ecs.components.modifier.VelocityModifierComponent;
 import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
@@ -73,10 +74,10 @@ public class CollisionResolutionSystem extends IteratingSystem {
     private final ComponentMapper<CollisionEventComponent> cem = ComponentMapper.getFor(CollisionEventComponent.class);
     private final ComponentMapper<AccelerationModifierComponent> am = ComponentMapper
         .getFor(AccelerationModifierComponent.class);
-    private final ComponentMapper<VelocityModifierComponent> vmMod = ComponentMapper
-        .getFor(VelocityModifierComponent.class);
+    private final ComponentMapper<VelocityModifierComponent> vmMod = ComponentMapper.getFor(VelocityModifierComponent.class);
     private final ComponentMapper<MassModifierComponent> mmMod = ComponentMapper.getFor(MassModifierComponent.class);
     private final ComponentMapper<HealthModifierComponent> hmMod = ComponentMapper.getFor(HealthModifierComponent.class);
+    private final ComponentMapper<InputModifierComponent> imMod = ComponentMapper.getFor(InputModifierComponent.class);
     private final ComponentMapper<ColliderComponent> cm = ComponentMapper.getFor(ColliderComponent.class);
 
     private final Vector2 normal = new Vector2();
@@ -218,6 +219,13 @@ public class CollisionResolutionSystem extends IteratingSystem {
             buff.add(newMod);
         }
 
+        // Copy input modifier
+        if (imMod.has(item)) {
+            InputModifierComponent modifier = imMod.get(item);
+            InputModifierComponent newMod = getEngine().createComponent(InputModifierComponent.class);
+            newMod.power = modifier.power;
+            buff.add(newMod);
+        }
 
         // Copy lifetime (temporary effect)
         LifetimeComponent lifetime = getEngine().createComponent(LifetimeComponent.class);

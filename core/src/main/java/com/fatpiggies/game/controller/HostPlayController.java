@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.model.GameWorld;
+import com.fatpiggies.game.model.ecs.components.HealthComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.network.NetworkIdentityComponent;
 import com.fatpiggies.game.model.ecs.systems.LifetimeSystem;
@@ -24,7 +25,9 @@ import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HostPlayController implements IPlayController {
@@ -35,10 +38,10 @@ public class HostPlayController implements IPlayController {
     private final Map<String, Float> lastProcessedInputTs = new HashMap<>();
     private static final float INPUT_TIMEOUT = 0.2f;
     private float powerupTimer = POWERUP_SPAWN_INTERVAL;
-    private static final float INPUT_DELAY = 0.1f;
     private Engine engine;
     private GameWorld world;
     private boolean gameRunning = false;
+    private final List<String> deathOrder = new ArrayList<>();
 
     public HostPlayController(IPlayActions actions, String lobbyId) {
         this.actions = actions;
@@ -67,6 +70,7 @@ public class HostPlayController implements IPlayController {
         gameRunning = true;
         remoteInputFreshness.clear();
         lastProcessedInputTs.clear();
+        deathOrder.clear();
 
         powerupTimer = POWERUP_SPAWN_INTERVAL;
 
@@ -117,6 +121,7 @@ public class HostPlayController implements IPlayController {
             powerupTimer = POWERUP_SPAWN_INTERVAL;
         }
 
+        // Timeout logic
         for (Entity entity : engine.getEntities()) {
             NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
             PlayerInputComponent inputComp = entity.getComponent(PlayerInputComponent.class);
@@ -135,10 +140,34 @@ public class HostPlayController implements IPlayController {
             remoteInputFreshness.put(netId.playerId, remaining);
         }
 
+        // Physics update
         world.update(dt);
 
+        // Track death order
+        for (Entity entity : engine.getEntities()) {
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+            HealthComponent health = entity.getComponent(HealthComponent.class);
+
+            if (netId != null && netId.playerId != null && health != null) {
+                // If dead and not yet recorded, add to death order
+                if (health.currentLife <= 0 && !deathOrder.contains(netId.playerId)) {
+                    deathOrder.add(netId.playerId);
+                }
+            }
+        }
+
+        // Check end game
         if (world.isGameFinished()) {
-            actions.onGameFinishedByHost();
+            for (Entity entity : engine.getEntities()) {
+                NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+                if (netId != null && netId.playerId != null) {
+                    if (!deathOrder.contains(netId.playerId)) {
+                        deathOrder.add(netId.playerId);
+                    }
+                }
+            }
+            actions.getLobbyModel().setFinalRanking(deathOrder);
+            actions.onGameFinishedByHost(deathOrder);
         }
     }
 

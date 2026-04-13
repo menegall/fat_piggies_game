@@ -148,14 +148,12 @@ public class GameWorld implements IReadOnlyGameWorld {
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
         netId.playerId = playerId;
-
         NetworkSyncComponent sync = new NetworkSyncComponent();
+
         TransformComponent transform = new TransformComponent();
 
         HealthComponent health = new HealthComponent();
         health.currentLife = BASE_LIFE;
-
-        attachPhysicComponents(entity);
 
         PlayerInputComponent input = new PlayerInputComponent();
         input.multiplier = 1;
@@ -166,9 +164,7 @@ public class GameWorld implements IReadOnlyGameWorld {
         render.height = PIG_HEIGHT;
         render.angleOffset = PIG_ANGLE_OFFSET;
 
-        // No network sync
-        entity.add(netId).add(transform).add(health)
-            .add(input).add(render).add(sync);
+        entity.add(netId).add(health).add(sync).add(input).add(render).add(transform);
 
         localPlayer = entity;
         engine.addEntity(entity);
@@ -186,10 +182,9 @@ public class GameWorld implements IReadOnlyGameWorld {
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
         netId.playerId = playerId;
+        NetworkSyncComponent sync = new NetworkSyncComponent();
 
         TransformComponent transform = new TransformComponent();
-
-        NetworkSyncComponent sync = new NetworkSyncComponent();
 
         RenderComponent render = new RenderComponent();
         render.textureId = textureId;
@@ -543,7 +538,7 @@ public class GameWorld implements IReadOnlyGameWorld {
         for (Entity entity : engine.getEntities()) {
             NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
 
-            if (netId == null || netId.playerId == null) continue;
+            if (netId == null) continue;
 
             PlayerData pd = state.players.get(netId.playerId);
             if (pd == null) continue;

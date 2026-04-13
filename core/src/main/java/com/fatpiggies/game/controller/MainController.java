@@ -1,7 +1,8 @@
 package com.fatpiggies.game.controller;
 
-import static com.fatpiggies.game.utils.Config.SEND_THRESHOLD;
+import static com.fatpiggies.game.model.utils.GameConstants.SEND_THRESHOLD;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.fatpiggies.game.controller.mainControllerInterfaces.ILobbyActions;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
@@ -14,6 +15,8 @@ import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.states.GameStateManager;
+
+import java.util.List;
 
 public class MainController implements IViewActions, ILobbyActions, IPlayActions {
 
@@ -182,6 +185,21 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     @Override
     public void goToOverState() {
         quitPlayState();
+        dbs.getFinalRank(lobbyModel.getLobbyId(), new DatabaseService.FinalRankCallback() {
+            @Override
+            public void onRankRetrieved(List<String> rankedPlayerIds) {
+                Gdx.app.postRunnable(() -> {
+                    lobbyModel.setFinalRanking(rankedPlayerIds);
+                });
+            }
+
+            @Override
+            public void onError(NetworkError error) {
+                Gdx.app.postRunnable(() -> {
+                    showError(error);
+                });
+            }
+        });
         gsm.pushOverState(this, lobbyModel, lobbyModel.getIsHost());
     }
 
@@ -203,14 +221,14 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     }
 
     @Override
-    public void onGameFinishedByHost() {
+    public void onGameFinishedByHost(List<String> finalRank) {
 
         if (playController == null) return;
 
         if (lobbyModel.getIsHost()) {
+            dbs.pushFinalRank(lobbyModel.getLobbyId(), finalRank);
             dbs.endGame(lobbyModel.getLobbyId());
         }
-
         quitPlayState();
         gsm.pushOverState(this, lobbyModel, lobbyModel.getIsHost());
     }
