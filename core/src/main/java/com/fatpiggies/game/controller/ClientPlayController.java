@@ -4,9 +4,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.model.GameWorld;
-import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
 import com.fatpiggies.game.model.ecs.systems.move.NetworkLerpSystem;
-import com.fatpiggies.game.model.ecs.systems.move.NetworkReconciliationSystem;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.network.dto.GameState;
@@ -41,8 +39,6 @@ public class ClientPlayController implements IPlayController {
 
         engine = new Engine();
 
-        engine.addSystem(new MovementSystem());
-        engine.addSystem(new NetworkReconciliationSystem());
         engine.addSystem(new NetworkLerpSystem());
 
         world = new GameWorld(engine);
