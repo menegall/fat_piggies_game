@@ -12,7 +12,6 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
-import com.fatpiggies.game.model.ecs.components.network.NetworkSyncComponent;
 import com.fatpiggies.game.model.ecs.components.physics.AccelerationComponent;
 import com.fatpiggies.game.model.ecs.components.physics.MassComponent;
 import com.fatpiggies.game.model.ecs.components.physics.VelocityComponent;
@@ -30,9 +29,7 @@ public class MovementSystem extends IteratingSystem {
     private final Vector2 frictionVec = new Vector2();
 
     public MovementSystem() {
-        super(Family.all(TransformComponent.class, VelocityComponent.class)
-            .exclude(NetworkSyncComponent.class)
-            .get());
+        super(Family.all(TransformComponent.class, VelocityComponent.class).get());
     }
 
     @Override

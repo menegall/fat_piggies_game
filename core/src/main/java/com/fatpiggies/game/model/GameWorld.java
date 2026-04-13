@@ -149,6 +149,7 @@ public class GameWorld implements IReadOnlyGameWorld {
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
         netId.playerId = playerId;
 
+        NetworkSyncComponent sync = new NetworkSyncComponent();
         TransformComponent transform = new TransformComponent();
 
         HealthComponent health = new HealthComponent();
@@ -167,10 +168,9 @@ public class GameWorld implements IReadOnlyGameWorld {
 
         // No network sync
         entity.add(netId).add(transform).add(health)
-            .add(input).add(render);
+            .add(input).add(render).add(sync);
 
         localPlayer = entity;
-
         engine.addEntity(entity);
     }
 
@@ -416,9 +416,10 @@ public class GameWorld implements IReadOnlyGameWorld {
                 activePlayersTracker.add(netId.playerId);
 
                 TransformComponent transform = entity.getComponent(TransformComponent.class);
+                VelocityComponent velocity = entity.getComponent(VelocityComponent.class);
                 HealthComponent health = entity.getComponent(HealthComponent.class);
 
-                if (transform != null) {
+                if (transform != null && velocity != null) {
                     // Try to get the pooled object
                     PlayerData pd = gameState.players.get(netId.playerId);
 
@@ -431,6 +432,8 @@ public class GameWorld implements IReadOnlyGameWorld {
                     // Update values
                     pd.x = roundToOneDecimal(transform.x);
                     pd.y = roundToOneDecimal(transform.y);
+                    pd.vx = roundToTwoDecimals(velocity.vx);
+                    pd.vy = roundToTwoDecimals(velocity.vy);
                     pd.hp = (health != null) ? health.currentLife : 0;
                 }
             }
@@ -523,7 +526,6 @@ public class GameWorld implements IReadOnlyGameWorld {
                     inputComp.joystickPercentageX = MathUtils.clamp(input.jx, -1.0f, 1.0f);
                     inputComp.joystickPercentageY = MathUtils.clamp(input.jy, -1.0f, 1.0f);
                 }
-
                 break;
             }
         }
@@ -546,7 +548,6 @@ public class GameWorld implements IReadOnlyGameWorld {
             PlayerData pd = state.players.get(netId.playerId);
             if (pd == null) continue;
 
-            TransformComponent transform = entity.getComponent(TransformComponent.class);
             NetworkSyncComponent sync = entity.getComponent(NetworkSyncComponent.class);
             HealthComponent health = entity.getComponent(HealthComponent.class);
 
@@ -554,41 +555,11 @@ public class GameWorld implements IReadOnlyGameWorld {
                 health.currentLife = pd.hp;
             }
 
-            // --- LOCAL PLAYER ---
-            if (entity == localPlayer) {
-
-                if (transform != null) {
-
-                    float dx = pd.x - transform.x;
-                    float dy = pd.y - transform.y;
-
-                    float dist2 = dx * dx + dy * dy;
-
-                    float SNAP_THRESHOLD = 4f;
-                    float DEADZONE = 0.0005f;
-
-                    if (dist2 < DEADZONE) continue;
-
-                    if (dist2 > SNAP_THRESHOLD) {
-                        transform.x = pd.x;
-                        transform.y = pd.y;
-                    }
-                    else {
-                        float dist = (float)Math.sqrt(dist2);
-                        float factor = Math.min(0.15f, dist * 0.08f);
-
-                        transform.x += dx * factor;
-                        transform.y += dy * factor;
-                    }
-                }
-
-            }
-            // --- REMOTE PLAYERS ---
-            else {
-                if (sync != null) {
-                    sync.targetX = pd.x;
-                    sync.targetY = pd.y;
-                }
+            if (sync != null) {
+                sync.targetX = pd.x;
+                sync.targetY = pd.y;
+                sync.targetVx = pd.vx;
+                sync.targetVy = pd.vy;
             }
         }
 

@@ -24,35 +24,20 @@ import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class HostPlayController implements IPlayController {
 
     private final IPlayActions actions;
     private final GameState gameState = new GameState();
-
     private final Map<String, Float> remoteInputFreshness = new HashMap<>();
+    private final Map<String, Float> lastProcessedInputTs = new HashMap<>();
     private static final float INPUT_TIMEOUT = 0.2f;
     private float powerupTimer = POWERUP_SPAWN_INTERVAL;
-
-    // Delay
-    private static class BufferedInput {
-        String playerId;
-        PlayerInput input;
-        float timestamp;
-    }
-
-    private final List<BufferedInput> inputBuffer = new ArrayList<>();
     private static final float INPUT_DELAY = 0.1f;
-
     private Engine engine;
     private GameWorld world;
-
-    private DatabaseService db;
     private boolean gameRunning = false;
 
     public HostPlayController(IPlayActions actions, String lobbyId) {
@@ -78,11 +63,10 @@ public class HostPlayController implements IPlayController {
     }
 
     @Override
-    public void startGame(DatabaseService db) {
-        this.db = db;
+    public void startGame() {
         gameRunning = true;
         remoteInputFreshness.clear();
-        inputBuffer.clear();
+        lastProcessedInputTs.clear();
 
         powerupTimer = POWERUP_SPAWN_INTERVAL;
 
@@ -104,8 +88,6 @@ public class HostPlayController implements IPlayController {
                 remoteInputFreshness.put(playerId, 0f);
             }
         }
-
-        attachPlayListener();
     }
 
     @Override
@@ -119,7 +101,7 @@ public class HostPlayController implements IPlayController {
         engine = null;
         world = null;
         remoteInputFreshness.clear();
-        inputBuffer.clear();
+        lastProcessedInputTs.clear();
     }
 
     @Override
@@ -135,25 +117,11 @@ public class HostPlayController implements IPlayController {
             powerupTimer = POWERUP_SPAWN_INTERVAL;
         }
 
-        float currentTime = actions.getTimerNetwork();
-
-        // TODO: Why this logic??
-        Iterator<BufferedInput> it = inputBuffer.iterator();
-        while (it.hasNext()) {
-            BufferedInput bi = it.next();
-
-            if ((currentTime - bi.timestamp) >= INPUT_DELAY) {
-                world.applyRemoteInput(bi.playerId, bi.input);
-                it.remove();
-            }
-        }
-
         for (Entity entity : engine.getEntities()) {
             NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
             PlayerInputComponent inputComp = entity.getComponent(PlayerInputComponent.class);
 
             if (netId == null || inputComp == null || netId.playerId == null) continue;
-
             if (netId.playerId.equals(currentUser)) continue;
 
             float remaining = remoteInputFreshness.getOrDefault(netId.playerId, 0f) - dt;
@@ -191,15 +159,13 @@ public class HostPlayController implements IPlayController {
         db.pushGameState(world.getLobbyId(), gameState);
     }
 
-    private void attachPlayListener() {
+    @Override
+    public void attachPlayListener(DatabaseService db) {
         db.listenToInputs(world.getLobbyId(), new DatabaseService.InputsCallback() {
-
             @Override
             public void onInputsReceived(Map<String, PlayerInput> inputs) {
                 Gdx.app.postRunnable(() -> {
                     if (!gameRunning || world == null || inputs == null) return;
-
-                    String currentUser = actions.getCurrentUserId();
 
                     for (Map.Entry<String, PlayerInput> entry : inputs.entrySet()) {
                         String playerId = entry.getKey();
@@ -207,16 +173,19 @@ public class HostPlayController implements IPlayController {
 
                         if (playerId == null || playerInput == null) continue;
 
-                        if (playerId.equals(currentUser)) continue;
-                        BufferedInput bi = new BufferedInput();
-                        bi.playerId = playerId;
-                        bi.input = playerInput;
-                        bi.timestamp = gameState.ts;
+                        // 1. Check for out-of-order packets
+                        float lastTs = lastProcessedInputTs.getOrDefault(playerId, -1f);
+                        if (playerInput.ts > lastTs) {
 
-                        inputBuffer.add(bi);
+                            // 2. Update the tracking timestamp
+                            lastProcessedInputTs.put(playerId, playerInput.ts);
 
-                        // refresh timeout
-                        remoteInputFreshness.put(playerId, INPUT_TIMEOUT);
+                            // 3. Apply the input IMMEDIATELY to the physics engine
+                            world.applyRemoteInput(playerId, playerInput);
+
+                            // 4. Reset the timeout freshness so the pig doesn't stop
+                            remoteInputFreshness.put(playerId, INPUT_TIMEOUT);
+                        }
                     }
                 });
             }

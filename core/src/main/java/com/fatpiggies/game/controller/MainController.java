@@ -72,7 +72,8 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
 
         dbs.startGame(lobbyModel.getLobbyId());
 
-        playController.startGame(dbs);
+        playController.startGame();
+        playController.attachPlayListener(dbs);
 
         gsm.pushPlayState(this,
             playController.getWorld(),
@@ -86,7 +87,8 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
 
         playController = new ClientPlayController(this, lobbyModel.getLobbyId());
 
-        playController.startGame(dbs);
+        playController.startGame();
+        playController.attachPlayListener(dbs);
 
         gsm.pushPlayState(this,
             playController.getWorld(),

@@ -6,6 +6,8 @@ import java.util.Map;
 public class PlayerData {
     public float x;
     public float y;
+    public float vx;
+    public float vy;
     public int hp;
     public Map<String, Boolean> fx; // Power-up
 

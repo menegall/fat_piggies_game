@@ -6,9 +6,11 @@ import com.fatpiggies.game.network.DatabaseService;
 public interface IPlayController {
     GameWorld getWorld();
 
-    void startGame(DatabaseService db);
+    void startGame();
 
     void endGame();
+
+    void attachPlayListener(DatabaseService db);
 
     void updateWorld(float dt);
 

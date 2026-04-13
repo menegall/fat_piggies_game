@@ -24,7 +24,7 @@ public final class GameConstants {
     public static final float PLAYER_BASE_MASS = 10f;
     public static final int MAX_PLAYERS = 4;
     public static final int BASE_LIFE = 5;
-    public static final float LERP_FACTOR = 20f;
+    public static final float LERP_FACTOR = 5f;
     public static final int PLAYER_COLLISION_RADIUS = 95;
     public static final float PLAYER_BOUNCINESS = 0.8f;
 
@@ -39,9 +39,9 @@ public final class GameConstants {
     public static final int POWERUP_COLLISION_RADIUS = 25;
 
     // --- RECONCILIATION THRESHOLDS (Tune these values during playtesting) ---
-    public static final float IGNORE_THRESHOLD = 30f;
-    public static final float SNAP_THRESHOLD = 150f;
-    public static final float CORRECTION_LERP = 5.0f;
+    public static final float IGNORE_THRESHOLD = 500f;
+    public static final float SNAP_THRESHOLD = 1200f;
+    public static final float CORRECTION_LERP = 20f;
 
     // --- INPUT SETTINGS ---
     public static final float JOYSTICK_DEADZONE = 10f;

@@ -73,6 +73,8 @@ public class NetworkReconciliationSystem extends IteratingSystem {
                 // Correct the position instantly
                 transform.x = sync.targetX;
                 transform.y = sync.targetY;
+                velocity.vx = sync.targetVx;
+                velocity.vy = sync.targetVy;
 
             } else {
                 // MEDIUM DESYNC: We are drifting slightly out of sync.

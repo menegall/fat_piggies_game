@@ -29,9 +29,6 @@ public class ClientPlayController implements IPlayController {
     private float lastStateTimestamp = 0f;
     private boolean gameRunning = false;
     private boolean firstStateReceived = false;
-
-    private DatabaseService db;
-
     private float sendTimer = 0f;
     private float lastSendTime = 0f;
 
@@ -58,8 +55,7 @@ public class ClientPlayController implements IPlayController {
     }
 
     @Override
-    public void startGame(DatabaseService db) {
-        this.db = db;
+    public void startGame() {
 
         gameRunning = true;
         lastStateTimestamp = 0f;
@@ -88,8 +84,6 @@ public class ClientPlayController implements IPlayController {
                 world.createRemotePig(playerId, texture);
             }
         }
-
-        attachPlayListener();
     }
 
     @Override
@@ -139,23 +133,25 @@ public class ClientPlayController implements IPlayController {
         if (sendTimer < SEND_RATE) {
             return;
         }
-        sendTimer = 0f;
 
         world.populatePlayerInput(input);
 
-        boolean isMoving = Math.abs(input.jx) > 0.001f || Math.abs(input.jy) > 0.001f;
+        boolean isMoving = Math.abs(input.jx) > 0.01f || Math.abs(input.jy) > 0.01f;
         boolean keepAlive = (input.ts - lastSendTime) >= KEEP_ALIVE;
 
+        // TOTO
         if (isMoving || keepAlive) {
             input.ts += SEND_RATE;
             db.pushPlayerInput(world.getLobbyId(), actions.getCurrentUserId(), input);
             lastSendTime = input.ts;
         }
+
+        sendTimer = 0f;
     }
 
-    private void attachPlayListener() {
+    @Override
+    public void attachPlayListener(DatabaseService db) {
         db.listenToGameState(world.getLobbyId(), new DatabaseService.GameStateCallback() {
-
             @Override
             public void onDataReceived(GameState data) {
                 Gdx.app.postRunnable(() -> {
