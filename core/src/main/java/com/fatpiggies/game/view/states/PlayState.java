@@ -238,7 +238,7 @@ public class PlayState extends State {
 
         // BG
         sb.begin();
-        sb.draw(bg, 0, 0, screenWidth, screenHeight);
+        sb.draw(TextureManager.getFrame(TextureId.PLAY_BACKGROUND), 0, 0, screenWidth, screenHeight);
         sb.end();
 
         // ENTITIES

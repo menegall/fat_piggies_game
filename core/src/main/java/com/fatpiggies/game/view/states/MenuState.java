@@ -60,6 +60,9 @@ public class MenuState extends State {
     private static final float BUTTON_HEIGHT_RATIO = 0.12f;
     private static final float BUTTON_HEIGHT_PAD = 0.03f;
 
+    private static final float SHOP_X_RATIO = 0.73f;
+    private static final float SHOP_Y_RATIO = 0.8f;
+
     private static final float ERROR_X_RATIO = 0.4f;
     private static final float ERROR_Y_RATIO = 0.81f;
     private static final float ERROR_WIDTH_RATIO = 0.2f;
@@ -71,6 +74,7 @@ public class MenuState extends State {
 
     private TextButton joinButton;
     private TextButton hostButton;
+    private TextButton shopButton;
     private ImageButton colorButton;
     private TextureId currentPig = TextureId.OVER_BLUE_PIG;
     private boolean showPigSelectionInfo = false;
@@ -79,7 +83,6 @@ public class MenuState extends State {
     private CheckBox vibrationButton;
 
     private final TextureRegion menuBackground;
-    private final TextureRegion playBackground;
     private final TextureRegion cross;
     private final TextureRegion bubble;
 
@@ -91,7 +94,6 @@ public class MenuState extends State {
     public MenuState(IViewActions viewActions) {
         super(viewActions);
         menuBackground = TextureManager.getFrame(TextureId.MENU_BACKGROUND);
-        playBackground = TextureManager.getFrame(TextureId.PLAY_BACKGROUND);
         cross = TextureManager.getFrame(TextureId.CROSS);
         bubble = TextureManager.getFrame(TextureId.BUBBLE);
 
@@ -152,6 +154,27 @@ public class MenuState extends State {
                 onHostClicked();
             }
         });
+
+        // ================= SHOP BUTTON =================
+        shopButton = new TextButton("Shop", skin);
+        shopButton.setSize(
+            screenWidth * BUTTON_WIDTH_RATIO,
+            screenHeight * BUTTON_HEIGHT_RATIO
+        );
+
+        shopButton.setPosition(
+            screenWidth * SHOP_X_RATIO,
+            screenHeight * SHOP_Y_RATIO
+        );
+
+        shopButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                viewActions.onShopClicked();
+            }
+        });
+
+        stage.addActor(shopButton);
 
         // ================= ERROR =================
         errorLabel = new Label("", skin);
@@ -350,7 +373,7 @@ public class MenuState extends State {
 
         sb.begin();
 
-        sb.draw(playBackground, 0, 0, screenWidth, screenHeight);
+        sb.draw(TextureManager.getFrame(TextureId.PLAY_BACKGROUND), 0, 0, screenWidth, screenHeight);
 
         float sizeX = screenWidth * MENU_SIZE_X_RATIO;
         float sizeY = screenHeight * MENU_SIZE_Y_RATIO;

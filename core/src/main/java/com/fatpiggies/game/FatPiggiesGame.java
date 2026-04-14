@@ -7,6 +7,9 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.fatpiggies.game.setting.MusicManager;
+import com.fatpiggies.game.setting.PreferencesManager;
+import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
@@ -54,6 +57,8 @@ public class FatPiggiesGame extends ApplicationAdapter {
         MusicManager.load();
 
         MusicManager.enable();
+
+        //PreferencesManager.reset();
 
         // To draw
         batch = new SpriteBatch();
