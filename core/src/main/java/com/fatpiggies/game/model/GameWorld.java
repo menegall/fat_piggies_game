@@ -24,6 +24,7 @@ import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.MathUtils;
 import com.fatpiggies.game.model.ecs.components.HealthComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
@@ -655,6 +656,38 @@ public class GameWorld implements IReadOnlyGameWorld {
     }
 
     public List<String> getDeathOrder(){ return deathOrder;}
+
+    /**
+     * Synchronizes the world entities with the players currently connected to the lobby.
+     * If a player has disconnected, their entity is removed and they are added
+     * to the deathOrder (as if they had been eliminated).
+     */
+    public void removeDisconnectedPlayers(Map<String, PlayerSetup> currentPlayersSetup) {
+        this.playersSetup = currentPlayersSetup;
+
+        ImmutableArray<Entity> entities = engine.getEntities();
+
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+
+
+            if (netId != null && netId.playerId != null) {
+                if (!currentPlayersSetup.containsKey(netId.playerId)) {
+
+                    if (!deathOrder.contains(netId.playerId)) {
+                        deathOrder.add(netId.playerId);
+                    }
+
+                    if (entity.equals(localPlayer)) {
+                        localPlayer = null;
+                    }
+
+                    engine.removeEntity(entity);
+                }
+            }
+        }
+    }
 
     @Override
     public Engine getEngine() {
