@@ -409,7 +409,6 @@ public class MenuState extends State {
 
     private String getErrorMessage(NetworkError error) {
         switch (error) {
-
             case NAME_ALREADY_EXIST:
                 return "That name's taken";
 
@@ -427,6 +426,9 @@ public class MenuState extends State {
 
             case DATABASE_ERROR:
                 return "Connection error - try again";
+
+            case LOGIN_REQUIRED:
+                return "Authenticating... retry later!";
 
             default:
                 return "Something went wrong";

@@ -36,6 +36,9 @@ public class FatPiggiesGame extends ApplicationAdapter {
         authService.signIn(new AuthService.AuthCallback() {
             @Override
             public void onSuccess(String userId) {
+                Gdx.app.postRunnable(() -> {
+                    main.getLobbyModel().setPlayerId(userId);
+                });
             }
 
             @Override

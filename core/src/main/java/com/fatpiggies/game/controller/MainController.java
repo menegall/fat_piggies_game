@@ -116,11 +116,21 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
 
     @Override
     public void onHostLobbyClicked(String playerName, PlayerColor playerColor) {
+        String uid = auth.getCurrentUserId();
+        if (uid == null) {
+            showError(NetworkError.LOGIN_REQUIRED);
+            return;
+        }
         lobbyController.hostLobby(playerName, playerColor);
     }
 
     @Override
     public void onJoinLobbyClicked(String playerName, String lobbyCode, PlayerColor playerColor) {
+        String uid = auth.getCurrentUserId();
+        if (uid == null) {
+            showError(NetworkError.LOGIN_REQUIRED);
+            return;
+        }
         lobbyController.joinLobby(playerName, lobbyCode, playerColor);
     }
 
