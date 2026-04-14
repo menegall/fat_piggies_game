@@ -13,6 +13,7 @@ import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.setting.MusicManager;
 import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.view.states.GameStateManager;
 
 
 /**
@@ -79,12 +80,20 @@ public class FatPiggiesGame extends ApplicationAdapter {
     public void dispose() {
         Gdx.app.log(TAG_APP, "Dispose App");
 
-        batch.dispose();
-        TextureManager.dispose();
+        if (main != null) {
+            main.dispose();
+        }
 
-        // TODO implement leaveLobby() if user is in a lobby
-        databaseService.stopListening();
         authService.signOut();
+
+        if (batch != null) {
+            batch.dispose();
+        }
+        TextureManager.dispose();
+        SoundsManager.dispose();
+        MusicManager.dispose();
+
+        GameStateManager.getInstance().dispose();
     }
 
     @Override

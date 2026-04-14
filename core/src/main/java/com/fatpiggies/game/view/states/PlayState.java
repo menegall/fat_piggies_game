@@ -364,4 +364,10 @@ public class PlayState extends State {
             Actions.run(() -> messageLabel.setVisible(false))
         ));
     }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        shapeRenderer.dispose();
+    }
 }

@@ -39,6 +39,7 @@ public abstract class State {
 
     public void dispose() {
         stage.dispose();
+        skin.dispose();
     }
 
     public void showError(NetworkError error){};

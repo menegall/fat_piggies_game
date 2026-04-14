@@ -44,7 +44,7 @@ public class GameStateManager {
         state.show();
     }
 
-    private void dispose() {
+    public void dispose() {
         while (!states.isEmpty()) {
             states.pop().dispose();
         }
