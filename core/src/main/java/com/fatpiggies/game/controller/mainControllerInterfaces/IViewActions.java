@@ -2,6 +2,7 @@ package com.fatpiggies.game.controller.mainControllerInterfaces;
 
 import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
+import com.fatpiggies.game.view.Theme;
 
 public interface IViewActions {
 
@@ -12,19 +13,20 @@ public interface IViewActions {
 
     void onShopClicked();
 
-
     // Shop
     void onMenuClicked();
 
-    void onBuyBackgroundClicked(TextureId bg);
+    void onBuyThemeClicked(Theme theme);
 
-    void onSelectBackground(TextureId bg);
+    void onSelectTheme(Theme theme);
+
+    boolean isThemeUnlocked(Theme theme);
+
+    int getThemePrice(Theme theme);
 
     int getCoins();
 
-    int getPrice(TextureId bg);
-
-    boolean isBackgroundUnlocked(TextureId bg);
+    Theme getCurrentTheme();
 
     // Lobby
     void onStartClicked();

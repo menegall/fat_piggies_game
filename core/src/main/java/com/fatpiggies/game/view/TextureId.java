@@ -3,19 +3,40 @@ package com.fatpiggies.game.view;
 public enum TextureId {
     LOGO,
     MENU_BACKGROUND,
+
+    // Used in the rest of the code
     PLAY_BACKGROUND,
-    PLAY_BACKGROUND_1,
-    PLAY_BACKGROUND_2,
-    PLAY_BACKGROUND_3,
+    BLUE_PIG,
+    GREEN_PIG,
+    RED_PIG,
+    YELLOW_PIG,
+
+    // Farm
+    PLAY_BACKGROUND_FARM,
+    BLUE_PIG_FARM,
+    RED_PIG_FARM,
+    GREEN_PIG_FARM,
+    YELLOW_PIG_FARM,
+
+    // Volcano
+    PLAY_BACKGROUND_VOLCANO,
+    BLUE_PIG_VOLCANO,
+    RED_PIG_VOLCANO,
+    GREEN_PIG_VOLCANO,
+    YELLOW_PIG_VOLCANO,
+
+    // Space
+    PLAY_BACKGROUND_SPACE,
+    BLUE_PIG_SPACE,
+    RED_PIG_SPACE,
+    GREEN_PIG_SPACE,
+    YELLOW_PIG_SPACE,
+
     ARROW,
     COIN,
     OVER_BACKGROUND,
     PODIUM,
     CROSS,
-    BLUE_PIG,
-    GREEN_PIG,
-    RED_PIG,
-    YELLOW_PIG,
     LIFE_BLUE_PIG,
     LIFE_GREEN_PIG,
     LIFE_RED_PIG,

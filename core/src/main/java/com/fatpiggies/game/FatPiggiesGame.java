@@ -58,7 +58,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
 
         MusicManager.enable();
 
-        //PreferencesManager.reset();
+        PreferencesManager.reset();
 
         // To draw
         batch = new SpriteBatch();

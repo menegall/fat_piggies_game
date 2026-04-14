@@ -16,6 +16,7 @@ import com.fatpiggies.game.setting.PreferencesManager;
 import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.view.Theme;
 import com.fatpiggies.game.view.states.GameStateManager;
 
 import java.util.List;
@@ -170,24 +171,27 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     }
 
     @Override
-    public void onBuyBackgroundClicked(TextureId bg) {
-        boolean success = shopController.buy(bg);
+    public void onBuyThemeClicked(Theme theme) {
+        boolean success = shopController.buy(theme);
 
         if (success) {
-            shopController.select(bg);
+            shopController.select(theme);
         }
     }
 
     @Override
-    public void onSelectBackground(TextureId bg) {
-        if (shopController.isUnlocked(bg)) {
-            shopController.select(bg);
-        }
+    public void onSelectTheme(Theme theme) {
+        shopController.select(theme);
     }
 
     @Override
-    public boolean isBackgroundUnlocked(TextureId bg) {
-        return shopController.isUnlocked(bg);
+    public boolean isThemeUnlocked(Theme theme) {
+        return shopController.isUnlocked(theme);
+    }
+
+    @Override
+    public int getThemePrice(Theme theme) {
+        return shopController.getPrice(theme);
     }
 
     @Override
@@ -196,8 +200,8 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     }
 
     @Override
-    public int getPrice(TextureId bg) {
-        return shopController.getPrice(bg);
+    public Theme getCurrentTheme() {
+        return PreferencesManager.loadTheme();
     }
 
     @Override

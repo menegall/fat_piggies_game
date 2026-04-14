@@ -3,75 +3,78 @@ package com.fatpiggies.game.view.states;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.view.Theme;
 
 public class ShopState extends State {
 
-    // ===== RATIOS =====
-    private static final float BUTTON_WIDTH_RATIO = 0.2f;
+    // ===== BUTTON =====
+    private static final float BUTTON_WIDTH_RATIO = 0.22f;
     private static final float BUTTON_HEIGHT_RATIO = 0.12f;
 
-    private static final float MENU_X_RATIO = 0.73f;
+    // ===== MENU BUTTON =====
+    private static final float MENU_X_RATIO = 0.71f;
     private static final float MENU_Y_RATIO = 0.8f;
 
-    private static final float MENU_1_SIZE_X_RATIO = 0.2f;
-    private static final float MENU_1_SIZE_Y_RATIO = 0.12f;
-    private static final float MENU_1_ANCHOR_X = 0.07f;
-    private static final float MENU_1_ANCHOR_Y = 0.8f;
+    // ===== PANELS =====
+    private static final float PANEL_WIDTH_RATIO = 0.22f;
+    private static final float PANEL_HEIGHT_RATIO = 0.12f;
 
-    private static final float COIN_ICON_X_RATIO = 0.18f;
-    private static final float COIN_ICON_Y_RATIO = 0.79f;
-    private static final float COIN_SIZE_X_RATIO = 0.06f;
-    private static final float COIN_SIZE_Y_RATIO = 0.14f;
+    private static final float PANEL_1_X_RATIO = 0.07f;
+    private static final float PANEL_1_Y_RATIO = 0.8f;
 
-    private static final float COIN_X_RATIO = 0.09f;
-    private static final float COIN_Y_RATIO = 0.86f;
+    private static final float PANEL_2_X_RATIO = 0.07f;
+    private static final float PANEL_2_Y_RATIO = 0.65f;
 
-    private static final float MENU_2_SIZE_X_RATIO = 0.2f;
-    private static final float MENU_2_SIZE_Y_RATIO = 0.12f;
-    private static final float MENU_2_ANCHOR_X = 0.07f;
-    private static final float MENU_2_ANCHOR_Y = 0.65f;
+    // ===== COINS =====
+    private static final float COINS_X_RATIO = 0.09f;
+    private static final float COINS_Y_RATIO = 0.86f;
 
+    // ===== PRICE =====
     private static final float PRICE_X_RATIO = 0.09f;
     private static final float PRICE_Y_RATIO = 0.71f;
 
-    private static final float BUY_X_RATIO = 0.73f;
+    // ===== BUY =====
+    private static final float BUY_X_RATIO = 0.71f;
     private static final float BUY_Y_RATIO = 0.65f;
 
-    private static final float ARROW_SIZE_X_RATIO = 0.09f;
-    private static final float ARROW_SIZE_Y_RATIO = 0.21f;
+    // ===== ARROW =====
+    private static final float ARROW_SIZE_X_RATIO = 0.11f;
+    private static final float ARROW_SIZE_Y_RATIO = 0.26f;
     private static final float ARROW_X_RATIO = 0.73f;
     private static final float ARROW_Y_RATIO = 0.2f;
+
+    // ===== PIG PREVIEW =====
+    private static final float PIG_X_RATIO = 0.4f;
+    private static final float PIG_Y_RATIO = 0.3f;
+    private static final float PIG_WIDTH_RATIO = 0.2f;
+    private static final float PIG_HEIGHT_RATIO = 0.3f;
 
     // ===== UI =====
     private TextButton menuButton;
     private TextButton buyButton;
-    private ImageButton nextBackgroundButton;
+    private ImageButton nextButton;
 
     private Label coinsLabel;
     private Label priceLabel;
-    private Image coinImage;
-
-    // 🔥 IMPORTANT : preview local (FIX BUG)
-    private TextureId currentPreview;
 
     private TextureRegion menuBackground;
+
+    // ===== THEME =====
+    private Theme currentPreview;
 
     public ShopState(IViewActions viewActions) {
         super(viewActions);
 
         menuBackground = TextureManager.getFrame(TextureId.MENU_BACKGROUND);
 
-        // Start with actual bg
-        currentPreview = TextureManager.getCurrentBackground();
+        currentPreview = viewActions.getCurrentTheme();
+        TextureManager.setPreviewTheme(currentPreview);
 
         createUI();
     }
@@ -92,32 +95,21 @@ public class ShopState extends State {
         menuButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                TextureManager.clearPreviewTheme();
                 viewActions.onMenuClicked();
             }
         });
         stage.addActor(menuButton);
 
-        // ===== COIN ICON =====
-        float coinSizeX = screenWidth * COIN_SIZE_X_RATIO;
-        float coinSizeY = screenHeight * COIN_SIZE_Y_RATIO;
-
-        coinImage = new Image(TextureManager.getFrame(TextureId.COIN));
-        coinImage.setSize(coinSizeX, coinSizeY);
-        coinImage.setPosition(
-            screenWidth * COIN_ICON_X_RATIO,
-            screenHeight * COIN_ICON_Y_RATIO
-        );
-        stage.addActor(coinImage);
-
-        // ===== COINS LABEL =====
+        // ===== COINS =====
         coinsLabel = new Label("", skin);
         coinsLabel.setPosition(
-            screenWidth * COIN_X_RATIO,
-            screenHeight * COIN_Y_RATIO
+            screenWidth * COINS_X_RATIO,
+            screenHeight * COINS_Y_RATIO
         );
         stage.addActor(coinsLabel);
 
-        // ===== PRICE LABEL =====
+        // ===== PRICE =====
         priceLabel = new Label("", skin);
         priceLabel.setPosition(
             screenWidth * PRICE_X_RATIO,
@@ -136,57 +128,68 @@ public class ShopState extends State {
         buyButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                viewActions.onBuyBackgroundClicked(currentPreview);
 
-                updateCoinsLabel();
-                updateBuyButton();
-                updatePriceLabel();
+                viewActions.onBuyThemeClicked(currentPreview);
+
+                TextureManager.setTheme(currentPreview);
+                TextureManager.clearPreviewTheme();
+
+                updateAll();
             }
         });
         stage.addActor(buyButton);
 
-        // ===== ARROW BUTTON =====
-        float arrowSizeX = screenWidth * ARROW_SIZE_X_RATIO;
-        float arrowSizeY = screenHeight * ARROW_SIZE_Y_RATIO;
-
-        TextureRegionDrawable arrowDrawable =
-            new TextureRegionDrawable(TextureManager.getFrame(TextureId.ARROW));
-
-        nextBackgroundButton = new ImageButton(arrowDrawable);
-        nextBackgroundButton.setSize(arrowSizeX, arrowSizeY);
-        nextBackgroundButton.setPosition(
+        // ===== NEXT BUTTON =====
+        nextButton = new ImageButton(new TextureRegionDrawable(TextureManager.getFrame(TextureId.ARROW)));
+        nextButton.setSize(screenWidth * ARROW_SIZE_X_RATIO, screenHeight * ARROW_SIZE_Y_RATIO);
+        nextButton.setPosition(
             screenWidth * ARROW_X_RATIO,
             screenHeight * ARROW_Y_RATIO
         );
-        nextBackgroundButton.getImageCell().expand().fill();
+        nextButton.getImageCell().expand().fill();
 
-        nextBackgroundButton.addListener(new ChangeListener() {
+        nextButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                currentPreview = TextureManager.nextBackground(currentPreview);
+                currentPreview = nextTheme(currentPreview);
+                TextureManager.setPreviewTheme(currentPreview);
 
-                updateBuyButton();
-                updatePriceLabel();
-
-                if (viewActions.isBackgroundUnlocked(currentPreview)) {
-                    viewActions.onSelectBackground(currentPreview);
-                }
+                updateAll();
             }
         });
 
-        stage.addActor(nextBackgroundButton);
+        stage.addActor(nextButton);
 
-        // ===== INIT =====
+        updateAll();
+    }
+
+    // ===== THEME LOOP =====
+    private Theme nextTheme(Theme current) {
+        Theme[] values = Theme.values();
+        return values[(current.ordinal() + 1) % values.length];
+    }
+
+    // ===== UPDATE =====
+    private void updateAll() {
         updateCoinsLabel();
-        updateBuyButton();
         updatePriceLabel();
+        updateBuyButton();
+    }
+
+    private void updateCoinsLabel() {
+        coinsLabel.setText("Coins : " + viewActions.getCoins());
+    }
+
+    private void updatePriceLabel() {
+        priceLabel.setText("Price : " + viewActions.getThemePrice(currentPreview));
     }
 
     private void updateBuyButton() {
-        boolean unlocked = viewActions.isBackgroundUnlocked(currentPreview);
+
+        boolean unlocked = viewActions.isThemeUnlocked(currentPreview);
         int coins = viewActions.getCoins();
-        int price = viewActions.getPrice(currentPreview);
+        int price = viewActions.getThemePrice(currentPreview);
 
         buyButton.setVisible(!unlocked);
         priceLabel.setVisible(!unlocked);
@@ -206,14 +209,7 @@ public class ShopState extends State {
         }
     }
 
-    private void updateCoinsLabel() {
-        coinsLabel.setText(String.valueOf(viewActions.getCoins()));
-    }
-
-    private void updatePriceLabel() {
-        priceLabel.setText("Price : " + viewActions.getPrice(currentPreview));
-    }
-
+    // ===== LOOP =====
     @Override
     public void update(float dt) {
         stage.act(dt);
@@ -223,26 +219,34 @@ public class ShopState extends State {
     public void render(SpriteBatch sb) {
         sb.begin();
 
-        // Show preview
+        // ===== BACKGROUND =====
         sb.draw(
-            TextureManager.getFrame(currentPreview),
+            TextureManager.getFrame(TextureId.PLAY_BACKGROUND),
             0, 0,
             screenWidth, screenHeight
         );
 
-        // panel 1
-        float sizeX = screenWidth * MENU_1_SIZE_X_RATIO;
-        float sizeY = screenHeight * MENU_1_SIZE_Y_RATIO;
-        float x = screenWidth * MENU_1_ANCHOR_X;
-        float y = screenHeight * MENU_1_ANCHOR_Y;
+        // ===== PIG PREVIEW =====
+        sb.draw(
+            TextureManager.getFrame(TextureId.BLUE_PIG),
+            screenWidth * PIG_X_RATIO,
+            screenHeight * PIG_Y_RATIO,
+            screenWidth * PIG_WIDTH_RATIO,
+            screenHeight * PIG_HEIGHT_RATIO
+        );
+
+        // ===== PANEL 1 =====
+        float sizeX = screenWidth * PANEL_WIDTH_RATIO;
+        float sizeY = screenHeight * PANEL_HEIGHT_RATIO;
+
+        float x = screenWidth * PANEL_1_X_RATIO;
+        float y = screenHeight * PANEL_1_Y_RATIO;
 
         sb.draw(menuBackground, x, y, sizeX, sizeY);
 
-        // panel 2 (price)
-        sizeX = screenWidth * MENU_2_SIZE_X_RATIO;
-        sizeY = screenHeight * MENU_2_SIZE_Y_RATIO;
-        x = screenWidth * MENU_2_ANCHOR_X;
-        y = screenHeight * MENU_2_ANCHOR_Y;
+        // ===== PANEL 2 =====
+        x = screenWidth * PANEL_2_X_RATIO;
+        y = screenHeight * PANEL_2_Y_RATIO;
 
         if (priceLabel.isVisible()) {
             sb.draw(menuBackground, x, y, sizeX, sizeY);
