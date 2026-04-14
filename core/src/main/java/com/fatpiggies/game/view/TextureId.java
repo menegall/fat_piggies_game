@@ -6,6 +6,7 @@ public enum TextureId {
     PLAY_BACKGROUND,
     PLAY_BACKGROUND_1,
     PLAY_BACKGROUND_2,
+    PLAY_BACKGROUND_3,
     ARROW,
     COIN,
     OVER_BACKGROUND,

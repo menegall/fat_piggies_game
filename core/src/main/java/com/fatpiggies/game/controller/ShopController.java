@@ -12,8 +12,9 @@ public class ShopController {
     private int coins;
     private Set<TextureId> unlocked;
 
-    private static final int BACKGROUND_1_PRICE = 100;
+    private static final int BACKGROUND_1_PRICE = 0;
     private static final int BACKGROUND_2_PRICE = 100;
+    private static final int BACKGROUND_3_PRICE = 150;
 
     public ShopController() {
         load();
@@ -58,6 +59,7 @@ public class ShopController {
         switch(bg){
             case PLAY_BACKGROUND_1 : return BACKGROUND_1_PRICE;
             case PLAY_BACKGROUND_2 : return BACKGROUND_2_PRICE;
+            case PLAY_BACKGROUND_3 : return BACKGROUND_3_PRICE;
             default : return BACKGROUND_1_PRICE;
         }
     }

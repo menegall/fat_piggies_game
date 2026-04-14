@@ -29,7 +29,8 @@ public class ShopState extends State {
 
     private static final float COIN_ICON_X_RATIO = 0.18f;
     private static final float COIN_ICON_Y_RATIO = 0.79f;
-    private static final float COIN_SIZE_RATIO = 0.06f;
+    private static final float COIN_SIZE_X_RATIO = 0.06f;
+    private static final float COIN_SIZE_Y_RATIO = 0.14f;
 
     private static final float COIN_X_RATIO = 0.09f;
     private static final float COIN_Y_RATIO = 0.86f;
@@ -69,7 +70,7 @@ public class ShopState extends State {
 
         menuBackground = TextureManager.getFrame(TextureId.MENU_BACKGROUND);
 
-        // 👉 start avec le background sélectionné
+        // Start with actual bg
         currentPreview = TextureManager.getCurrentBackground();
 
         createUI();
@@ -97,10 +98,11 @@ public class ShopState extends State {
         stage.addActor(menuButton);
 
         // ===== COIN ICON =====
-        float coinSize = screenWidth * COIN_SIZE_RATIO;
+        float coinSizeX = screenWidth * COIN_SIZE_X_RATIO;
+        float coinSizeY = screenHeight * COIN_SIZE_Y_RATIO;
 
         coinImage = new Image(TextureManager.getFrame(TextureId.COIN));
-        coinImage.setSize(coinSize, coinSize);
+        coinImage.setSize(coinSizeX, coinSizeY);
         coinImage.setPosition(
             screenWidth * COIN_ICON_X_RATIO,
             screenHeight * COIN_ICON_Y_RATIO

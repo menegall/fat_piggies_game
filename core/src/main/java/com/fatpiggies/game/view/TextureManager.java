@@ -31,7 +31,8 @@ public class TextureManager {
 
     private static final TextureId[] AVAILABLE_BACKGROUNDS = {
         TextureId.PLAY_BACKGROUND_1,
-        TextureId.PLAY_BACKGROUND_2
+        TextureId.PLAY_BACKGROUND_2,
+        TextureId.PLAY_BACKGROUND_3
     };
 
     public static void nextBackground() {currentPlayBackground = nextBackground(currentPlayBackground);}
@@ -94,6 +95,7 @@ public class TextureManager {
         // Background
         textures.put(TextureId.PLAY_BACKGROUND_1, new Texture("backgrounds/arena1.png"));
         textures.put(TextureId.PLAY_BACKGROUND_2, new Texture("backgrounds/arena2.png"));
+        textures.put(TextureId.PLAY_BACKGROUND_3, new Texture("backgrounds/arena3.png"));
         textures.put(TextureId.ARROW, new Texture("uiAssets/arrow.png"));
         textures.put(TextureId.COIN, new Texture("uiAssets/coin.png"));
 
@@ -163,7 +165,7 @@ public class TextureManager {
 
     public static TextureRegion getFrame(TextureId id) {
 
-        // Override dynamique
+        // Dynamic
         if (id == TextureId.PLAY_BACKGROUND) {
             id = currentPlayBackground;
         }
