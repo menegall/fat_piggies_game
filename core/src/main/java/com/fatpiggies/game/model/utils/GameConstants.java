@@ -34,17 +34,18 @@ public final class GameConstants {
     public static final float POWERUP_SPAWN_INTERVAL = 7.0f; // Spawns a new power-up every 7 seconds
     public static final float POWERUP_MIN_LIFETIME = 10.0f;  // Minimum seconds the power-up live
     public static final float POWERUP_MAX_LIFETIME = 30.0f;  // Maximum seconds the power-up live
-    public static final int POWER_VELOCITY_MODIFIER = 250;
+    public static final int POWER_VELOCITY_MODIFIER = 400;
     public static final int POWER_ACCELERATION_MODIFIER = 1500;
     public static final int POWER_MASS_MODIFIER = 15;
     public static final int POWERUP_COLLISION_RADIUS = 30;
 
-    // --- RECONCILIATION THRESHOLDS (Tune these values during playtesting) ---
 
+    // --- RECONCILIATION THRESHOLDS (Tune these values during playtesting) ---
     public static final float SNAP_THRESHOLD = 500f;
-    // TODO normally we can delete the next two
+    // Next two used in ReconciliationSystem
     public static final float IGNORE_THRESHOLD = 100f;
     public static final float CORRECTION_LERP = 20f;
+
 
     // --- INPUT SETTINGS ---
     public static final float JOYSTICK_DEADZONE = 10f;
