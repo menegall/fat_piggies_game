@@ -80,7 +80,6 @@ public class GameWorld implements IReadOnlyGameWorld {
      * @param dt time passed since the last frame
      */
     public void update(float dt) {
-
         engine.update(dt);
 
         // Track death order

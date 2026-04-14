@@ -47,7 +47,7 @@ import com.fatpiggies.game.model.ecs.components.network.NetworkSyncComponent;
 public class NetworkLerpSystem extends IteratingSystem {
     private final ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
     private final ComponentMapper<NetworkSyncComponent> nsm = ComponentMapper.getFor(NetworkSyncComponent.class);
-    // Variable for fluidity of interpolation. lower value = smoother interpolation
+    private final ComponentMapper<PlayerInputComponent> pim = ComponentMapper.getFor(PlayerInputComponent.class);
 
     public NetworkLerpSystem() {
         super(Family.all(TransformComponent.class, NetworkSyncComponent.class).get());
@@ -57,6 +57,7 @@ public class NetworkLerpSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         TransformComponent transform = tm.get(entity);
         NetworkSyncComponent sync = nsm.get(entity);
+        PlayerInputComponent input = pim.get(entity);
 
         float deltaX = sync.targetX - transform.x;
         float deltaY = sync.targetY - transform.y;
@@ -72,15 +73,24 @@ public class NetworkLerpSystem extends IteratingSystem {
         // Linear interpolation for x and y
         // We limit the alpha value to be between 0 and 1 to avoid bigger movements
         float lerpAlpha = MathUtils.clamp(LERP_FACTOR * deltaTime, 0f, 1f);
-        float targetAngle = transform.angle;
 
         transform.x += (deltaX) * lerpAlpha;
         transform.y += (deltaY) * lerpAlpha;
 
-        // Spherical interpolation for angle
-        if (Math.abs(deltaX) > 0.01f || Math.abs(deltaY) > 0.01f) {
-            targetAngle = MathUtils.atan2(deltaY, deltaX) * MathUtils.radiansToDegrees;
+        if (input != null) {
+            // Local Player
+            if (input.joystickPercentageX != 0f || input.joystickPercentageY != 0f) {
+                float joystickAngle = MathUtils.atan2(input.joystickPercentageY, input.joystickPercentageX) * MathUtils.radiansToDegrees;
+                transform.angle = joystickAngle;
+            }
+        } else {
+            // Remote Player
+            // Spherical interpolation for angle
+            float targetAngle = transform.angle;
+            if (Math.abs(deltaX) > 0.01f || Math.abs(deltaY) > 0.01f) {
+                targetAngle = MathUtils.atan2(deltaY, deltaX) * MathUtils.radiansToDegrees;
+            }
+            transform.angle = MathUtils.lerpAngleDeg(transform.angle, targetAngle, lerpAlpha);
         }
-        transform.angle = MathUtils.lerpAngleDeg(transform.angle, targetAngle, lerpAlpha);
     }
 }
