@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Align;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.setting.MusicManager;
+import com.fatpiggies.game.setting.PreferencesManager;
 import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.setting.VibrationManager;
 import com.fatpiggies.game.view.PlayerColor;
@@ -76,8 +77,7 @@ public class MenuState extends State {
     private TextButton hostButton;
     private TextButton shopButton;
     private ImageButton colorButton;
-    private TextureId currentPig = TextureId.OVER_BLUE_PIG;
-    private boolean showPigSelectionInfo = false;
+    private TextureId currentPig = PreferencesManager.loadPig();    private boolean showPigSelectionInfo = false;
     private CheckBox musicButton;
     private CheckBox soundButton;
     private CheckBox vibrationButton;
@@ -88,7 +88,6 @@ public class MenuState extends State {
 
     private Label errorLabel;
 
-    private String lastNameField;
     private float btnSizeX;
 
     public MenuState(IViewActions viewActions) {
@@ -97,7 +96,7 @@ public class MenuState extends State {
         cross = TextureManager.getFrame(TextureId.CROSS);
         bubble = TextureManager.getFrame(TextureId.BUBBLE);
 
-        createUI("");
+        createUI(PreferencesManager.loadPlayerName());
     }
 
     private void createUI(String lastNameField) {
@@ -106,6 +105,7 @@ public class MenuState extends State {
         nameField = new TextField(lastNameField, skin);
         nameField.setMessageText("Name");
         nameField.setMaxLength(20);
+        nameField.setCursorPosition(nameField.getText().length());
         nameField.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -245,6 +245,7 @@ public class MenuState extends State {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 currentPig = TextureManager.nextPig(currentPig);
+                PreferencesManager.savePig(currentPig);
                 showPigSelectionInfo = false;
                 updateColorButton();
             }
@@ -334,12 +335,12 @@ public class MenuState extends State {
     }
 
     private void onJoinClicked() {
-        lastNameField = nameField.getText();
+        String name = nameField.getText();
 
         PlayerColor color = TextureManager.getColorFromTexture(currentPig);
 
         viewActions.onJoinLobbyClicked(
-            lastNameField,
+            name,
             lobbyField.getText(),
             color
         );
@@ -349,12 +350,12 @@ public class MenuState extends State {
     }
 
     private void onHostClicked() {
-        lastNameField = nameField.getText();
+        String name = nameField.getText();
 
         PlayerColor color = TextureManager.getColorFromTexture(currentPig);
 
         viewActions.onHostLobbyClicked(
-            lastNameField,
+            name,
             color
         );
 
@@ -463,6 +464,7 @@ public class MenuState extends State {
         super.show();
         stage.clear();
         showPigSelectionInfo = false;
-        createUI(lastNameField);
+
+        createUI(PreferencesManager.loadPlayerName());
     }
 }

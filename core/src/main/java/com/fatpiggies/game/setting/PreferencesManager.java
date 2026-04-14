@@ -14,6 +14,30 @@ public class PreferencesManager {
 
     private PreferencesManager() {}
 
+    // ===== PLAYER NAME =====
+    private static final String KEY_NAME = "player_name";
+
+    public static void savePlayerName(String name) {
+        prefs.putString(KEY_NAME, name);
+        prefs.flush();
+    }
+
+    public static String loadPlayerName() {
+        return prefs.getString(KEY_NAME, "");
+    }
+
+    // ===== PIG COLOR (last one) =====
+    public static void savePig(TextureId pig) {
+        prefs.putString("selected_pig", pig.name());
+        prefs.flush();
+    }
+
+    public static TextureId loadPig() {
+        return TextureId.valueOf(
+            prefs.getString("selected_pig", TextureId.OVER_BLUE_PIG.name())
+        );
+    }
+
     // ===== COINS =====
     public static void saveCoins(int coins) {
         prefs.putInteger("coins", coins);
@@ -24,7 +48,7 @@ public class PreferencesManager {
         return prefs.getInteger("coins", 90);
     }
 
-    // ===== UNLOCKED =====
+    // ===== UNLOCKED BACKGROUNDS =====
     public static void saveUnlocked(Set<TextureId> unlocked) {
         StringBuilder sb = new StringBuilder();
 
@@ -52,7 +76,7 @@ public class PreferencesManager {
         return result;
     }
 
-    // ===== SELECTED =====
+    // ===== SELECTED BACKGROUNDS =====
     public static void saveSelected(TextureId bg) {
         prefs.putString("selected_bg", bg.name());
         prefs.flush();

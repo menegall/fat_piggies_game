@@ -142,6 +142,8 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
             showError(NetworkError.LOGIN_REQUIRED);
             return;
         }
+
+        if (!playerName.trim().isEmpty()) {PreferencesManager.savePlayerName(playerName);}
         lobbyController.hostLobby(playerName, playerColor);
     }
 
@@ -152,6 +154,8 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
             showError(NetworkError.LOGIN_REQUIRED);
             return;
         }
+
+        if (!playerName.trim().isEmpty()) {PreferencesManager.savePlayerName(playerName);}
         lobbyController.joinLobby(playerName, lobbyCode, playerColor);
     }
 

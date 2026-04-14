@@ -50,7 +50,7 @@ public class OverState extends State {
     private static final float CROWN_Y = 0.98f;
     private static final float CROWN_HEIGHT_RATIO = 0.6f;
 
-    private static final float SCORE_SIZE_X = 0.33f;
+    private static final float SCORE_SIZE_X = 0.4f;
     private static final float SCORE_SIZE_Y = 0.6f;
     private static final float SCORE_ANCHOR_X = 0.03f;
     private static final float SCORE_ANCHOR_Y = 0.35f;
