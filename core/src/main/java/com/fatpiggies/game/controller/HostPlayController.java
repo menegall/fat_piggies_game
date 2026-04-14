@@ -7,7 +7,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.model.GameWorld;
-import com.fatpiggies.game.model.ecs.components.HealthComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.network.NetworkIdentityComponent;
 import com.fatpiggies.game.model.ecs.systems.LifetimeSystem;
@@ -26,7 +25,6 @@ import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,6 +110,12 @@ public class HostPlayController implements IPlayController {
         if (!gameRunning || world == null) return;
 
         String currentUser = actions.getCurrentUserId();
+
+        // Sync player before physics
+        List<String> droppedPlayers = world.removeDisconnectedPlayers(actions.getLobbyModel().getPlayerSetups());
+        for (String playerName : droppedPlayers) {
+            actions.showMessage(playerName + " disconnected!");
+        }
 
         // Creating PowerUp Logic
         powerupTimer -= dt;

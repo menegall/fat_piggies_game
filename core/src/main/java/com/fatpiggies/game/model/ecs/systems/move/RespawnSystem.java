@@ -14,6 +14,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.MathUtils;
+import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
 import com.fatpiggies.game.model.ecs.components.collision.NeedsRespawnComponent;
 import com.fatpiggies.game.model.ecs.components.item.AttachedComponent;
@@ -52,6 +53,8 @@ public class RespawnSystem extends IteratingSystem {
     private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private final ComponentMapper<AccelerationComponent> am = ComponentMapper.getFor(AccelerationComponent.class);
     private final ComponentMapper<MassComponent> mm = ComponentMapper.getFor(MassComponent.class);
+    private final ComponentMapper<NeedsRespawnComponent> rm = ComponentMapper.getFor(NeedsRespawnComponent.class);
+    private final ComponentMapper<PlayerInputComponent> im = ComponentMapper.getFor(PlayerInputComponent.class);
     private ImmutableArray<Entity> allEntitiesWithTransform;
 
     public RespawnSystem() {
@@ -68,11 +71,34 @@ public class RespawnSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         TransformComponent transform = tm.get(entity);
+        NeedsRespawnComponent respawn = rm.get(entity);
+
+        respawn.respawnTimer -= deltaTime;
+        // Put the pig outside
+        transform.x = -10000f;
+        transform.y = -10000f;
+        // Stop input
+        PlayerInputComponent input = im.get(entity);
+        if (input != null) {
+            input.joystickPercentageX = 0;
+            input.joystickPercentageY = 0;
+        }
+        // Stop Velocity
         VelocityComponent velocity = vm.get(entity);
+        if (velocity != null) {
+            velocity.vx = 0f;
+            velocity.vy = 0f;
+        }
+
+        if (respawn.respawnTimer > 0) return;
+
+        // Execute Respawn
         AccelerationComponent acceleration = am.get(entity);
         MassComponent mass = mm.get(entity);
 
-        physicReset(velocity, acceleration, mass);
+        if (velocity != null && acceleration != null && mass != null) {
+            physicReset(velocity, acceleration, mass);
+        }
 
         clearPowerUps(entity);
 

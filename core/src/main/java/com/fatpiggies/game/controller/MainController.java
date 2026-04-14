@@ -24,14 +24,12 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
 
     private final LobbyModel lobbyModel;
     private final LobbyController lobbyController;
-    private IPlayController playController;
     private final ShopController shopController;
 
     private final AuthService auth;
     private final DatabaseService dbs;
-    private final GameStateManager gsm;
+    private IPlayController playController;
     private float timerNetwork = 0f;
-
     private boolean returningToLobby = false;
 
     public MainController(AuthService auth, DatabaseService db) {
@@ -48,8 +46,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
             lobbyModel
         );
 
-        gsm = GameStateManager.getInstance();
-        gsm.setMenuState(this);
+        GameStateManager.getInstance().setMenuState(this);
     }
 
     // ================= UPDATE =================
@@ -67,7 +64,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         }
 
         TextureManager.update(dt);
-        gsm.render(batch, dt);
+        GameStateManager.getInstance().render(batch, dt);
     }
 
     // ================= GAME FLOW =================
@@ -82,7 +79,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         playController.startGame();
         playController.attachPlayListener(dbs);
 
-        gsm.pushPlayState(this,
+        GameStateManager.getInstance().pushPlayState(this,
             playController.getWorld(),
             lobbyModel.getPlayerId(),
             true
@@ -97,7 +94,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         playController.startGame();
         playController.attachPlayListener(dbs);
 
-        gsm.pushPlayState(this,
+        GameStateManager.getInstance().pushPlayState(this,
             playController.getWorld(),
             lobbyModel.getPlayerId(),
             false
@@ -133,18 +130,28 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     }
 
     public void resize(int width, int height) {
-        gsm.resize(width, height);
+        GameStateManager.getInstance().resize(width, height);
     }
 
     // ================= VIEW ACTIONS =================
 
     @Override
     public void onHostLobbyClicked(String playerName, PlayerColor playerColor) {
+        String uid = auth.getCurrentUserId();
+        if (uid == null) {
+            showError(NetworkError.LOGIN_REQUIRED);
+            return;
+        }
         lobbyController.hostLobby(playerName, playerColor);
     }
 
     @Override
     public void onJoinLobbyClicked(String playerName, String lobbyCode, PlayerColor playerColor) {
+        String uid = auth.getCurrentUserId();
+        if (uid == null) {
+            showError(NetworkError.LOGIN_REQUIRED);
+            return;
+        }
         lobbyController.joinLobby(playerName, lobbyCode, playerColor);
     }
 
@@ -220,13 +227,13 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         dbs.stopListening();
         lobbyController.leaveLobby();
 
-        gsm.popToMenu();
+        GameStateManager.getInstance().popToMenu();
     }
 
     @Override
     public void goToLobbyState(IReadOnlyLobbyModel lobbyModel, boolean isHost) {
         returningToLobby = false;
-        gsm.pushLobbyState(this, lobbyModel, isHost);
+        GameStateManager.getInstance().pushLobbyState(this, lobbyModel, isHost);
     }
 
     @Override
@@ -237,7 +244,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         quitPlayState();
         lobbyController.goBackToLobby();
 
-        gsm.popToLobby();
+        GameStateManager.getInstance().popToLobby();
 
         returningToLobby = false;
     }
@@ -266,12 +273,12 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
                 });
             }
         });
-        gsm.pushOverState(this, lobbyModel, lobbyModel.getIsHost());
+        GameStateManager.getInstance().pushOverState(this, lobbyModel, lobbyModel.getIsHost());
     }
 
     @Override
     public void showError(NetworkError error) {
-        gsm.showError(error);
+        GameStateManager.getInstance().showError(error);
     }
 
     // ================= PLAY ACTIONS =================
@@ -297,11 +304,41 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
             rewardIfWinner(finalRank);
         }
         quitPlayState();
-        gsm.pushOverState(this, lobbyModel, lobbyModel.getIsHost());
+        GameStateManager.getInstance().pushOverState(this, lobbyModel, lobbyModel.getIsHost());
     }
 
     @Override
     public float getTimerNetwork() {
         return timerNetwork;
+    }
+
+    @Override
+    public void showMessage(String message) {
+        GameStateManager.getInstance().showMessage(message);
+    }
+
+
+    // ================= APP LIFECYCLE =================
+
+    public void pause() {
+        // When the app goes to the background (Home button pressed),
+        // we disconnect the user to avoid leaving a "ghost" player in the lobby/game.
+
+        // We only need to disconnect if the user is actually in a lobby or a game.
+        if (lobbyModel.getLobbyId() != null) {
+            Gdx.app.log("MainController", "App paused: leaving lobby and returning to menu.");
+            goToMenuState();
+        }
+    }
+
+    public void dispose() {
+        if (lobbyModel.getLobbyId() != null) {
+            goToMenuState();
+        }
+
+        dbs.stopListening();
+
+        lobbyModel.setLobbyId(null);
+        lobbyModel.setPlayerId(null);
     }
 }

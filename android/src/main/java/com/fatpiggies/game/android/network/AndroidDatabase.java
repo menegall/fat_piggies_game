@@ -13,7 +13,6 @@ import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.network.dto.LobbyInfo;
 import com.fatpiggies.game.network.dto.PlayerInput;
 import com.fatpiggies.game.network.dto.PlayerSetup;
-import com.fatpiggies.game.view.PlayerColor;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
@@ -44,6 +43,11 @@ public class AndroidDatabase implements DatabaseService {
 
     @Override
     public void createLobby(String hostId, String playerName, String playerColor, LobbyCallback callback) {
+        if (hostId == null || hostId.isEmpty()) {
+            callback.onError(NetworkError.LOGIN_REQUIRED);
+            return;
+        }
+
         final long startTime = System.currentTimeMillis();
         Log.i(TAG_DATABASE, playerName + " create a new lobby");
         // Push new lobby node and get its ID
@@ -76,6 +80,11 @@ public class AndroidDatabase implements DatabaseService {
 
     @Override
     public void joinLobby(String lobbyCode, String playerId, String playerName, String playerColor, LobbyCallback callback) {
+        if (playerId == null || playerId.isEmpty()) {
+            callback.onError(NetworkError.LOGIN_REQUIRED);
+            return;
+        }
+
         final long startTime = System.currentTimeMillis();
         Log.i(TAG_DATABASE, playerName + " join lobby " + lobbyCode);
         // Find lobby by code

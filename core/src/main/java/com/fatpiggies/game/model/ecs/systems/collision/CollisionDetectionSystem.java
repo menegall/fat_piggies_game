@@ -9,6 +9,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.fatpiggies.game.model.ecs.components.TransformComponent;
 import com.fatpiggies.game.model.ecs.components.collision.ColliderComponent;
 import com.fatpiggies.game.model.ecs.components.collision.CollisionEventComponent;
+import com.fatpiggies.game.model.ecs.components.collision.NeedsRespawnComponent;
 
 /**
  * A core ECS system responsible for detecting spatial overlaps between physical entities.
@@ -43,7 +44,9 @@ public class CollisionDetectionSystem extends EntitySystem {
             Family.all(
                 TransformComponent.class,
                 ColliderComponent.class,
-                CollisionEventComponent.class).get());
+                    CollisionEventComponent.class)
+                .exclude(NeedsRespawnComponent.class)
+                .get());
     }
 
     @Override

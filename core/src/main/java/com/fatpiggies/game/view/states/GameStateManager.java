@@ -44,7 +44,7 @@ public class GameStateManager {
         state.show();
     }
 
-    private void dispose() {
+    public void dispose() {
         while (!states.isEmpty()) {
             states.pop().dispose();
         }
@@ -124,6 +124,12 @@ public class GameStateManager {
     public void showError(NetworkError error) {
         if (!states.isEmpty()) {
             states.peek().showError(error);
+        }
+    }
+
+    public void showMessage(String message) {
+        if (!states.isEmpty()) {
+            states.peek().showMessage(message);
         }
     }
 

@@ -16,4 +16,6 @@ public interface IPlayActions {
     void onGameFinishedByHost(List<String> finalRank);
 
     void showError(NetworkError error);
+
+    void showMessage(String message);
 }

@@ -17,10 +17,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.setting.MusicManager;
 import com.fatpiggies.game.setting.SoundsManager;
-import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.setting.VibrationManager;
 import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
@@ -41,7 +41,6 @@ public class MenuState extends State {
     private static final float PANEL_WIDTH_RATIO = 0.1f;
     private static final float PANEL_HEIGHT_RATIO = 0.65f;
 
-    private static final float ERROR_Y_RATIO = 0.81f;
     private static final float CROSS_SIZE_X_RATIO = 0.04f;
     private static final float CROSS_SIZE_Y_RATIO = 0.1f;
     private static final float CROSS_X_RATIO = 0.26f;
@@ -65,6 +64,7 @@ public class MenuState extends State {
     private static final float SHOP_Y_RATIO = 0.8f;
 
     private static final float ERROR_X_RATIO = 0.4f;
+    private static final float ERROR_Y_RATIO = 0.81f;
     private static final float ERROR_WIDTH_RATIO = 0.2f;
     private static final float ERROR_HEIGHT_RATIO = 0.05f;
 
@@ -432,7 +432,6 @@ public class MenuState extends State {
 
     private String getErrorMessage(NetworkError error) {
         switch (error) {
-
             case NAME_ALREADY_EXIST:
                 return "That name's taken";
 
@@ -450,6 +449,9 @@ public class MenuState extends State {
 
             case DATABASE_ERROR:
                 return "Connection error - try again";
+
+            case LOGIN_REQUIRED:
+                return "Authenticating... retry later!";
 
             default:
                 return "Something went wrong";

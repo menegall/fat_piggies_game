@@ -16,7 +16,8 @@ public enum NetworkError {
     NAME_ALREADY_EXIST,     // Name already exist
     COLOR_ALREADY_TAKEN,    // Color already exist
     DATABASE_ERROR,         // Database error
-    HOST_LEFT_LOBBY
+    HOST_LEFT_LOBBY,
+    LOGIN_REQUIRED,
 }
 
 

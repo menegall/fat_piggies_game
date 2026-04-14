@@ -24,6 +24,7 @@ import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.MathUtils;
 import com.fatpiggies.game.model.ecs.components.HealthComponent;
 import com.fatpiggies.game.model.ecs.components.PlayerInputComponent;
@@ -79,7 +80,6 @@ public class GameWorld implements IReadOnlyGameWorld {
      * @param dt time passed since the last frame
      */
     public void update(float dt) {
-
         engine.update(dt);
 
         // Track death order
@@ -563,8 +563,9 @@ public class GameWorld implements IReadOnlyGameWorld {
      *
      * @param state The game state snapshot containing all players and powerups
      */
-    public void applyGameState(GameState state) {
-        if (state == null) return;
+    public List<String> applyGameState(GameState state) {
+        List<String> disconnectedNames = new ArrayList<>();
+        if (state == null) return disconnectedNames;
 
         // --- CLEAN PLAYERS ---
         engine.getEntities().forEach(entity -> {
@@ -573,6 +574,11 @@ public class GameWorld implements IReadOnlyGameWorld {
             if (netId == null || netId.playerId == null) return;
 
             if (!state.players.containsKey(netId.playerId)) {
+                String playerName = "";
+                if (this.playersSetup != null && this.playersSetup.containsKey(netId.playerId)) {
+                    playerName = this.playersSetup.get(netId.playerId).name;
+                    disconnectedNames.add(playerName);
+                }
                 if (entity.equals(localPlayer)) localPlayer=null;
                 engine.removeEntity(entity);
             }
@@ -627,6 +633,7 @@ public class GameWorld implements IReadOnlyGameWorld {
                 }
             }
         }
+        return disconnectedNames;
     }
 
     public void applyGameStateInstant(GameState state) {
@@ -655,6 +662,40 @@ public class GameWorld implements IReadOnlyGameWorld {
     }
 
     public List<String> getDeathOrder(){ return deathOrder;}
+
+    /**
+     * Synchronizes the world entities with the players currently connected to the lobby.
+     * If a player has disconnected, their entity is removed.
+     */
+    public List<String> removeDisconnectedPlayers(Map<String, PlayerSetup> currentPlayersSetup) {
+        List<String> disconnectedNames = new ArrayList<>();
+
+        ImmutableArray<Entity> entities = engine.getEntities();
+
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
+            NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
+
+            if (netId != null && netId.playerId != null) {
+                if (!currentPlayersSetup.containsKey(netId.playerId)) {
+                    String playerName = "";
+                    if (this.playersSetup != null && this.playersSetup.containsKey(netId.playerId)) {
+                        playerName = this.playersSetup.get(netId.playerId).name;
+                        disconnectedNames.add(playerName);
+                    }
+
+                    if (entity.equals(localPlayer)) {
+                        localPlayer = null;
+                    }
+
+                    engine.removeEntity(entity);
+
+                }
+            }
+        }
+        this.playersSetup = currentPlayersSetup;
+        return disconnectedNames;
+    }
 
     @Override
     public Engine getEngine() {

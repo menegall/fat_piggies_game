@@ -39,9 +39,15 @@ public abstract class State {
 
     public void dispose() {
         stage.dispose();
+        skin.dispose();
     }
 
     public void showError(NetworkError error){};
+
+    public void showMessage(String message) {
+    }
+
+    ;
 
     public void show() {Gdx.input.setInputProcessor(getInputProcessor());}
 
