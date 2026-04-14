@@ -157,12 +157,12 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
 
     @Override
     public void onShopClicked(){
-        gsm.pushShopState(this);
+        GameStateManager.getInstance().pushShopState(this);
     }
 
     @Override
     public void onMenuClicked(){
-        gsm.popToMenu();
+        GameStateManager.getInstance().popToMenu();
     }
 
     @Override
