@@ -145,6 +145,11 @@ public class CollisionResolutionSystem extends IteratingSystem {
         relativeVelocity.set(va.vx - vb.vx, va.vy - vb.vy);
         float velocityAlongNormal = relativeVelocity.dot(normal);
 
+        float baseImpact = -200f; // Change to make more or less violent
+        if (velocityAlongNormal > baseImpact && velocityAlongNormal <= 0) {
+            velocityAlongNormal = baseImpact;
+        }
+
         // Only resolve if moving towards each other
         if (velocityAlongNormal < 0) {
             // Impulse (velocity-based resolution)
