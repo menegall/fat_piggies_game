@@ -32,7 +32,9 @@ public enum TextureId {
     GREEN_PIG_SPACE,
     YELLOW_PIG_SPACE,
 
-    ARROW,
+    NEXT,
+    PREVIOUS,
+
     COIN,
     OVER_BACKGROUND,
     PODIUM,

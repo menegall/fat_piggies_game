@@ -77,7 +77,8 @@ public class TextureManager {
         textures.put(TextureId.OVER_BACKGROUND, new Texture("backgrounds/overBackground.png"));
 
 
-        textures.put(TextureId.ARROW, new Texture("uiAssets/arrow.png"));
+        textures.put(TextureId.NEXT, new Texture("uiAssets/next.png"));
+        textures.put(TextureId.PREVIOUS, new Texture("uiAssets/previous.png"));
         textures.put(TextureId.COIN, new Texture("uiAssets/coin.png"));
         textures.put(TextureId.PODIUM, new Texture("backgrounds/podium.png"));
         textures.put(TextureId.CROSS, new Texture("uiAssets/cross.png"));

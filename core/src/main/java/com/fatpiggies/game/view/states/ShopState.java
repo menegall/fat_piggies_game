@@ -44,11 +44,17 @@ public class ShopState extends State {
     private static final float BUY_X_RATIO = 0.71f;
     private static final float BUY_Y_RATIO = 0.65f;
 
-    // ===== ARROW =====
-    private static final float ARROW_SIZE_X_RATIO = 0.11f;
-    private static final float ARROW_SIZE_Y_RATIO = 0.26f;
-    private static final float ARROW_X_RATIO = 0.73f;
-    private static final float ARROW_Y_RATIO = 0.2f;
+    // ===== NEXT =====
+    private static final float NEXT_SIZE_X_RATIO = 0.11f;
+    private static final float NEXT_SIZE_Y_RATIO = 0.26f;
+    private static final float NEXT_X_RATIO = 0.73f;
+    private static final float NEXT_Y_RATIO = 0.2f;
+
+    // ===== PREVIOUS =====
+    private static final float PREVIOUS_SIZE_X_RATIO = 0.11f;
+    private static final float PREVIOUS_SIZE_Y_RATIO = 0.26f;
+    private static final float PREVIOUS_X_RATIO = 0.16f;
+    private static final float PREVIOUS_Y_RATIO = 0.2f;
 
     // ===== PIG PREVIEW =====
     private static final float PIG_X_RATIO = 0.4f;
@@ -60,6 +66,7 @@ public class ShopState extends State {
     private TextButton menuButton;
     private TextButton buyButton;
     private ImageButton nextButton;
+    private ImageButton previousButton;
 
     private Label coinsLabel;
     private Label priceLabel;
@@ -137,11 +144,11 @@ public class ShopState extends State {
         stage.addActor(buyButton);
 
         // ===== NEXT BUTTON =====
-        nextButton = new ImageButton(new TextureRegionDrawable(TextureManager.getFrame(TextureId.ARROW)));
-        nextButton.setSize(screenWidth * ARROW_SIZE_X_RATIO, screenHeight * ARROW_SIZE_Y_RATIO);
+        nextButton = new ImageButton(new TextureRegionDrawable(TextureManager.getFrame(TextureId.NEXT)));
+        nextButton.setSize(screenWidth * NEXT_SIZE_X_RATIO, screenHeight * NEXT_SIZE_Y_RATIO);
         nextButton.setPosition(
-            screenWidth * ARROW_X_RATIO,
-            screenHeight * ARROW_Y_RATIO
+            screenWidth * NEXT_X_RATIO,
+            screenHeight * NEXT_Y_RATIO
         );
         nextButton.getImageCell().expand().fill();
 
@@ -159,13 +166,41 @@ public class ShopState extends State {
 
         stage.addActor(nextButton);
 
+        // ===== PREVIOUS BUTTON =====
+        previousButton = new ImageButton(new TextureRegionDrawable(TextureManager.getFrame(TextureId.PREVIOUS)));
+        previousButton.setSize(screenWidth * PREVIOUS_SIZE_X_RATIO, screenHeight * PREVIOUS_SIZE_Y_RATIO);
+        previousButton.setPosition(
+            screenWidth * PREVIOUS_X_RATIO,
+            screenHeight * PREVIOUS_Y_RATIO
+        );
+        previousButton.getImageCell().expand().fill();
+
+        previousButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                currentPreview = previousTheme(currentPreview);
+                TextureManager.setPreviewTheme(currentPreview);
+
+                viewActions.onSelectTheme(currentPreview);
+
+                updateAll();
+            }
+        });
+
+        stage.addActor(previousButton);
+
         updateAll();
     }
 
     // ===== THEME LOOP =====
+    private static final Theme[] THEMES = Theme.values();
+
     private Theme nextTheme(Theme current) {
-        Theme[] values = Theme.values();
-        return values[(current.ordinal() + 1) % values.length];
+        return THEMES[(current.ordinal() + 1) % THEMES.length];
+    }
+
+    private Theme previousTheme(Theme current) {
+        return THEMES[(current.ordinal() - 1 + THEMES.length) % THEMES.length];
     }
 
     // ===== UPDATE =====
