@@ -93,6 +93,10 @@ public class GameStateManager {
         push(new MenuState(viewActions));
     }
 
+    public void pushShopState(IViewActions viewActions) {
+        push(new ShopState(viewActions));
+    }
+
     public void pushLobbyState(IViewActions viewActions, IReadOnlyLobbyModel lobbyModel, boolean isHost) {
         push(new LobbyState(viewActions, lobbyModel, isHost));
     }

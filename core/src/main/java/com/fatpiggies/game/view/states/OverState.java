@@ -27,9 +27,6 @@ public class OverState extends State {
     private static final float BUTTON_HEIGHT = 0.08f;
     private static final float BUTTON_TEXT_SCALE = 0.001f;
 
-    private static final float MENU_PAD_TOP = 0.5f;
-    private static final float MENU_PAD_LEFT = 0.8f;
-
     private static final float SCORE_PAD_TOP = 0.08f;
     private static final float SCORE_PAD_LEFT = 0.06f;
 
@@ -57,6 +54,9 @@ public class OverState extends State {
     private static final float SCORE_SIZE_Y = 0.6f;
     private static final float SCORE_ANCHOR_X = 0.03f;
     private static final float SCORE_ANCHOR_Y = 0.35f;
+
+    private static final float MENU_PAD_TOP = 0.5f;
+    private static final float MENU_PAD_LEFT = 0.8f;
 
     private static final float MENU_SIZE_X = 0.17f;
     private static final float MENU_SIZE_Y = 0.3f;
@@ -164,6 +164,15 @@ public class OverState extends State {
         }
     }
 
+    private String getCoinRecompense(int index) {
+        switch (index) {
+            case 0: return " + 20 coins.";
+            case 1: return " + 10 coins.";
+            case 2: return " +  5 coin.";
+            default: return (index + 1) + "";
+        }
+    }
+
     private TextureId getPigTextureForPlayer(String playerName) {
         for (PlayerSetup setup : lobbyModel.getPlayerSetups().values()) {
             if (setup != null && setup.name != null && setup.name.equals(playerName)) {
@@ -182,7 +191,7 @@ public class OverState extends State {
 
         for (int i = 0; i < names.size; i++) {
             Label rankLabel = new Label(getRankLabel(i), skin);
-            Label nameLabel = new Label(names.get(i), skin);
+            Label nameLabel = new Label(names.get(i) + getCoinRecompense(i), skin);
 
             scoreTable.add(rankLabel).left().padRight(10);
             scoreTable.add(nameLabel).left().row();

@@ -12,7 +12,9 @@ import com.fatpiggies.game.model.LobbyModel;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
+import com.fatpiggies.game.setting.PreferencesManager;
 import com.fatpiggies.game.view.PlayerColor;
+import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.states.GameStateManager;
 
@@ -23,6 +25,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     private final LobbyModel lobbyModel;
     private final LobbyController lobbyController;
     private IPlayController playController;
+    private final ShopController shopController;
 
     private final AuthService auth;
     private final DatabaseService dbs;
@@ -36,6 +39,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         this.dbs = db;
 
         lobbyModel = new LobbyModel();
+        shopController = new ShopController();
 
         lobbyController = new LobbyController(
             this,
@@ -108,6 +112,26 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         timerNetwork = 0f;
     }
 
+    private void rewardIfWinner(List<String> ranking) {
+        if (ranking == null || ranking.isEmpty()) return;
+
+        int size = ranking.size();
+        String playerId = getCurrentUserId();
+
+        // 1st
+        if (size >= 1 && ranking.get(size - 1).equals(playerId)) {
+            shopController.addCoins(20);
+        }
+        // 2nd
+        else if (size >= 2 && ranking.get(size - 2).equals(playerId)) {
+            shopController.addCoins(10);
+        }
+        // 3rd
+        else if (size >= 3 && ranking.get(size - 3).equals(playerId)) {
+            shopController.addCoins(5);
+        }
+    }
+
     public void resize(int width, int height) {
         gsm.resize(width, height);
     }
@@ -122,6 +146,47 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     @Override
     public void onJoinLobbyClicked(String playerName, String lobbyCode, PlayerColor playerColor) {
         lobbyController.joinLobby(playerName, lobbyCode, playerColor);
+    }
+
+    @Override
+    public void onShopClicked(){
+        gsm.pushShopState(this);
+    }
+
+    @Override
+    public void onMenuClicked(){
+        gsm.popToMenu();
+    }
+
+    @Override
+    public void onBuyBackgroundClicked(TextureId bg) {
+        boolean success = shopController.buy(bg);
+
+        if (success) {
+            shopController.select(bg);
+        }
+    }
+
+    @Override
+    public void onSelectBackground(TextureId bg) {
+        if (shopController.isUnlocked(bg)) {
+            shopController.select(bg);
+        }
+    }
+
+    @Override
+    public boolean isBackgroundUnlocked(TextureId bg) {
+        return shopController.isUnlocked(bg);
+    }
+
+    @Override
+    public int getCoins() {
+        return shopController.getCoins();
+    }
+
+    @Override
+    public int getPrice(TextureId bg) {
+        return shopController.getPrice(bg);
     }
 
     @Override
@@ -190,6 +255,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
             public void onRankRetrieved(List<String> rankedPlayerIds) {
                 Gdx.app.postRunnable(() -> {
                     lobbyModel.setFinalRanking(rankedPlayerIds);
+                    rewardIfWinner(rankedPlayerIds);
                 });
             }
 
@@ -228,6 +294,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         if (lobbyModel.getIsHost()) {
             dbs.pushFinalRank(lobbyModel.getLobbyId(), finalRank);
             dbs.endGame(lobbyModel.getLobbyId());
+            rewardIfWinner(finalRank);
         }
         quitPlayState();
         gsm.pushOverState(this, lobbyModel, lobbyModel.getIsHost());

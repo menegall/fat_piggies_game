@@ -9,6 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.*;
+
+
 public class TextureManager {
 
     private TextureManager() {}
@@ -18,6 +24,40 @@ public class TextureManager {
     private static final Map<TextureId, AnimationConfig> configs = new HashMap<>();
 
     // ========================
+    // BACKGROUND DYNAMIQUE
+    // ========================
+
+    private static TextureId currentPlayBackground = TextureId.PLAY_BACKGROUND_1;
+
+    private static final TextureId[] AVAILABLE_BACKGROUNDS = {
+        TextureId.PLAY_BACKGROUND_1,
+        TextureId.PLAY_BACKGROUND_2,
+    };
+
+    public static void nextBackground() {
+        for (int i = 0; i < AVAILABLE_BACKGROUNDS.length; i++) {
+            if (AVAILABLE_BACKGROUNDS[i] == currentPlayBackground) {
+                currentPlayBackground = AVAILABLE_BACKGROUNDS[(i + 1) % AVAILABLE_BACKGROUNDS.length];
+                return;
+            }
+        }
+        currentPlayBackground = AVAILABLE_BACKGROUNDS[0];
+    }
+
+    public static void setBackground(TextureId background) {
+        for (TextureId bg : AVAILABLE_BACKGROUNDS) {
+            if (bg == background) {
+                currentPlayBackground = background;
+                return;
+            }
+        }
+    }
+
+    public static TextureId getCurrentBackground() {
+        return currentPlayBackground;
+    }
+
+    // ========================
     // CONFIG CLASS
     // ========================
 
@@ -25,7 +65,7 @@ public class TextureManager {
         String path;
         int rows, cols;
         int animatedFrames;
-        int forcedFrame; // -1 = normal animation
+        int forcedFrame;
         float animationTime;
 
         AnimationConfig(String path, int rows, int cols, int animatedFrames, int forcedFrame, float animationTime) {
@@ -34,7 +74,7 @@ public class TextureManager {
             this.cols = cols;
             this.animatedFrames = animatedFrames;
             this.forcedFrame = forcedFrame;
-            this.animationTime =animationTime;
+            this.animationTime = animationTime;
         }
     }
 
@@ -46,11 +86,16 @@ public class TextureManager {
 
         if (!textures.isEmpty()) return;
 
-        // --- STATIC ---
         textures.put(TextureId.LOGO, new Texture("logo.png"));
         textures.put(TextureId.MENU_BACKGROUND, new Texture("backgrounds/menuBackground.png"));
-        textures.put(TextureId.PLAY_BACKGROUND, new Texture("backgrounds/arena.png"));
         textures.put(TextureId.OVER_BACKGROUND, new Texture("backgrounds/overBackground.png"));
+
+        // Background
+        textures.put(TextureId.PLAY_BACKGROUND_1, new Texture("backgrounds/arena1.png"));
+        textures.put(TextureId.PLAY_BACKGROUND_2, new Texture("backgrounds/arena2.png"));
+        textures.put(TextureId.ARROW, new Texture("uiAssets/arrow.png"));
+        textures.put(TextureId.COIN, new Texture("uiAssets/coin.png"));
+
         textures.put(TextureId.PODIUM, new Texture("backgrounds/podium.png"));
         textures.put(TextureId.CROSS, new Texture("uiAssets/cross.png"));
         textures.put(TextureId.BUBBLE, new Texture("uiAssets/bubble.png"));
@@ -60,19 +105,16 @@ public class TextureManager {
         // CONFIG
         // ========================
 
-        // pigs (top view)
         configs.put(TextureId.BLUE_PIG, new AnimationConfig("pig/top_pig_blue.png", 2, 1, 2, -1, 1f));
         configs.put(TextureId.GREEN_PIG, new AnimationConfig("pig/top_pig_green.png", 2, 1, 2, -1, 1f));
         configs.put(TextureId.RED_PIG, new AnimationConfig("pig/top_pig_red.png", 2, 1, 2, -1, 1f));
         configs.put(TextureId.YELLOW_PIG, new AnimationConfig("pig/top_pig_yellow.png", 2, 1, 2, -1, 1f));
 
-        // life (3 animated + 4th accessible)
         configs.put(TextureId.LIFE_BLUE_PIG, new AnimationConfig("pig/life_pig_blue.png", 2, 2, 3, -1, 2f));
         configs.put(TextureId.LIFE_GREEN_PIG, new AnimationConfig("pig/life_pig_green.png", 2, 2, 3, -1, 2f));
         configs.put(TextureId.LIFE_RED_PIG, new AnimationConfig("pig/life_pig_red.png", 2, 2, 3, -1, 2f));
         configs.put(TextureId.LIFE_YELLOW_PIG, new AnimationConfig("pig/life_pig_yellow.png", 2, 2, 3, -1, 2f));
 
-        // over
         configs.put(TextureId.OVER_BLUE_PIG, new AnimationConfig("pig/over_pig_blue.png", 2, 2, 4, -1, 2f));
         configs.put(TextureId.OVER_GREEN_PIG, new AnimationConfig("pig/over_pig_green.png", 2, 2, 4, -1, 2f));
         configs.put(TextureId.OVER_RED_PIG, new AnimationConfig("pig/over_pig_red.png", 2, 2, 4, -1, 2f));
@@ -80,15 +122,10 @@ public class TextureManager {
 
         configs.put(TextureId.CROWN, new AnimationConfig("events/crown.png", 2, 2, 4, -1, 2f));
 
-        // items (same sheet, different frame)
         configs.put(TextureId.APPLE, new AnimationConfig("events/items.png", 2, 2, 4, 0, 2f));
         configs.put(TextureId.DONUT, new AnimationConfig("events/items.png", 2, 2, 4, 1, 2f));
         configs.put(TextureId.BEER, new AnimationConfig("events/items.png", 2, 2, 4, 2, 2f));
         configs.put(TextureId.LIFE, new AnimationConfig("events/items.png", 2, 2, 4, 3, 2f));
-
-        // ========================
-        // LOAD ANIMATIONS
-        // ========================
 
         for (Map.Entry<TextureId, AnimationConfig> entry : configs.entrySet()) {
 
@@ -124,6 +161,11 @@ public class TextureManager {
     // ========================
 
     public static TextureRegion getFrame(TextureId id) {
+
+        // Override dynamique
+        if (id == TextureId.PLAY_BACKGROUND) {
+            id = currentPlayBackground;
+        }
 
         if (animations.containsKey(id)) {
             AnimationConfig cfg = configs.get(id);
