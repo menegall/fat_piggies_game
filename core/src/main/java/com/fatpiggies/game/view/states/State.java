@@ -29,8 +29,8 @@ public abstract class State {
         stage = new Stage(new ScreenViewport());
         skin = TextureManager.getSkin();
 
-        screenWidth = Gdx.graphics.getWidth();
-        screenHeight = Gdx.graphics.getHeight();
+        screenWidth = Math.max(1, Gdx.graphics.getWidth());
+        screenHeight = Math.max(1, Gdx.graphics.getHeight());
     }
 
     public abstract void update(float dt);
@@ -53,8 +53,8 @@ public abstract class State {
     public InputProcessor getInputProcessor() {return stage;}
 
     public void resize(int width, int height) {
-        screenWidth = width;
-        screenHeight = height;
-        stage.getViewport().update(width, height, true);
+        screenWidth = Math.max(1, width);
+        screenHeight = Math.max(1, height);
+        stage.getViewport().update(Math.max(1, width), Math.max(1, height), true);
     }
 }
