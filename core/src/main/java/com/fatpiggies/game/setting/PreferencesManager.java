@@ -21,7 +21,7 @@ public class PreferencesManager {
     }
 
     public static int loadCoins() {
-        return prefs.getInteger("coins", 0);
+        return prefs.getInteger("coins", 90);
     }
 
     // ===== UNLOCKED =====

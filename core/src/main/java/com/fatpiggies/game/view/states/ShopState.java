@@ -59,12 +59,19 @@ public class ShopState extends State {
     private Label priceLabel;
     private Image coinImage;
 
-    private TextureId currentPreview = TextureManager.getCurrentBackground();
+    // 🔥 IMPORTANT : preview local (FIX BUG)
+    private TextureId currentPreview;
+
     private TextureRegion menuBackground;
 
     public ShopState(IViewActions viewActions) {
         super(viewActions);
+
         menuBackground = TextureManager.getFrame(TextureId.MENU_BACKGROUND);
+
+        // 👉 start avec le background sélectionné
+        currentPreview = TextureManager.getCurrentBackground();
+
         createUI();
     }
 
@@ -128,6 +135,7 @@ public class ShopState extends State {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 viewActions.onBuyBackgroundClicked(currentPreview);
+
                 updateCoinsLabel();
                 updateBuyButton();
                 updatePriceLabel();
@@ -153,8 +161,8 @@ public class ShopState extends State {
         nextBackgroundButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                TextureManager.nextBackground();
-                currentPreview = TextureManager.getCurrentBackground();
+
+                currentPreview = TextureManager.nextBackground(currentPreview);
 
                 updateBuyButton();
                 updatePriceLabel();
@@ -164,6 +172,7 @@ public class ShopState extends State {
                 }
             }
         });
+
         stage.addActor(nextBackgroundButton);
 
         // ===== INIT =====
@@ -196,13 +205,11 @@ public class ShopState extends State {
     }
 
     private void updateCoinsLabel() {
-        int coins = viewActions.getCoins();
-        coinsLabel.setText(String.valueOf(coins));
+        coinsLabel.setText(String.valueOf(viewActions.getCoins()));
     }
 
     private void updatePriceLabel() {
-        int price = viewActions.getPrice(currentPreview);
-        priceLabel.setText("Price : " + price);
+        priceLabel.setText("Price : " + viewActions.getPrice(currentPreview));
     }
 
     @Override
@@ -214,14 +221,14 @@ public class ShopState extends State {
     public void render(SpriteBatch sb) {
         sb.begin();
 
-        // background dynamique
+        // Show preview
         sb.draw(
-            TextureManager.getFrame(TextureId.PLAY_BACKGROUND),
+            TextureManager.getFrame(currentPreview),
             0, 0,
             screenWidth, screenHeight
         );
 
-        // panel menu
+        // panel 1
         float sizeX = screenWidth * MENU_1_SIZE_X_RATIO;
         float sizeY = screenHeight * MENU_1_SIZE_Y_RATIO;
         float x = screenWidth * MENU_1_ANCHOR_X;
@@ -229,8 +236,7 @@ public class ShopState extends State {
 
         sb.draw(menuBackground, x, y, sizeX, sizeY);
 
-
-        // panel menu
+        // panel 2 (price)
         sizeX = screenWidth * MENU_2_SIZE_X_RATIO;
         sizeY = screenHeight * MENU_2_SIZE_Y_RATIO;
         x = screenWidth * MENU_2_ANCHOR_X;
@@ -239,6 +245,7 @@ public class ShopState extends State {
         if (priceLabel.isVisible()) {
             sb.draw(menuBackground, x, y, sizeX, sizeY);
         }
+
         sb.end();
 
         stage.draw();

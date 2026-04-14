@@ -24,24 +24,28 @@ public class TextureManager {
     private static final Map<TextureId, AnimationConfig> configs = new HashMap<>();
 
     // ========================
-    // BACKGROUND DYNAMIQUE
+    // BACKGROUND DYNAMIC
     // ========================
 
     private static TextureId currentPlayBackground = TextureId.PLAY_BACKGROUND_1;
 
     private static final TextureId[] AVAILABLE_BACKGROUNDS = {
         TextureId.PLAY_BACKGROUND_1,
-        TextureId.PLAY_BACKGROUND_2,
+        TextureId.PLAY_BACKGROUND_2
     };
 
-    public static void nextBackground() {
+    public static void nextBackground() {currentPlayBackground = nextBackground(currentPlayBackground);}
+
+    public static TextureId nextBackground(TextureId current) {
+        if (current == null) return AVAILABLE_BACKGROUNDS[0];
+
         for (int i = 0; i < AVAILABLE_BACKGROUNDS.length; i++) {
-            if (AVAILABLE_BACKGROUNDS[i] == currentPlayBackground) {
-                currentPlayBackground = AVAILABLE_BACKGROUNDS[(i + 1) % AVAILABLE_BACKGROUNDS.length];
-                return;
+            if (AVAILABLE_BACKGROUNDS[i] == current) {
+                return AVAILABLE_BACKGROUNDS[(i + 1) % AVAILABLE_BACKGROUNDS.length];
             }
         }
-        currentPlayBackground = AVAILABLE_BACKGROUNDS[0];
+
+        return AVAILABLE_BACKGROUNDS[0];
     }
 
     public static void setBackground(TextureId background) {
@@ -53,10 +57,7 @@ public class TextureManager {
         }
     }
 
-    public static TextureId getCurrentBackground() {
-        return currentPlayBackground;
-    }
-
+    public static TextureId getCurrentBackground() {return currentPlayBackground;}
     // ========================
     // CONFIG CLASS
     // ========================
