@@ -7,11 +7,11 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.fatpiggies.game.setting.MusicManager;
-import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
+import com.fatpiggies.game.setting.MusicManager;
+import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.view.TextureManager;
 
 
@@ -36,12 +36,10 @@ public class FatPiggiesGame extends ApplicationAdapter {
         authService.signIn(new AuthService.AuthCallback() {
             @Override
             public void onSuccess(String userId) {
-                // TODO something with userId
             }
 
             @Override
             public void onFailure(String error) {
-                // TODO handle error
             }
         });
 
@@ -84,5 +82,10 @@ public class FatPiggiesGame extends ApplicationAdapter {
         // TODO implement leaveLobby() if user is in a lobby
         databaseService.stopListening();
         authService.signOut();
+    }
+
+    @Override
+    public void pause() {
+        main.pause();
     }
 }

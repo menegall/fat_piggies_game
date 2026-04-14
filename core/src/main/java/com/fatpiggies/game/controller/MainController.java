@@ -237,4 +237,18 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     public float getTimerNetwork() {
         return timerNetwork;
     }
+
+
+    // ================= APP LIFECYCLE =================
+
+    public void pause() {
+        // When the app goes to the background (Home button pressed),
+        // we disconnect the user to avoid leaving a "ghost" player in the lobby/game.
+
+        // We only need to disconnect if the user is actually in a lobby or a game.
+        if (lobbyModel.getLobbyId() != null) {
+            Gdx.app.log("MainController", "App paused: leaving lobby and returning to menu.");
+            goToMenuState();
+        }
+    }
 }
