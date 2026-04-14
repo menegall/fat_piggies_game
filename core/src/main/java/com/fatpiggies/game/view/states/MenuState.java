@@ -17,10 +17,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.setting.MusicManager;
 import com.fatpiggies.game.setting.SoundsManager;
-import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.setting.VibrationManager;
 import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
@@ -41,7 +41,6 @@ public class MenuState extends State {
     private static final float PANEL_WIDTH_RATIO = 0.1f;
     private static final float PANEL_HEIGHT_RATIO = 0.65f;
 
-    private static final float ERROR_Y_RATIO = 0.81f;
     private static final float CROSS_SIZE_X_RATIO = 0.04f;
     private static final float CROSS_SIZE_Y_RATIO = 0.1f;
     private static final float CROSS_X_RATIO = 0.26f;
@@ -62,6 +61,7 @@ public class MenuState extends State {
     private static final float BUTTON_HEIGHT_PAD = 0.03f;
 
     private static final float ERROR_X_RATIO = 0.4f;
+    private static final float ERROR_Y_RATIO = 0.81f;
     private static final float ERROR_WIDTH_RATIO = 0.2f;
     private static final float ERROR_HEIGHT_RATIO = 0.05f;
 

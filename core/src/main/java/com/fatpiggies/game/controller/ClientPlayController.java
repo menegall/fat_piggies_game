@@ -14,6 +14,7 @@ import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
+import java.util.List;
 import java.util.Map;
 
 public class ClientPlayController implements IPlayController {
@@ -99,6 +100,11 @@ public class ClientPlayController implements IPlayController {
     public void updateWorld(float dt) {
         if (!gameRunning || world == null) {
             return;
+        }
+
+        List<String> droppedPlayers = world.removeDisconnectedPlayers(actions.getLobbyModel().getPlayerSetups());
+        for (String playerName : droppedPlayers) {
+            actions.showMessage(playerName + " disconnected!");
         }
 
         world.update(dt);

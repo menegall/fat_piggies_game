@@ -123,6 +123,12 @@ public class GameStateManager {
         }
     }
 
+    public void showMessage(String message) {
+        if (!states.isEmpty()) {
+            states.peek().showMessage(message);
+        }
+    }
+
     // ========================
     // Size
     // ========================

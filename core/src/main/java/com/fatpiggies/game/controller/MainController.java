@@ -238,6 +238,11 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
         return timerNetwork;
     }
 
+    @Override
+    public void showMessage(String message) {
+        gsm.showMessage(message);
+    }
+
 
     // ================= APP LIFECYCLE =================
 

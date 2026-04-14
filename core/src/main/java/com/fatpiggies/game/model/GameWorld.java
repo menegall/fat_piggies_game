@@ -564,8 +564,9 @@ public class GameWorld implements IReadOnlyGameWorld {
      *
      * @param state The game state snapshot containing all players and powerups
      */
-    public void applyGameState(GameState state) {
-        if (state == null) return;
+    public List<String> applyGameState(GameState state) {
+        List<String> disconnectedNames = new ArrayList<>();
+        if (state == null) return disconnectedNames;
 
         // --- CLEAN PLAYERS ---
         engine.getEntities().forEach(entity -> {
@@ -574,6 +575,11 @@ public class GameWorld implements IReadOnlyGameWorld {
             if (netId == null || netId.playerId == null) return;
 
             if (!state.players.containsKey(netId.playerId)) {
+                String playerName = "";
+                if (this.playersSetup != null && this.playersSetup.containsKey(netId.playerId)) {
+                    playerName = this.playersSetup.get(netId.playerId).name;
+                    disconnectedNames.add(playerName);
+                }
                 if (entity.equals(localPlayer)) localPlayer=null;
                 engine.removeEntity(entity);
             }
@@ -628,6 +634,7 @@ public class GameWorld implements IReadOnlyGameWorld {
                 }
             }
         }
+        return disconnectedNames;
     }
 
     public void applyGameStateInstant(GameState state) {
@@ -659,11 +666,10 @@ public class GameWorld implements IReadOnlyGameWorld {
 
     /**
      * Synchronizes the world entities with the players currently connected to the lobby.
-     * If a player has disconnected, their entity is removed and they are added
-     * to the deathOrder (as if they had been eliminated).
+     * If a player has disconnected, their entity is removed.
      */
-    public void removeDisconnectedPlayers(Map<String, PlayerSetup> currentPlayersSetup) {
-        this.playersSetup = currentPlayersSetup;
+    public List<String> removeDisconnectedPlayers(Map<String, PlayerSetup> currentPlayersSetup) {
+        List<String> disconnectedNames = new ArrayList<>();
 
         ImmutableArray<Entity> entities = engine.getEntities();
 
@@ -671,12 +677,12 @@ public class GameWorld implements IReadOnlyGameWorld {
             Entity entity = entities.get(i);
             NetworkIdentityComponent netId = entity.getComponent(NetworkIdentityComponent.class);
 
-
             if (netId != null && netId.playerId != null) {
                 if (!currentPlayersSetup.containsKey(netId.playerId)) {
-
-                    if (!deathOrder.contains(netId.playerId)) {
-                        deathOrder.add(netId.playerId);
+                    String playerName = "";
+                    if (this.playersSetup != null && this.playersSetup.containsKey(netId.playerId)) {
+                        playerName = this.playersSetup.get(netId.playerId).name;
+                        disconnectedNames.add(playerName);
                     }
 
                     if (entity.equals(localPlayer)) {
@@ -684,9 +690,12 @@ public class GameWorld implements IReadOnlyGameWorld {
                     }
 
                     engine.removeEntity(entity);
+
                 }
             }
         }
+        this.playersSetup = currentPlayersSetup;
+        return disconnectedNames;
     }
 
     @Override

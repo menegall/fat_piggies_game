@@ -43,6 +43,11 @@ public abstract class State {
 
     public void showError(NetworkError error){};
 
+    public void showMessage(String message) {
+    }
+
+    ;
+
     public void show() {Gdx.input.setInputProcessor(getInputProcessor());}
 
     public InputProcessor getInputProcessor() {return stage;}

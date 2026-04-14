@@ -26,6 +26,7 @@ import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HostPlayController implements IPlayController {
@@ -111,7 +112,10 @@ public class HostPlayController implements IPlayController {
         String currentUser = actions.getCurrentUserId();
 
         // Sync player before physics
-        world.removeDisconnectedPlayers(actions.getLobbyModel().getPlayerSetups());
+        List<String> droppedPlayers = world.removeDisconnectedPlayers(actions.getLobbyModel().getPlayerSetups());
+        for (String playerName : droppedPlayers) {
+            actions.showMessage(playerName + " disconnected!");
+        }
 
         // Creating PowerUp Logic
         powerupTimer -= dt;
