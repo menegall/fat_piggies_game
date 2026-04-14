@@ -21,12 +21,12 @@ public class ShopController {
     }
 
     public boolean buy(Theme theme) {
-        if (unlocked.contains(theme)) return false;
+        if (unlocked.contains(theme)) return true;
 
         int price = getPrice(theme);
 
         if (coins < price) {
-            System.out.println("Not enough coins");
+            //System.out.println("Not enough coins");
             return false;
         }
 
@@ -49,6 +49,7 @@ public class ShopController {
     public void select(Theme theme) {
         if (unlocked.contains(theme)) {
             TextureManager.setTheme(theme);
+            TextureManager.clearPreviewTheme();
             PreferencesManager.saveTheme(theme);
         }
     }

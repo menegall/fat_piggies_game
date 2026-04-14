@@ -200,11 +200,6 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
     }
 
     @Override
-    public Theme getCurrentTheme() {
-        return PreferencesManager.loadTheme();
-    }
-
-    @Override
     public void onStartClicked() {
         startHostGame();
     }

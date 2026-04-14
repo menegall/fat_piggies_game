@@ -26,8 +26,6 @@ public interface IViewActions {
 
     int getCoins();
 
-    Theme getCurrentTheme();
-
     // Lobby
     void onStartClicked();
 

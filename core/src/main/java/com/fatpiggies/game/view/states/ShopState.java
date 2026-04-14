@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
+import com.fatpiggies.game.setting.PreferencesManager;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.Theme;
@@ -73,7 +74,7 @@ public class ShopState extends State {
 
         menuBackground = TextureManager.getFrame(TextureId.MENU_BACKGROUND);
 
-        currentPreview = viewActions.getCurrentTheme();
+        currentPreview = PreferencesManager.loadTheme();
         TextureManager.setPreviewTheme(currentPreview);
 
         createUI();
@@ -128,11 +129,7 @@ public class ShopState extends State {
         buyButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
                 viewActions.onBuyThemeClicked(currentPreview);
-
-                TextureManager.setTheme(currentPreview);
-                TextureManager.clearPreviewTheme();
 
                 updateAll();
             }
@@ -151,9 +148,10 @@ public class ShopState extends State {
         nextButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
                 currentPreview = nextTheme(currentPreview);
                 TextureManager.setPreviewTheme(currentPreview);
+
+                viewActions.onSelectTheme(currentPreview);
 
                 updateAll();
             }
