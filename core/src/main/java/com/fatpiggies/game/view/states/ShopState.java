@@ -58,7 +58,6 @@ public class ShopState extends State {
     private Label coinsLabel;
     private Label priceLabel;
     private Image coinImage;
-    private boolean priceVisbile = false;
 
     private TextureId currentPreview = TextureManager.getCurrentBackground();
     private TextureRegion menuBackground;
@@ -179,18 +178,13 @@ public class ShopState extends State {
         int price = viewActions.getPrice(currentPreview);
 
         buyButton.setVisible(!unlocked);
-
-        priceVisbile = false;
+        priceLabel.setVisible(!unlocked);
 
         if (unlocked) {
             buyButton.setText("Owned");
             buyButton.setDisabled(true);
-            priceLabel.setVisible(priceVisbile);
             return;
         }
-
-        priceVisbile = true;
-        priceLabel.setVisible(priceVisbile);
 
         if (coins < price) {
             buyButton.setText("Not enough!");
@@ -242,8 +236,9 @@ public class ShopState extends State {
         x = screenWidth * MENU_2_ANCHOR_X;
         y = screenHeight * MENU_2_ANCHOR_Y;
 
-        if (priceVisbile) sb.draw(menuBackground, x, y, sizeX, sizeY);
-
+        if (priceLabel.isVisible()) {
+            sb.draw(menuBackground, x, y, sizeX, sizeY);
+        }
         sb.end();
 
         stage.draw();
