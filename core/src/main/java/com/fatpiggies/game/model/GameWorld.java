@@ -19,6 +19,7 @@ import static com.fatpiggies.game.model.utils.GameConstants.POWER_UP_HEIGHT;
 import static com.fatpiggies.game.model.utils.GameConstants.POWER_UP_WIDTH;
 import static com.fatpiggies.game.model.utils.GameConstants.POWER_VELOCITY_MODIFIER;
 import static com.fatpiggies.game.model.utils.GameConstants.RIGHT_BOUND;
+import static com.fatpiggies.game.model.utils.GameConstants.SAFE_SPAWN_RADIUS;
 import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
 
 import com.badlogic.ashley.core.Engine;
@@ -244,8 +245,8 @@ public class GameWorld implements IReadOnlyGameWorld {
         Entity entity = engine.createEntity();
 
         TransformComponent transform = new TransformComponent();
-        transform.x = MathUtils.random(LEFT_BOUND, RIGHT_BOUND);
-        transform.y = MathUtils.random(BOTTOM_BOUND, TOP_BOUND);
+        transform.x = MathUtils.random(LEFT_BOUND + SAFE_SPAWN_RADIUS, RIGHT_BOUND - SAFE_SPAWN_RADIUS);
+        transform.y = MathUtils.random(BOTTOM_BOUND + SAFE_SPAWN_RADIUS, TOP_BOUND - SAFE_SPAWN_RADIUS);
 
         LifetimeComponent lifetime = new LifetimeComponent();
         lifetime.timeLeft = MathUtils.random(POWERUP_MIN_LIFETIME, POWERUP_MAX_LIFETIME);
