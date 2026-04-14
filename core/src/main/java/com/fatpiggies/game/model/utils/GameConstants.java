@@ -17,6 +17,7 @@ public final class GameConstants {
     // --- RESPAWN & SPAWN SETTINGS ---
     public static final float SAFE_SPAWN_RADIUS = 100f;
     public static final int MAX_SPAWN_ATTEMPTS = 10;
+    public static final float RESPAWN_TIMER = 2f;
 
     // --- PLAYER SETTINGS ---
     public static final float PLAYER_BASE_VELOCITY = 600;
@@ -26,7 +27,7 @@ public final class GameConstants {
     public static final int BASE_LIFE = 5;
     public static final float LERP_FACTOR = 6f;
     public static final int PLAYER_COLLISION_RADIUS = 60;
-    public static final float PLAYER_BOUNCINESS = 2.5f; // better if value between 1.5 and 3.0
+    public static final float PLAYER_BOUNCINESS = 2f; // better if value between 1.5 and 3.0
 
 
     // --- POWERUP SETTINGS ---
@@ -35,7 +36,7 @@ public final class GameConstants {
     public static final float POWERUP_MAX_LIFETIME = 30.0f;  // Maximum seconds the power-up live
     public static final int POWER_VELOCITY_MODIFIER = 250;
     public static final int POWER_ACCELERATION_MODIFIER = 1500;
-    public static final int POWER_MASS_MODIFIER = 10;
+    public static final int POWER_MASS_MODIFIER = 15;
     public static final int POWERUP_COLLISION_RADIUS = 30;
 
     // --- RECONCILIATION THRESHOLDS (Tune these values during playtesting) ---

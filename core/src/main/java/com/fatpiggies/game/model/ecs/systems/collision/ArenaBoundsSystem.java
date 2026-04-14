@@ -2,6 +2,7 @@ package com.fatpiggies.game.model.ecs.systems.collision;
 
 import static com.fatpiggies.game.model.utils.GameConstants.BOTTOM_BOUND;
 import static com.fatpiggies.game.model.utils.GameConstants.LEFT_BOUND;
+import static com.fatpiggies.game.model.utils.GameConstants.RESPAWN_TIMER;
 import static com.fatpiggies.game.model.utils.GameConstants.RIGHT_BOUND;
 import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
 
@@ -75,9 +76,10 @@ public class ArenaBoundsSystem extends IteratingSystem {
         if (isOutOfBounds) {
             // Remove one life if the entity is out of bounds
             health.currentLife--;
-
+            NeedsRespawnComponent respawn = getEngine().createComponent(NeedsRespawnComponent.class);
+            respawn.respawnTimer = RESPAWN_TIMER;
             // RESPAWN: Mark the entity for respawning
-            entity.add(new NeedsRespawnComponent());
+            entity.add(respawn);
         }
 
     }
