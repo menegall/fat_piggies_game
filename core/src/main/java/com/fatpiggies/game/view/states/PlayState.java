@@ -1,22 +1,41 @@
 package com.fatpiggies.game.view.states;
 
-import static com.fatpiggies.game.model.utils.GameConstants.*;
+import static com.fatpiggies.game.model.utils.GameConstants.BOTTOM_BOUND;
+import static com.fatpiggies.game.model.utils.GameConstants.JOYSTICK_DEADZONE;
+import static com.fatpiggies.game.model.utils.GameConstants.LEFT_BOUND;
+import static com.fatpiggies.game.model.utils.GameConstants.RIGHT_BOUND;
+import static com.fatpiggies.game.model.utils.GameConstants.TOP_BOUND;
+import static com.fatpiggies.game.model.utils.GameConstants.WORLD_HEIGHT;
+import static com.fatpiggies.game.model.utils.GameConstants.WORLD_WIDTH;
 
-import com.badlogic.ashley.core.*;
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.model.IReadOnlyGameWorld;
-import com.fatpiggies.game.model.ecs.components.*;
-import com.fatpiggies.game.model.ecs.components.network.NetworkIdentityComponent;
+import com.fatpiggies.game.model.ecs.components.RenderComponent;
+import com.fatpiggies.game.model.ecs.components.TransformComponent;
+import com.fatpiggies.game.model.ecs.components.collision.ColliderComponent;
+import com.fatpiggies.game.model.utils.GameConstants;
 import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.setting.VibrationManager;
 import com.fatpiggies.game.view.TextureId;
@@ -30,6 +49,11 @@ public class PlayState extends State {
     private static final float BACK_MARGIN_X = 0.03f;
     private static final float BACK_MARGIN_Y = 0.03f;
 
+    private static final float MESSAGE_X_RATIO = 0.4f;
+    private static final float MESSAGE_Y_RATIO = 0.81f;
+    private static final float MESSAGE_WIDTH_RATIO = 0.2f;
+    private static final float MESSAGE_HEIGHT_RATIO = 0.05f;
+
     private static final int MAX_LIFE = 5;
     private static final float LIFE_WIDTH = 0.06f;
     private static final float LIFE_HEIGHT = 0.12f;
@@ -38,6 +62,7 @@ public class PlayState extends State {
     private static final float LIFE_Y = 0.8f;
 
     // ================= DATA =================
+    private ShapeRenderer shapeRenderer;
     private final IReadOnlyGameWorld gameWorld;
     private final boolean isHost;
 
@@ -45,21 +70,21 @@ public class PlayState extends State {
 
     private final ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
     private final ComponentMapper<RenderComponent> rm = ComponentMapper.getFor(RenderComponent.class);
+    private final ComponentMapper<ColliderComponent> cm = ComponentMapper.getFor(ColliderComponent.class);
 
     // ================= UI =================
     private Touchpad touchpad;
     private Button backButton;
+    private Label messageLabel;
     private InputMultiplexer multiplexer;
-
     private boolean joystickActive = false;
     private int joystickPointer = -1;
-
     private final TextureRegion bg;
     private final TextureId localTexture;
 
     public PlayState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, String playerId, boolean isHost) {
         super(viewActions);
-
+        shapeRenderer = new ShapeRenderer();
         this.gameWorld = gameWorld;
         this.isHost = isHost;
 
@@ -114,6 +139,18 @@ public class PlayState extends State {
 
             stage.addActor(backButton);
         }
+
+        // ================= MESSAGE =================
+        messageLabel = new Label("", skin);
+        messageLabel.setColor(Color.YELLOW);
+        messageLabel.setAlignment(Align.center);
+        messageLabel.setVisible(false);
+        messageLabel.setPosition(screenWidth * MESSAGE_X_RATIO, -screenHeight);
+        messageLabel.setSize(
+            screenWidth * MESSAGE_WIDTH_RATIO,
+            screenHeight * MESSAGE_HEIGHT_RATIO
+        );
+        stage.addActor(messageLabel);
     }
 
     // ================= INPUT =================
@@ -265,6 +302,66 @@ public class PlayState extends State {
         }
         sb.end();
 
+        // ================= DEBUG =================
+        if (GameConstants.DEBUG) {
+            shapeRenderer.setProjectionMatrix(sb.getProjectionMatrix());
+
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+            shapeRenderer.setColor(Color.RED);
+            shapeRenderer.rect(
+                LEFT_BOUND * sx,
+                BOTTOM_BOUND * sy,
+                (RIGHT_BOUND - LEFT_BOUND) * sx,
+                (TOP_BOUND - BOTTOM_BOUND) * sy
+            );
+
+            for (Entity e : renderables) {
+                TransformComponent t = tm.get(e);
+                ColliderComponent c = cm.get(e);
+
+                if (t != null && c != null) {
+                    if (e == gameWorld.getLocalPlayer()) {
+                        shapeRenderer.setColor(Color.GREEN);
+                    } else {
+                        shapeRenderer.setColor(Color.YELLOW);
+                    }
+
+                    float radiusX = c.radius * sx;
+                    float radiusY = c.radius * sy;
+
+                    float drawX = (t.x * sx) - radiusX;
+                    float drawY = (t.y * sy) - radiusY;
+
+                    shapeRenderer.ellipse(
+                        drawX,
+                        drawY,
+                        radiusX * 2f,
+                        radiusY * 2f
+                    );
+                }
+            }
+            shapeRenderer.end();
+        }
+
         stage.draw();
+    }
+
+    @Override
+    public void showMessage(String message) {
+        SoundsManager.playError(3f);
+
+        messageLabel.clearActions();
+        messageLabel.setText(message);
+        messageLabel.setVisible(true);
+
+        float targetY = screenHeight * MESSAGE_Y_RATIO;
+
+        messageLabel.addAction(Actions.sequence(
+            Actions.moveTo(screenWidth * MESSAGE_X_RATIO, targetY, 0.3f, Interpolation.swingIn),
+            Actions.delay(2f),
+            Actions.moveTo(screenWidth * MESSAGE_X_RATIO, -screenHeight, 0.1f),
+            Actions.run(() -> messageLabel.setVisible(false))
+        ));
     }
 }

@@ -1,6 +1,11 @@
 package com.fatpiggies.game.model.utils;
 
 public final class GameConstants {
+
+    // --- DEBUG ---
+    public static final boolean DEBUG = false;
+
+
     // --- ARENA SETTINGS ---
     public static final float WORLD_WIDTH = 2000f;
     public static final float WORLD_HEIGHT = 1000f;
@@ -9,7 +14,7 @@ public final class GameConstants {
     public static final float RIGHT_BOUND = WORLD_WIDTH - LEFT_BOUND;
     public static final float BOTTOM_BOUND = 70f;
     public static final float TOP_BOUND = WORLD_HEIGHT - BOTTOM_BOUND;
-    public static final float GROUND_FRICTION = 400f;
+    public static final float GROUND_FRICTION = 500f;
     public static final float FORCE_FACTOR = 15f;
     public static final float STOP_THRESHOLD = 0.0001f;
     public static final float INPUT_DEADZONE = 0.1f;
@@ -21,7 +26,7 @@ public final class GameConstants {
 
     // --- PLAYER SETTINGS ---
     public static final float PLAYER_BASE_VELOCITY = 600;
-    public static final float PLAYER_BASE_ACCELERATION = 1000f;
+    public static final float PLAYER_BASE_ACCELERATION = 800f;
     public static final float PLAYER_BASE_MASS = 10f;
     public static final int MAX_PLAYERS = 4;
     public static final int BASE_LIFE = 5;
