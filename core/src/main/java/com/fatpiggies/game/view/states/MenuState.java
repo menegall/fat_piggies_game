@@ -171,6 +171,8 @@ public class MenuState extends State {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 viewActions.onShopClicked();
+                VibrationManager.vibrate(200);
+                SoundsManager.playButton(1f);
             }
         });
 
@@ -248,6 +250,8 @@ public class MenuState extends State {
                 PreferencesManager.savePig(currentPig);
                 showPigSelectionInfo = false;
                 updateColorButton();
+                VibrationManager.vibrate(200);
+                SoundsManager.playButton(1f);
             }
         });
         stage.addActor(colorButton);

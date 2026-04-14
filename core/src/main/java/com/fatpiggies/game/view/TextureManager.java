@@ -1,10 +1,21 @@
 package com.fatpiggies.game.view;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -99,6 +110,13 @@ public class TextureManager {
         configs.put(TextureId.GREEN_PIG_VOLCANO, new AnimationConfig("pig/volcano/green.png", 2, 1, 2, -1, 1f));
         configs.put(TextureId.YELLOW_PIG_VOLCANO, new AnimationConfig("pig/volcano/yellow.png", 2, 1, 2, -1, 1f));
 
+        // ===== PIRATE =====
+        textures.put(TextureId.PLAY_BACKGROUND_PIRATE, new Texture("backgrounds/arena_pirate.png"));
+        configs.put(TextureId.BLUE_PIG_PIRATE, new AnimationConfig("pig/pirate/blue.png", 2, 1, 2, -1, 1f));
+        configs.put(TextureId.RED_PIG_PIRATE, new AnimationConfig("pig/pirate/red.png", 2, 1, 2, -1, 1f));
+        configs.put(TextureId.GREEN_PIG_PIRATE, new AnimationConfig("pig/pirate/green.png", 2, 1, 2, -1, 1f));
+        configs.put(TextureId.YELLOW_PIG_PIRATE, new AnimationConfig("pig/pirate/yellow.png", 2, 1, 2, -1, 1f));
+
         // ===== SPACE =====
         textures.put(TextureId.PLAY_BACKGROUND_SPACE, new Texture("backgrounds/arena_space.png"));
         configs.put(TextureId.BLUE_PIG_SPACE, new AnimationConfig("pig/space/blue.png", 2, 1, 2, -1, 1f));
@@ -154,6 +172,12 @@ public class TextureManager {
         volcano.put(TextureId.GREEN_PIG, TextureId.GREEN_PIG_VOLCANO);
         volcano.put(TextureId.YELLOW_PIG, TextureId.YELLOW_PIG_VOLCANO);
 
+        Map<TextureId, TextureId> pirate = new HashMap<>();
+        pirate.put(TextureId.BLUE_PIG, TextureId.BLUE_PIG_PIRATE);
+        pirate.put(TextureId.RED_PIG, TextureId.RED_PIG_PIRATE);
+        pirate.put(TextureId.GREEN_PIG, TextureId.GREEN_PIG_PIRATE);
+        pirate.put(TextureId.YELLOW_PIG, TextureId.YELLOW_PIG_PIRATE);
+
         Map<TextureId, TextureId> space = new HashMap<>();
         space.put(TextureId.BLUE_PIG, TextureId.BLUE_PIG_SPACE);
         space.put(TextureId.RED_PIG, TextureId.RED_PIG_SPACE);
@@ -163,10 +187,12 @@ public class TextureManager {
         themePigMap.put(Theme.FARM, farm);
         themePigMap.put(Theme.VOLCANO, volcano);
         themePigMap.put(Theme.SPACE, space);
+        themePigMap.put(Theme.PIRATE, pirate);
 
         // ===== THEME BACKGROUND =====
         themeBackgroundMap.put(Theme.FARM, TextureId.PLAY_BACKGROUND_FARM);
         themeBackgroundMap.put(Theme.VOLCANO, TextureId.PLAY_BACKGROUND_VOLCANO);
+        themeBackgroundMap.put(Theme.PIRATE, TextureId.PLAY_BACKGROUND_PIRATE);
         themeBackgroundMap.put(Theme.SPACE, TextureId.PLAY_BACKGROUND_SPACE);
     }
 

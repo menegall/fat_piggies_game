@@ -3,11 +3,15 @@ package com.fatpiggies.game.view.states;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IViewActions;
 import com.fatpiggies.game.setting.PreferencesManager;
+import com.fatpiggies.game.setting.SoundsManager;
+import com.fatpiggies.game.setting.VibrationManager;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.Theme;
@@ -57,9 +61,9 @@ public class ShopState extends State {
     private static final float PREVIOUS_Y_RATIO = 0.2f;
 
     // ===== PIG PREVIEW =====
-    private static final float PIG_X_RATIO = 0.4f;
+    private static final float PIG_X_RATIO = 0.43f;
     private static final float PIG_Y_RATIO = 0.3f;
-    private static final float PIG_WIDTH_RATIO = 0.2f;
+    private static final float PIG_WIDTH_RATIO = 0.14f;
     private static final float PIG_HEIGHT_RATIO = 0.3f;
 
     // ===== UI =====
@@ -105,6 +109,8 @@ public class ShopState extends State {
             public void changed(ChangeEvent event, Actor actor) {
                 TextureManager.clearPreviewTheme();
                 viewActions.onMenuClicked();
+                VibrationManager.vibrate(200);
+                SoundsManager.playButton(1f);
             }
         });
         stage.addActor(menuButton);
@@ -138,6 +144,8 @@ public class ShopState extends State {
             public void changed(ChangeEvent event, Actor actor) {
                 viewActions.onBuyThemeClicked(currentPreview);
 
+                VibrationManager.vibrate(200);
+                SoundsManager.playButton(1f);
                 updateAll();
             }
         });
@@ -160,6 +168,8 @@ public class ShopState extends State {
 
                 viewActions.onSelectTheme(currentPreview);
 
+                VibrationManager.vibrate(200);
+                SoundsManager.playButton(1f);
                 updateAll();
             }
         });
@@ -183,6 +193,8 @@ public class ShopState extends State {
 
                 viewActions.onSelectTheme(currentPreview);
 
+                VibrationManager.vibrate(200);
+                SoundsManager.playButton(1f);
                 updateAll();
             }
         });

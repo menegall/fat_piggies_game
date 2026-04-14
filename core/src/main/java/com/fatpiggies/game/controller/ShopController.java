@@ -1,10 +1,9 @@
 package com.fatpiggies.game.controller;
 
 import com.fatpiggies.game.setting.PreferencesManager;
-import com.fatpiggies.game.view.Theme;
 import com.fatpiggies.game.view.TextureManager;
+import com.fatpiggies.game.view.Theme;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class ShopController {
@@ -14,6 +13,7 @@ public class ShopController {
 
     private static final int FARM_PRICE = 0;
     private static final int VOLCANO_PRICE = 100;
+    private static final int PIRATE_PRICE = 200;
     private static final int SPACE_PRICE = 300;
 
     public ShopController() {
@@ -62,6 +62,8 @@ public class ShopController {
         switch(theme){
             case FARM: return FARM_PRICE;
             case VOLCANO: return VOLCANO_PRICE;
+            case PIRATE:
+                return PIRATE_PRICE;
             case SPACE: return SPACE_PRICE;
             default: return FARM_PRICE;
         }
