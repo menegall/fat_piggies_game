@@ -80,8 +80,8 @@ public class RespawnSystem extends IteratingSystem {
         boolean spawnSuccessful = false;
         // Try to find a free space for the pig
         for (int i = 0; i < MAX_SPAWN_ATTEMPTS; i++) {
-            float randomX = MathUtils.random(LEFT_BOUND, RIGHT_BOUND);
-            float randomY = MathUtils.random(BOTTOM_BOUND, TOP_BOUND);
+            float randomX = MathUtils.random(LEFT_BOUND + SAFE_SPAWN_RADIUS, RIGHT_BOUND - SAFE_SPAWN_RADIUS);
+            float randomY = MathUtils.random(BOTTOM_BOUND + SAFE_SPAWN_RADIUS, TOP_BOUND - SAFE_SPAWN_RADIUS);
 
             if (isSpaceFree(randomX, randomY, entity)) {
                 transform.x = randomX;
