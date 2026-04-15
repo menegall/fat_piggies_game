@@ -4,7 +4,7 @@
 >
 > **Engine:** LibGDX (Java)
 
-**Fat Piggies** is a high-energy, multiplayer physics-based brawler developed as a collaborative
+Fat Piggies is a high-energy, multiplayer physics-based brawler developed as a collaborative
 university project. The goal is simple: be the heftiest pig on the block and shove your opponents
 off the arena to claim the title of Champion. Developed by a team of 7 for
 TDT4120-Software Architecture course at NTNU.
@@ -16,8 +16,10 @@ TDT4120-Software Architecture course at NTNU.
 You don't need to be a developer to play! You can grab the latest playable version right here on
 GitHub:
 
-1. Go to the *Releases* page on the right side of this repository.
-2. Under the latest release, click on `app-release.apk` to download the file to your Android phone.
+1. Go to the [Releases](https://github.com/menegall/fat_piggies_game/releases) page on the right
+   side of this repository.
+2. Under the latest release, click on `android-release.apk` to download the file to your Android
+   phone.
 3. Open the downloaded file to install the game.
     * *Note: Your phone might warn you about installing apps from "Unknown Sources."
       You will need to allow this in your device settings to proceed with the installation.*
@@ -68,7 +70,7 @@ To run the project locally and contribute to the code:
     git clone https://github.com/menegall/fat_piggies_game.git
     ```
 2.  **Open in Android Studio:**
-    * File -> Open -> Select the `build.gradle` file in the root folder.
+    * File → Open → Select the `build.gradle` file in the root folder.
 3.  **Sync Gradle:** Wait for dependencies to download.
 4. **Run:** Select the `Android` configuration and press Play.
 
