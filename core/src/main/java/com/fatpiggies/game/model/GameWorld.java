@@ -388,6 +388,7 @@ public class GameWorld implements IReadOnlyGameWorld {
         clientRemotePowerups.clear();
         localPlayer = null;
         playersSetup = null;
+        lastPlayerColor = null;
 
         if (engine != null) {
             engine.removeAllEntities();
@@ -715,23 +716,20 @@ public class GameWorld implements IReadOnlyGameWorld {
     public PlayerColor getLocalPlayerColor() {
 
         if (localPlayer == null || playersSetup == null) {
-            if (lastPlayerColor == null) return PlayerColor.BLUE;
-            else return lastPlayerColor;
+            return lastPlayerColor != null ? lastPlayerColor : PlayerColor.BLUE;
         }
 
         NetworkIdentityComponent netId =
             localPlayer.getComponent(NetworkIdentityComponent.class);
 
         if (netId == null || netId.playerId == null) {
-            if (lastPlayerColor == null) return PlayerColor.BLUE;
-            else return lastPlayerColor;
+            return lastPlayerColor != null ? lastPlayerColor : PlayerColor.BLUE;
         }
 
         PlayerSetup setup = playersSetup.get(netId.playerId);
 
         if (setup == null || setup.color == null) {
-            if (lastPlayerColor == null) return PlayerColor.BLUE;
-            else return lastPlayerColor;
+            return lastPlayerColor != null ? lastPlayerColor : PlayerColor.BLUE;
         }
 
         lastPlayerColor = PlayerColor.valueOf(setup.color);
