@@ -173,6 +173,9 @@ public class GameWorld implements IReadOnlyGameWorld {
 
         TransformComponent transform = new TransformComponent();
 
+        // For Client-Side prediction
+        attachPhysicComponents(entity);
+
         HealthComponent health = new HealthComponent();
         health.currentLife = BASE_LIFE;
 
@@ -460,7 +463,7 @@ public class GameWorld implements IReadOnlyGameWorld {
                     pd.y = roundToOneDecimal(transform.y);
                     pd.vx = roundToTwoDecimals(velocity.vx);
                     pd.vy = roundToTwoDecimals(velocity.vy);
-                    pd.hp = (health != null) ? health.currentLife : 0;
+                    pd.hp = health.currentLife;
                 }
             }
 
@@ -563,9 +566,8 @@ public class GameWorld implements IReadOnlyGameWorld {
      *
      * @param state The game state snapshot containing all players and powerups
      */
-    public List<String> applyGameState(GameState state) {
-        List<String> disconnectedNames = new ArrayList<>();
-        if (state == null) return disconnectedNames;
+    public void applyGameState(GameState state) {
+        if (state == null) return;
 
         // --- CLEAN PLAYERS ---
         engine.getEntities().forEach(entity -> {
@@ -574,11 +576,6 @@ public class GameWorld implements IReadOnlyGameWorld {
             if (netId == null || netId.playerId == null) return;
 
             if (!state.players.containsKey(netId.playerId)) {
-                String playerName = "";
-                if (this.playersSetup != null && this.playersSetup.containsKey(netId.playerId)) {
-                    playerName = this.playersSetup.get(netId.playerId).name;
-                    disconnectedNames.add(playerName);
-                }
                 if (entity.equals(localPlayer)) localPlayer=null;
                 engine.removeEntity(entity);
             }
@@ -633,7 +630,6 @@ public class GameWorld implements IReadOnlyGameWorld {
                 }
             }
         }
-        return disconnectedNames;
     }
 
     public void applyGameStateInstant(GameState state) {
@@ -678,7 +674,7 @@ public class GameWorld implements IReadOnlyGameWorld {
 
             if (netId != null && netId.playerId != null) {
                 if (!currentPlayersSetup.containsKey(netId.playerId)) {
-                    String playerName = "";
+                    String playerName;
                     if (this.playersSetup != null && this.playersSetup.containsKey(netId.playerId)) {
                         playerName = this.playersSetup.get(netId.playerId).name;
                         disconnectedNames.add(playerName);

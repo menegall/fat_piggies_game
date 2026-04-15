@@ -3,7 +3,6 @@ package com.fatpiggies.game.network;
 import com.fatpiggies.game.network.dto.GameState;
 import com.fatpiggies.game.network.dto.PlayerInput;
 import com.fatpiggies.game.network.dto.PlayerSetup;
-import com.fatpiggies.game.view.PlayerColor;
 
 import java.util.Map;
 
@@ -225,7 +224,7 @@ public interface DatabaseService {
     interface CodeCallback {
         void onCodeRetrieved(String code);
 
-        void onError(NetworkError error);;
+        void onError(NetworkError error);
     }
 
     interface FinalRankCallback {

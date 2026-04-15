@@ -62,7 +62,7 @@ public class PlayState extends State {
     private static final float LIFE_Y = 0.8f;
 
     // ================= DATA =================
-    private ShapeRenderer shapeRenderer;
+    private final ShapeRenderer shapeRenderer;
     private final IReadOnlyGameWorld gameWorld;
     private final boolean isHost;
 
