@@ -8,8 +8,9 @@ Themes in Fat Piggies control the visual appearance of the gameplay area. Specif
 changes:
 
 1. The **Arena background**
-2. The **Pig skins** (for each of the 4 colors: blue, red, green, yellow)
+2. The **Pig skins** (for each of the colors)
 
+Current built-in colors are: `BLUE`, `GREEN`, `RED`, `YELLOW`, `PURPLE`.
 Current built-in themes are: `FARM`, `VOLCANO`, `PIRATE`, `SPACE`.
 
 ---
@@ -49,26 +50,31 @@ assets/
     │   ├── blue.png
     │   ├── red.png
     │   ├── green.png
+    │   ├── purple.png
     │   └── yellow.png
     ├── volcano/
     │   ├── blue.png
     │   ├── red.png
     │   ├── green.png
+    │   ├── purple.png
     │   └── yellow.png
     ├── pirate/
     │   ├── blue.png
     │   ├── red.png
     │   ├── green.png
+    │   ├── purple.png
     │   └── yellow.png
     ├── space/
     │   ├── blue.png
     │   ├── red.png
     │   ├── green.png
+    │   ├── purple.png
     │   └── yellow.png
     └── jungle/                    (NEW: Create this folder)
         ├── blue.png              (2x1 sprite, 2 animated frames)
         ├── red.png
         ├── green.png
+        ├── purple.png
         └── yellow.png
 ```
 
@@ -82,31 +88,7 @@ assets/
     * Contains 2 animated frames
     * Format: PNG (transparent background recommended)
 
-### Step 3: Load Theme Textures in TextureManager
-
-Edit `core/src/main/java/com/fatpiggies/game/view/TextureManager.java` in the `loadTextures()`
-method.
-Find the section with existing themes and add:
-
-```Java
-public static void loadTextures() {
-
-    if (!textures.isEmpty()) return;
-
-    // ... existing UI textures ...
-
-    // ===== THEMES =====
-    loadTheme(Theme.FARM);
-    loadTheme(Theme.VOLCANO);
-    loadTheme(Theme.PIRATE);
-    loadTheme(Theme.SPACE);
-    loadTheme(Theme.JUNGLE); // ← NEW: load your theme here
-    
-    // ... rest of configuration ...
-}
-```
-
-### Step 4: Add Theme Pricing (Optional)
+### Step 3: Add Theme Pricing (Optional)
 
 Edit `core/src/main/java/com/fatpiggies/game/controller/ShopController.java`:
 
@@ -137,7 +119,7 @@ private Set<Theme> unlocked;
 }
 ```
 
-### Step 5: Test Your Theme
+### Step 4: Test Your Theme
 
 1. Create the asset files in the correct locations:
     * `assets/backgrounds/arena_jungle.png`
@@ -165,6 +147,7 @@ For a new theme called **JUNGLE**, create:
 | Red pig          | 	`assets/pig/jungle/red.png`	         | PNG  | 	2x1 grid (2 frames) |
 | Green pig        | 	`assets/pig/jungle/green.png`	       | PNG  | 	2x1 grid (2 frames) |
 | Yellow pig       | 	`assets/pig/jungle/yellow.png`	      | PNG  | 	2x1 grid (2 frames) |
+| Purple pig       | 	`assets/pig/jungle/purple.png`	      | PNG  | 	2x1 grid (2 frames) |
 
 ---
 
@@ -172,9 +155,10 @@ For a new theme called **JUNGLE**, create:
 
 * Add `JUNGLE` to `Theme` enum
 * Create `assets/backgrounds/arena_jungle.png`
-* Create `assets/pig/jungle/` folder with 4 pig color sprites
-* Load themes in `TextureManager.loadTextures()`
+* Create `assets/pig/jungle/` folder with 5 pig color sprites
 * Add theme price in `ShopController.getPrice()` (optional but recommended)
 * Rebuild
 * Test theme selection and visual appearance in-game
+
+>⚠️ Important: If any texture is missing, the game will crash at startup.
 

@@ -70,18 +70,12 @@ public class SpeedBoostModifierComponent implements Component {
 }
 ```
 
-_Note: If your powerup uses an existing modifier (velocity, acceleration, mass, health, input), you
-can skip this step._
+*Note: If your powerup uses an existing modifier (velocity, acceleration, mass, health, input), you
+can skip this step.*
 
 ### Step 4: Add Powerup Textures to Assets
 
-Add your powerup texture to `assets/events/items.png`. The game uses a sprite sheet:
-
-* Grid size: 2x2 (2 rows, 2 columns)
-* Total frames: 4 animated frames
-* Animation time: 2.0 seconds
-
-Add your texture to this sprite sheet and note its position (row, column).
+Add your powerup texture to `assets/events/`.
 
 ### Step 5: Register Texture Configuration
 
@@ -93,8 +87,8 @@ public static void loadTextures() {
     // ... existing code ...
     
     // Add animation configuration for your new powerup
-    configs.put(TextureId.SPEED_BOOST, 
-        new AnimationConfig("events/items.png", 2, 2, 4, -1, 2f));
+
+    textures.put("SPEED_BOOST", new Texture("events/speedBoost.png"));
     
     // ... rest of code ...
 }
@@ -122,9 +116,9 @@ private void attachModifierAndRender(Entity entity, PowerUpType type) {
         // ... other cases ...
         
         case SPEED_BOOST: {  // ← NEW: Add your case
-            VelocityModifierComponent velocityMod = new VelocityModifierComponent();
-            velocityMod.power = 150;  // Amount to increase velocity
-            entity.add(velocityMod);
+            SpeedBoostModifierComponent speedMod = new SpeedBoostModifierComponent();
+            speedMod.power = 150;  // Amount to increase velocity
+            entity.add(speedMod);
             render.textureId = TextureId.SPEED_BOOST;
             break;
         }
@@ -133,6 +127,65 @@ private void attachModifierAndRender(Entity entity, PowerUpType type) {
             break;
     }
     entity.add(render);
+}
+```
+
+### Step 7: Implement copy of the new modifier (optional)
+
+> *Do next step only if you added a new modifier.*
+
+Edit `core/src/main/java/com/fatpiggies/game/model/ecs/systems/collision/CollisionResolutionSystem.java`
+in the `collect()` method:
+```java
+    // Add the mapper in the attribute of the system
+    private final ComponentMapper<SpeedBoostModifierComponent> sbmMod = ComponentMapper.getFor(SpeedBoostModifierComponent.class);
+
+private void collect(Entity collector, Entity item) {
+        // ... other copy ...
+
+        // Copy input modifier
+        if (imMod.has(item)) {
+            InputModifierComponent modifier = imMod.get(item);
+            InputModifierComponent newMod = getEngine().createComponent(InputModifierComponent.class);
+            newMod.power = modifier.power;
+            buff.add(newMod);
+        }
+
+        // Copy speed boost modifier NEW
+        if (sbmMod.has(item)) {
+            SpeedBoostModifierComponent modifier = sbmMod.get(item);
+            SpeedBoostModifierComponent newMod = getEngine().createComponent(SpeedBoostModifierComponent.class);
+            newMod.power = modifier.power;
+            buff.add(newMod);
+        }
+
+        // ... Lifetime ...
+    
+}
+```
+
+### Step 8: Implement application of the new modifier (optional)
+
+Edit `core/src/main/java/com/fatpiggies/game/model/ecs/systems/StatSystem.java`
+in the `update()` method:
+
+```java
+private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
+// Add the mapper in the attribute of the system
+private final ComponentMapper<SpeedBoostModifierComponent> sbmMod = ComponentMapper.getFor(SpeedBoostModifierComponent.class);
+
+@Override
+public void update(float deltaTime) {
+    // ... other code ...
+
+    // Apply Health Modifier
+    if (sbmMod.has(powerup)) {
+        VelocityComponent targetVel = vm.get(targetPig);
+        SpeedBoostModifierComponent sbMod = sbmMod.get(powerup);
+        targetVel.currentMaxVelocity += sbMod.power;
+    }
+    
+    // ...
 }
 ```
 
@@ -145,13 +198,13 @@ Host Creates Powerup
     ↓
 attachModifierAndRender() adds:
   • RenderComponent (for visual)
-  • Modifier Component (BEER/DONUT/LIFE/APPLE)
+  • Modifier Component (BEER/DONUT/LIFE/APPLE/SPEED_BOOST)
   • CollectibleComponent (mark as collectible)
   • LifetimeComponent (expiration timer)
   • TransformComponent (position)
   • ColliderComponent (collision radius)
     ↓
-Pig collides with powerup
+Pig collides with powerup (CollisionDetectionSystem)
     ↓
 CollisionResolutionSystem.collect()
     ↓
@@ -181,9 +234,10 @@ LifetimeSystem removes expired buff
 * Add `POWERUP_NAME` to `PowerUpType` enum
 * Add `POWERUP_NAME` to `TextureId` enum
 * Create modifier component (only if new stat type)
-* Add sprite sheet to `assets/events/items.png`
-* Add `AnimationConfig` in `TextureManager.loadTextures()`
+* Add sprite sheet to `assets/events/`
 * Add case `POWERUP_NAME` in `GameWorld.attachModifierAndRender()`
+* Add copy of the new modifier in `CollisionResolutionSystem.collect(collector, item)`
+* Add application of new modifier in `StatSystem`
 * Test powerup spawning and collection
 
 ## Troubleshooting
@@ -201,3 +255,6 @@ LifetimeSystem removes expired buff
 * `StatSystem.java` - Applies powerup effects each frame.
 * `LifetimeSystem.java` - Removes expired powerups.
 * `CollisionResolutionSystem.java` - Handles powerup collection.
+
+
+>⚠️ Important: If any texture is missing, the game will crash at startup.
