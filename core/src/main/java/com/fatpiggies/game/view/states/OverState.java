@@ -255,9 +255,7 @@ public class OverState extends State {
         // 1st
         if (rankedNames.size > 0) {
             sb.draw(
-                TextureManager.getFrame(TextureManager.getOverTextureId(getPigColorForPlayer(
-                    rankedNames.get(0)
-                ))),
+                TextureManager.getOverFrame(getPigColorForPlayer(rankedNames.get(0))),
                 podiumX + podiumW * FIRST_X - pigSize / 2f,
                 podiumY + podiumH * FIRST_Y,
                 pigSize,
@@ -268,9 +266,7 @@ public class OverState extends State {
         // 2nd
         if (rankedNames.size > 1) {
             sb.draw(
-                TextureManager.getFrame(TextureManager.getOverTextureId(getPigColorForPlayer(
-                    rankedNames.get(1)
-                ))),
+                TextureManager.getOverFrame(getPigColorForPlayer(rankedNames.get(1))),
                 podiumX + podiumW * SECOND_X - pigSize / 2f,
                 podiumY + podiumH * SECOND_Y,
                 pigSize,
@@ -281,9 +277,7 @@ public class OverState extends State {
         // 3rd
         if (rankedNames.size > 2) {
             sb.draw(
-                TextureManager.getFrame(TextureManager.getOverTextureId(getPigColorForPlayer(
-                    rankedNames.get(2)
-                ))),
+                TextureManager.getOverFrame(getPigColorForPlayer(rankedNames.get(2))),
                 podiumX + podiumW * THIRD_X - pigSize / 2f,
                 podiumY + podiumH * THIRD_Y,
                 pigSize,

@@ -98,10 +98,7 @@ public class TextureManager {
         loadColors();
 
         // ===== THEMES =====
-        loadTheme(Theme.FARM);
-        loadTheme(Theme.VOLCANO);
-        loadTheme(Theme.PIRATE);
-        loadTheme(Theme.SPACE);
+        loadThemes();
 
         configs.put("CROWN", new AnimationConfig("events/crown.png", 2, 2, 4, -1, 2f));
 
@@ -156,16 +153,34 @@ public class TextureManager {
         }
     }
 
-    private static void loadTheme(Theme theme) {
-        String themeName = theme.name().toLowerCase();
+    private static void loadThemes() {
 
-        // background
-        textures.put(
-            "PLAY_BACKGROUND_" + theme.name(),
-            new Texture("backgrounds/arena_" + themeName + ".png")
-        );
+        for (Theme theme : Theme.values()) {
 
-        loadPigsForTheme(theme);
+            String themeName = theme.name().toLowerCase();
+
+            // ===== BACKGROUND =====
+            textures.put(
+                "PLAY_BACKGROUND_" + theme.name(),
+                new Texture("backgrounds/arena_" + themeName + ".png")
+            );
+
+            // ===== PIGS =====
+            for (PlayerColor color : PlayerColor.values()) {
+
+                String colorName = color.name().toLowerCase();
+
+                String id = color.name() + "_PIG_" + theme.name();
+
+                configs.put(
+                    id,
+                    new AnimationConfig(
+                        "pig/" + themeName + "/" + colorName + ".png",
+                        2, 1, 2, -1, 1f
+                    )
+                );
+            }
+        }
     }
 
     private static void loadPigsForTheme(Theme theme) {
@@ -270,16 +285,25 @@ public class TextureManager {
         return TextureId.valueOf(color.name() + "_PIG");
     }
 
-    public static TextureId getLifeTextureId(PlayerColor color) {
-        if (color == null) return TextureId.LIFE_BLUE_PIG;
+    public static TextureRegion getLifeFrame(PlayerColor color) {
+        if (color == null) color = PlayerColor.BLUE;
 
-        return TextureId.valueOf("LIFE_" + color.name() + "_PIG");
+        String key = "LIFE_" + color.name() + "_PIG";
+        return animations.get(key).getFrame();
     }
 
-    public static TextureId getOverTextureId(PlayerColor color) {
-        if (color == null) return TextureId.OVER_BLUE_PIG;
+    public static TextureRegion getLifeFrame(PlayerColor color, int frameIndex) {
+        if (color == null) color = PlayerColor.BLUE;
 
-        return TextureId.valueOf("OVER_" + color.name() + "_PIG");
+        String key = "LIFE_" + color.name() + "_PIG";
+        return animations.get(key).getFrame(frameIndex);
+    }
+
+    public static TextureRegion getOverFrame(PlayerColor color) {
+        if (color == null) color = PlayerColor.BLUE;
+
+        String key = "OVER_" + color.name() + "_PIG";
+        return animations.get(key).getFrame();
     }
 
     // ========================

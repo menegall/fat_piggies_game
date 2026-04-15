@@ -234,9 +234,7 @@ public class MenuState extends State {
         btnSizeX = screenWidth * BTN_SIZE_X_RATIO;
         float btnSizeY = screenHeight * BTN_SIZE_Y_RATIO;
 
-        TextureRegionDrawable drawable = new TextureRegionDrawable(TextureManager.getFrame(
-            TextureManager.getOverTextureId(currentColor)
-        ));
+        TextureRegionDrawable drawable = new TextureRegionDrawable(TextureManager.getOverFrame(currentColor));
         colorButton = new ImageButton(drawable);
 
         colorButton.setSize(btnSizeX, btnSizeY);
@@ -340,9 +338,7 @@ public class MenuState extends State {
 
 
     private void updateColorButton() {
-        TextureRegion region = TextureManager.getFrame(
-            TextureManager.getOverTextureId(currentColor)
-        );
+        TextureRegion region = TextureManager.getOverFrame(currentColor);
 
         colorButton.getStyle().imageUp = new TextureRegionDrawable(region);
     }

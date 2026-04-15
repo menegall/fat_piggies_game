@@ -291,8 +291,8 @@ public class PlayState extends State {
             PlayerColor localColor = gameWorld.getLocalPlayerColor();
 
             TextureRegion frame = heartAlive
-                ? TextureManager.getFrame(TextureManager.getLifeTextureId(localColor))
-                : TextureManager.getFrame(TextureManager.getLifeTextureId(localColor), 3);
+                ? TextureManager.getLifeFrame(localColor)
+                : TextureManager.getLifeFrame((localColor), 3);
 
             if (!heartAlive) sb.setColor(0.3f, 0.3f, 0.3f, 1f);
 
