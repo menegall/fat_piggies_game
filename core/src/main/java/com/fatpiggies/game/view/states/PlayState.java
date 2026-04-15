@@ -80,7 +80,6 @@ public class PlayState extends State {
     private InputMultiplexer multiplexer;
     private boolean joystickActive = false;
     private int joystickPointer = -1;
-    private final PlayerColor localColor;
 
     public PlayState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, String playerId, boolean isHost) {
         super(viewActions);
@@ -92,8 +91,6 @@ public class PlayState extends State {
         this.renderables = engine.getEntitiesFor(
             Family.all(TransformComponent.class, RenderComponent.class).get()
         );
-
-        localColor = gameWorld.getLocalPlayerColor();
 
         createUI();
         setupInput();

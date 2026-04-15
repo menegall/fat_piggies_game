@@ -18,6 +18,7 @@ import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class OverState extends State {
 
@@ -67,6 +68,7 @@ public class OverState extends State {
     private final IReadOnlyLobbyModel lobbyModel;
 
     private Array<String> rankedNames = new Array<>();
+    private Array<PlayerColor> rankedColors = new Array<>();
 
     // ================= UI =================
     private TextButton lobbyButton;
@@ -89,7 +91,6 @@ public class OverState extends State {
         podium = TextureManager.getFrame(TextureId.PODIUM);
 
         createUI();
-        initRanking();
     }
 
     private void createUI() {
@@ -172,17 +173,6 @@ public class OverState extends State {
         }
     }
 
-    private PlayerColor getPigColorForPlayer(String playerName) {
-        for (PlayerSetup setup : lobbyModel.getPlayerSetups().values()) {
-            if (setup != null && setup.name != null && setup.name.equals(playerName)) {
-                return PlayerColor.valueOf(setup.color);
-            }
-        }
-
-        return PlayerColor.BLUE;
-    }
-
-
 
     // ================= SCORE =================
     private void initRanking() {
@@ -191,14 +181,22 @@ public class OverState extends State {
         if (ranking == null || ranking.isEmpty()) return;
 
         Array<String> names = new Array<>();
+        Array<PlayerColor> colors = new Array<>();
 
         for (PlayerSetup setup : ranking.values()) {
             if (setup != null && setup.name != null) {
                 names.add(setup.name);
+
+                if (setup.color != null) {
+                    colors.add(PlayerColor.valueOf(setup.color));
+                } else {
+                    colors.add(PlayerColor.BLUE);
+                }
             }
         }
 
         rankedNames = buildRankedNames(names);
+        rankedColors = buildRankedColors(colors);
         updateScoreBoard(rankedNames);
     }
 
@@ -220,6 +218,14 @@ public class OverState extends State {
         Array<String> result = new Array<>(); // First of the given list is last ranked
         for (int i = sourceNames.size - 1; i >= 0; i--) {
             result.add(sourceNames.get(i));
+        }
+        return result;
+    }
+
+    private Array<PlayerColor> buildRankedColors(Array<PlayerColor> sourceColors) {
+        Array<PlayerColor> result = new Array<>();
+        for (int i = sourceColors.size - 1; i >= 0; i--) {
+            result.add(sourceColors.get(i));
         }
         return result;
     }
@@ -255,7 +261,7 @@ public class OverState extends State {
         // 1st
         if (rankedNames.size > 0) {
             sb.draw(
-                TextureManager.getOverFrame(getPigColorForPlayer(rankedNames.get(0))),
+                TextureManager.getOverFrame(rankedColors.get(0)),
                 podiumX + podiumW * FIRST_X - pigSize / 2f,
                 podiumY + podiumH * FIRST_Y,
                 pigSize,
@@ -266,7 +272,7 @@ public class OverState extends State {
         // 2nd
         if (rankedNames.size > 1) {
             sb.draw(
-                TextureManager.getOverFrame(getPigColorForPlayer(rankedNames.get(1))),
+                TextureManager.getOverFrame(rankedColors.get(1)),
                 podiumX + podiumW * SECOND_X - pigSize / 2f,
                 podiumY + podiumH * SECOND_Y,
                 pigSize,
@@ -277,7 +283,7 @@ public class OverState extends State {
         // 3rd
         if (rankedNames.size > 2) {
             sb.draw(
-                TextureManager.getOverFrame(getPigColorForPlayer(rankedNames.get(2))),
+                TextureManager.getOverFrame(rankedColors.get(2)),
                 podiumX + podiumW * THIRD_X - pigSize / 2f,
                 podiumY + podiumH * THIRD_Y,
                 pigSize,

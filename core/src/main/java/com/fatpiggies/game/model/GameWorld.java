@@ -70,6 +70,7 @@ public class GameWorld implements IReadOnlyGameWorld {
     private final List<String> deathOrder = new ArrayList<>();
     private Entity localPlayer;
     private String lobbyId;
+    private PlayerColor lastPlayerColor;
     private Map<String, PlayerSetup> playersSetup;
 
     public GameWorld(Engine engine) {
@@ -714,23 +715,27 @@ public class GameWorld implements IReadOnlyGameWorld {
     public PlayerColor getLocalPlayerColor() {
 
         if (localPlayer == null || playersSetup == null) {
-            return PlayerColor.BLUE;
+            if (lastPlayerColor == null) return PlayerColor.BLUE;
+            else return lastPlayerColor;
         }
 
         NetworkIdentityComponent netId =
             localPlayer.getComponent(NetworkIdentityComponent.class);
 
         if (netId == null || netId.playerId == null) {
-            return PlayerColor.BLUE;
+            if (lastPlayerColor == null) return PlayerColor.BLUE;
+            else return lastPlayerColor;
         }
 
         PlayerSetup setup = playersSetup.get(netId.playerId);
 
         if (setup == null || setup.color == null) {
-            return PlayerColor.BLUE;
+            if (lastPlayerColor == null) return PlayerColor.BLUE;
+            else return lastPlayerColor;
         }
 
-        return PlayerColor.valueOf(setup.color);
+        lastPlayerColor = PlayerColor.valueOf(setup.color);
+        return lastPlayerColor;
     }
 
     @Override
