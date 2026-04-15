@@ -80,8 +80,7 @@ public class HostPlayController implements IPlayController {
             String playerId = entry.getKey();
             PlayerSetup setup = entry.getValue();
 
-            TextureId texture = TextureManager.getPigTextureId(PlayerColor.valueOf(setup.color));
-            Entity pig = world.createHostPig(playerId, texture);
+            Entity pig = world.createHostPig(playerId, PlayerColor.valueOf(setup.color));
 
             if (playerId.equals(currentUser)) {
                 world.setLocalPlayer(pig);
