@@ -47,7 +47,7 @@ public class PreferencesManager {
     }
 
     public static int loadCoins() {
-        return prefs.getInteger("coins", 200);
+        return prefs.getInteger("coins", 130);
     }
 
     // ===== THEME =====
