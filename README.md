@@ -1,15 +1,46 @@
 # 🐽 Fat Piggies
 
-> **Status:** In Development (Alpha)
+> **Status:** Final Version
+>
 > **Engine:** LibGDX (Java)
 
-**Fat Piggies** is a high-energy, multiplayer physics-based brawler developed as a collaborative university project. The goal is simple: be the heftiest pig on the block and shove your opponents off the arena to claim the title of Champion. Developed by a team of 7 for TDT4120-Software Architecture course at NTNU.
+**Fat Piggies** is a high-energy, multiplayer physics-based brawler developed as a collaborative
+university project. The goal is simple: be the heftiest pig on the block and shove your opponents
+off the arena to claim the title of Champion. Developed by a team of 7 for
+TDT4120-Software Architecture course at NTNU.
 
 ---
 
-## 🎮 The Game
+## 📱 How to Download & Install
 
-In a world where size matters, players take control of round, bouncy pigs. Using momentum and physics, you must bump, slide, and ram into your rivals to knock them out of the field of play. The last piggy remaining in the arena wins!
+You don't need to be a developer to play! You can grab the latest playable version right here on
+GitHub:
+
+1. Go to the *Releases* page on the right side of this repository.
+2. Under the latest release, click on `app-release.apk` to download the file to your Android phone.
+3. Open the downloaded file to install the game.
+    * *Note: Your phone might warn you about installing apps from "Unknown Sources."
+      You will need to allow this in your device settings to proceed with the installation.*
+4. Open the app and get ready to brawl!
+
+---
+
+## 🎮 How to play
+
+In a world where weight matters, players take control of bouncy pigs.
+Using momentum and physics, you must bump, slide, and ram into your rivals to knock them out
+of the field of play.
+
+1. **Create a Profile:** Enter your name and pick your favorite pig color.
+2. **Host or Join:** One player taps Host to create a lobby and receives a 4-digit code. Give that
+   code to your friend. Up to 3 other friends can enter the code, tap join and enter the lobby.
+3. **The Brawl:** Use the virtual joystick to build up speed and ram into your opponents.
+4. **Power-ups:** Keep an eye out for items spawning in the arena!
+   Grab an Apple for a speed boost, a Donut to become heavy and immovable, or a Life to heal up. You
+   can also grab a beer, but be aware of the consequence.
+5. **Survive & Win:** Push your rivals out of bounds. The last piggy remaining in the arena wins!
+6. **Customize:** Winning games earns you coins. Head to the Shop to spend your hard-earned coins
+   and unlock amazing new arena themes (like Space, Volcano, or Pirates).
 
 ### 🚀 Key Features
 * **Multi-Device Connectivity:** Seamlessly join the action using your own device.
@@ -24,25 +55,13 @@ In a world where size matters, players take control of round, bouncy pigs. Using
 * **Language:** Java
 * **Framework:** [LibGDX](https://libgdx.com/), [Ashley](https://github.com/libgdx/ashley)
 * **IDE:** Android Studio
-* **Physics:** Box2D
-* **Networking:** Firebase & Auth
+* **Networking:** Firebase Realtime Database & Firebase Auth
 
 ---
 
-## ⚙️ Workflow & Rules (TEAM MUST READ)
+## 💻 Getting Started (Development)
 
-We are a team of 7. To avoid chaos, please read these documents before pushing any code:
-
-1.  [**📜 CONTRIBUTING.md**](./CONTRIBUTING.md)
-    * *Read this for:* Git Flow, Branching rules, and Asset management.
-2.  [**🗂️ PROJECT_MANAGEMENT.md**](./PROJECT_MANAGEMENT.md)
-    * *Read this for:* How to use the Project Board, Issues, and Task assignments.
-
----
-
-## 🚀 Getting Started
-
-To run the project locally:
+To run the project locally and contribute to the code:
 
 1.  **Clone the repo:**
     ```bash
@@ -55,12 +74,13 @@ To run the project locally:
 
 ---
 
-## Game Extension
+## 🧩 Game Extension
 
-Take a look to these files based on what you would ike to extend:
+Take a look at these files based on what you would like to extend in the game:
 
 * [**Add new power-up**](./docs/NEW_POWERUP.md)
 * [**Add new theme**](./docs/NEW_THEME.md)
+* [**Add new pig color**](./docs/NEW_PIG_COLOR.md)
 
 ---
 
@@ -68,10 +88,10 @@ Take a look to these files based on what you would ike to extend:
 
 Built with ❤️ and coffee by:
 
-* **Gabin** - *Latex Goat*
-* **Liangchen** - *Is just here for vibes*
-* **Patrick** - *Role*
-* **Pia** - *Role*
-* **Paula** - *Role*
-* **Ingvild** - *Role*
-* **Gina** - *Role*
+* **Gabin** - *Developer*
+* **Patrick** - *Developer*
+* **Liangchen**
+* **Pia**
+* **Paula**
+* **Gina**
+* **Ingvild**
