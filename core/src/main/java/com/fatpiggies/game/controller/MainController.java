@@ -58,6 +58,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
 
             timerNetwork += dt;
             if (timerNetwork >= SEND_THRESHOLD) {
+                if (playController == null) return;
                 playController.sendToServer(dbs, timerNetwork);
                 timerNetwork = 0f;
             }
@@ -265,6 +266,9 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
                 Gdx.app.postRunnable(() -> {
                     lobbyModel.setFinalRanking(rankedPlayerIds);
                     rewardIfWinner(rankedPlayerIds);
+                    GameStateManager.getInstance().pushOverState(
+                        MainController.this, lobbyModel, lobbyModel.getIsHost()
+                    );
                 });
             }
 
@@ -273,7 +277,6 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
                 Gdx.app.postRunnable(() -> showError(error));
             }
         });
-        GameStateManager.getInstance().pushOverState(this, lobbyModel, lobbyModel.getIsHost());
     }
 
     @Override

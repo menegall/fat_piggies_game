@@ -94,23 +94,13 @@ public class TextureManager {
         textures.put("CROSS", new Texture("uiAssets/cross.png"));
         textures.put("BUBBLE", new Texture("uiAssets/bubble.png"));
 
+        // ===== COLORS =====
+        loadColors();
+
         // ===== THEMES =====
-        loadTheme(Theme.FARM);
-        loadTheme(Theme.VOLCANO);
-        loadTheme(Theme.PIRATE);
-        loadTheme(Theme.SPACE);
+        loadThemes();
 
         configs.put("CROWN", new AnimationConfig("events/crown.png", 2, 2, 4, -1, 2f));
-
-        configs.put("LIFE_BLUE_PIG", new AnimationConfig("pig/life/blue.png", 2, 2, 3, -1, 2f));
-        configs.put("LIFE_GREEN_PIG", new AnimationConfig("pig/life/green.png", 2, 2, 3, -1, 2f));
-        configs.put("LIFE_RED_PIG", new AnimationConfig("pig/life/red.png", 2, 2, 3, -1, 2f));
-        configs.put("LIFE_YELLOW_PIG", new AnimationConfig("pig/life/yellow.png", 2, 2, 3, -1, 2f));
-
-        configs.put("OVER_BLUE_PIG", new AnimationConfig("pig/over/blue.png", 2, 2, 4, -1, 2f));
-        configs.put("OVER_GREEN_PIG", new AnimationConfig("pig/over/green.png", 2, 2, 4, -1, 2f));
-        configs.put("OVER_RED_PIG", new AnimationConfig("pig/over/red.png", 2, 2, 4, -1, 2f));
-        configs.put("OVER_YELLOW_PIG", new AnimationConfig("pig/over/yellow.png", 2, 2, 4, -1, 2f));
 
         // ===== EVENTS =====
         configs.put("APPLE", new AnimationConfig("events/items.png", 2, 2, 4, 0, 2f));
@@ -137,31 +127,77 @@ public class TextureManager {
         }
     }
 
-    private static void loadTheme(Theme theme) {
-        String themeName = theme.name().toLowerCase();
+    private static void loadColors() {
 
-        // background
-        textures.put(
-            "PLAY_BACKGROUND_" + theme.name(),
-            new Texture("backgrounds/arena_" + themeName + ".png")
-        );
+        for (PlayerColor color : PlayerColor.values()) {
 
-        loadPig(themeName, "blue");
-        loadPig(themeName, "red");
-        loadPig(themeName, "green");
-        loadPig(themeName, "yellow");
+            String colorName = color.name().toLowerCase();
+
+            // ===== LIFE =====
+            configs.put(
+                "LIFE_" + color.name() + "_PIG",
+                new AnimationConfig(
+                    "pig/life/" + colorName + ".png",
+                    2, 2, 3, -1, 2f
+                )
+            );
+
+            // ===== OVER =====
+            configs.put(
+                "OVER_" + color.name() + "_PIG",
+                new AnimationConfig(
+                    "pig/over/" + colorName + ".png",
+                    2, 2, 4, -1, 2f
+                )
+            );
+        }
     }
 
-    private static void loadPig(String theme, String color) {
+    private static void loadThemes() {
 
-        String id = color.toUpperCase() + "_PIG_" + theme.toUpperCase();
+        for (Theme theme : Theme.values()) {
 
-        configs.put(id,
-            new AnimationConfig(
-                "pig/" + theme + "/" + color + ".png",
-                2, 1, 2, -1, 1f
-            )
-        );
+            String themeName = theme.name().toLowerCase();
+
+            // ===== BACKGROUND =====
+            textures.put(
+                "PLAY_BACKGROUND_" + theme.name(),
+                new Texture("backgrounds/arena_" + themeName + ".png")
+            );
+
+            // ===== PIGS =====
+            for (PlayerColor color : PlayerColor.values()) {
+
+                String colorName = color.name().toLowerCase();
+
+                String id = color.name() + "_PIG_" + theme.name();
+
+                configs.put(
+                    id,
+                    new AnimationConfig(
+                        "pig/" + themeName + "/" + colorName + ".png",
+                        2, 1, 2, -1, 1f
+                    )
+                );
+            }
+        }
+    }
+
+    private static void loadPigsForTheme(Theme theme) {
+        String themeName = theme.name().toLowerCase();
+
+        for (PlayerColor color : PlayerColor.values()) {
+            String colorName = color.name().toLowerCase();
+
+            String id = color.name() + "_PIG_" + theme.name();
+
+            configs.put(id,
+                new AnimationConfig(
+                    "pig/" + themeName + "/" + colorName + ".png",
+                    2, 1, 2, -1, 1f
+                )
+            );
+        }
     }
 
     // ========================
@@ -186,10 +222,9 @@ public class TextureManager {
     }
 
     private static boolean isPig(TextureId id) {
-        return id == TextureId.BLUE_PIG
-            || id == TextureId.RED_PIG
-            || id == TextureId.GREEN_PIG
-            || id == TextureId.YELLOW_PIG;
+        return id.name().endsWith("_PIG")
+            && !id.name().startsWith("LIFE_")
+            && !id.name().startsWith("OVER_");
     }
 
     // ========================
@@ -247,98 +282,28 @@ public class TextureManager {
     public static TextureId getPigTextureId(PlayerColor color) {
         if (color == null) return TextureId.BLUE_PIG;
 
-        switch (color) {
-            case BLUE:
-                return TextureId.BLUE_PIG;
-            case RED:
-                return TextureId.RED_PIG;
-            case GREEN:
-                return TextureId.GREEN_PIG;
-            case YELLOW:
-                return TextureId.YELLOW_PIG;
-            default:
-                return TextureId.BLUE_PIG;
-        }
+        return TextureId.valueOf(color.name() + "_PIG");
     }
 
-    public static PlayerColor getColorFromTexture(TextureId textureId) {
-        if (textureId == null) return PlayerColor.BLUE;
+    public static TextureRegion getLifeFrame(PlayerColor color) {
+        if (color == null) color = PlayerColor.BLUE;
 
-        switch (textureId) {
-            case BLUE_PIG:
-            case LIFE_BLUE_PIG:
-            case OVER_BLUE_PIG:
-                return PlayerColor.BLUE;
-
-            case RED_PIG:
-            case LIFE_RED_PIG:
-            case OVER_RED_PIG:
-                return PlayerColor.RED;
-
-            case GREEN_PIG:
-            case LIFE_GREEN_PIG:
-            case OVER_GREEN_PIG:
-                return PlayerColor.GREEN;
-
-            case YELLOW_PIG:
-            case LIFE_YELLOW_PIG:
-            case OVER_YELLOW_PIG:
-                return PlayerColor.YELLOW;
-
-            default:
-                return PlayerColor.BLUE;
-        }
+        String key = "LIFE_" + color.name() + "_PIG";
+        return animations.get(key).getFrame();
     }
 
-    public static TextureId getLifeTextureId(TextureId textureId) {
-        if (textureId == null) return TextureId.LIFE_BLUE_PIG;
+    public static TextureRegion getLifeFrame(PlayerColor color, int frameIndex) {
+        if (color == null) color = PlayerColor.BLUE;
 
-        switch (textureId) {
-            case BLUE_PIG:
-                return TextureId.LIFE_BLUE_PIG;
-            case RED_PIG:
-                return TextureId.LIFE_RED_PIG;
-            case GREEN_PIG:
-                return TextureId.LIFE_GREEN_PIG;
-            case YELLOW_PIG:
-                return TextureId.LIFE_YELLOW_PIG;
-            default:
-                return TextureId.LIFE_BLUE_PIG;
-        }
+        String key = "LIFE_" + color.name() + "_PIG";
+        return animations.get(key).getFrame(frameIndex);
     }
 
-    public static TextureId getOverTextureId(TextureId textureId) {
-        if (textureId == null) return TextureId.OVER_BLUE_PIG;
+    public static TextureRegion getOverFrame(PlayerColor color) {
+        if (color == null) color = PlayerColor.BLUE;
 
-        switch (textureId) {
-            case BLUE_PIG:
-                return TextureId.OVER_BLUE_PIG;
-            case RED_PIG:
-                return TextureId.OVER_RED_PIG;
-            case GREEN_PIG:
-                return TextureId.OVER_GREEN_PIG;
-            case YELLOW_PIG:
-                return TextureId.OVER_YELLOW_PIG;
-            default:
-                return TextureId.OVER_BLUE_PIG;
-        }
-    }
-
-    public static TextureId nextPig(TextureId current) {
-        if (current == null) return TextureId.OVER_BLUE_PIG;
-
-        switch (current) {
-            case OVER_BLUE_PIG:
-                return TextureId.OVER_GREEN_PIG;
-            case OVER_GREEN_PIG:
-                return TextureId.OVER_RED_PIG;
-            case OVER_RED_PIG:
-                return TextureId.OVER_YELLOW_PIG;
-            case OVER_YELLOW_PIG:
-                return TextureId.OVER_BLUE_PIG;
-            default:
-                return TextureId.OVER_BLUE_PIG;
-        }
+        String key = "OVER_" + color.name() + "_PIG";
+        return animations.get(key).getFrame();
     }
 
     // ========================

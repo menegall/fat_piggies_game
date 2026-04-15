@@ -2,6 +2,7 @@ package com.fatpiggies.game.model;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 
 public interface IReadOnlyGameWorld {
@@ -12,7 +13,7 @@ public interface IReadOnlyGameWorld {
 
     int getLocalPlayerLife();
 
-    TextureId getLocalPlayerTexture();
+    PlayerColor getLocalPlayerColor();
 
     boolean isLocalPlayerAlive();
 }

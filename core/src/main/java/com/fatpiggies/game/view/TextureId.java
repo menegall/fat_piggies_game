@@ -10,6 +10,8 @@ public enum TextureId {
     GREEN_PIG,
     RED_PIG,
     YELLOW_PIG,
+    PURPLE_PIG,
+
     NEXT,
     PREVIOUS,
 
@@ -17,14 +19,8 @@ public enum TextureId {
     OVER_BACKGROUND,
     PODIUM,
     CROSS,
-    LIFE_BLUE_PIG,
-    LIFE_GREEN_PIG,
-    LIFE_RED_PIG,
-    LIFE_YELLOW_PIG,
-    OVER_BLUE_PIG,
-    OVER_GREEN_PIG,
-    OVER_RED_PIG,
-    OVER_YELLOW_PIG,
+
+
     CROWN,
     DONUT,
     BEER,
