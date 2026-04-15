@@ -234,9 +234,12 @@ public class TextureManager {
 
 
     public static TextureRegion getFrame(TextureId id, int i) {
-        if (animations.containsKey(id)) {
-            return animations.get(id).getFrame(i);
+        String key = resolve(id);
+
+        if (animations.containsKey(key)) {
+            return animations.get(key).getFrame(i);
         }
+
         return getFrame(id);
     }
 

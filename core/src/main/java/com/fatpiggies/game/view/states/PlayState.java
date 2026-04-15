@@ -79,7 +79,6 @@ public class PlayState extends State {
     private InputMultiplexer multiplexer;
     private boolean joystickActive = false;
     private int joystickPointer = -1;
-    private final TextureRegion bg;
     private final TextureId localTexture;
 
     public PlayState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, String playerId, boolean isHost) {
@@ -93,7 +92,6 @@ public class PlayState extends State {
             Family.all(TransformComponent.class, RenderComponent.class).get()
         );
 
-        bg = TextureManager.getFrame(TextureId.PLAY_BACKGROUND);
         localTexture = gameWorld.getLocalPlayerTexture();
 
         createUI();
@@ -236,9 +234,24 @@ public class PlayState extends State {
     @Override
     public void render(SpriteBatch sb) {
 
+
+        int life = gameWorld.getLocalPlayerLife();
+        boolean isAlive = gameWorld.isLocalPlayerAlive();
+
         // BG
         sb.begin();
+        sb.setColor(1f, 1f, 1f, 1f);
         sb.draw(TextureManager.getFrame(TextureId.PLAY_BACKGROUND), 0, 0, screenWidth, screenHeight);
+
+        // Overlay
+        if (!isAlive) {
+            sb.setColor(0f, 0f, 0f, 0.5f);
+            sb.draw(TextureManager.getFrame(TextureId.PLAY_BACKGROUND), 0, 0, screenWidth, screenHeight);
+        }
+
+        // Reset
+        sb.setColor(1f, 1f, 1f, 1f);
+
         sb.end();
 
         // ENTITIES
@@ -268,16 +281,6 @@ public class PlayState extends State {
 
         // UI LIFE
         sb.begin();
-
-        int life = gameWorld.getLocalPlayerLife();
-        boolean isAlive = gameWorld.isLocalPlayerAlive();
-
-        if (!isAlive) {
-            sb.setColor(0f, 0f, 0f, 0.5f);
-            sb.draw(bg, 0, 0, screenWidth, screenHeight);
-            sb.setColor(1f, 1f, 1f, 1f);
-        }
-
         float w = screenWidth * LIFE_WIDTH;
         float h = screenHeight * LIFE_HEIGHT;
 
