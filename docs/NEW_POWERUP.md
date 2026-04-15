@@ -169,12 +169,12 @@ LifetimeSystem removes expired buff
 
 ## Powerup Types Reference
 
-| Type  | Effect Component                                    | Use Case                              |
-|-------|-----------------------------------------------------|---------------------------------------|
-| BEER  | `InputModifierComponent`                            | Enhanced controls / Inverted controls |
-| DONUT | `MassModifierComponent` `VelocityModifierComponent` | Makes pig slow & heavy                |
-| LIFE  | `HealthModifierComponent`                           | Healing (+1 HP)                       |
-| APPLE | `VelocityModifierComponent`                         | Speed boost                           |
+| Type  | Effect Component                                    | Use Case               |
+|-------|-----------------------------------------------------|------------------------|
+| BEER  | `InputModifierComponent`                            | Inverted controls      |
+| DONUT | `MassModifierComponent` `VelocityModifierComponent` | Makes pig slow & heavy |
+| LIFE  | `HealthModifierComponent`                           | Healing (+1 HP)        |
+| APPLE | `VelocityModifierComponent`                         | Speed boost            |
 
 ## Checklist
 
