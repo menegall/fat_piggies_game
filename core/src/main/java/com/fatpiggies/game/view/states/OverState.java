@@ -172,14 +172,14 @@ public class OverState extends State {
         }
     }
 
-    private TextureId getPigTextureForPlayer(String playerName) {
+    private PlayerColor getPigColorForPlayer(String playerName) {
         for (PlayerSetup setup : lobbyModel.getPlayerSetups().values()) {
             if (setup != null && setup.name != null && setup.name.equals(playerName)) {
-                return TextureManager.getOverTextureId(TextureManager.getPigTextureId(PlayerColor.valueOf(setup.color)));
+                return PlayerColor.valueOf(setup.color);
             }
         }
 
-        return TextureManager.getOverTextureId(TextureManager.getPigTextureId(PlayerColor.BLUE));
+        return PlayerColor.BLUE;
     }
 
 
@@ -255,7 +255,9 @@ public class OverState extends State {
         // 1st
         if (rankedNames.size > 0) {
             sb.draw(
-                TextureManager.getFrame(getPigTextureForPlayer(rankedNames.get(0))),
+                TextureManager.getFrame(TextureManager.getOverTextureId(getPigColorForPlayer(
+                    rankedNames.get(0)
+                ))),
                 podiumX + podiumW * FIRST_X - pigSize / 2f,
                 podiumY + podiumH * FIRST_Y,
                 pigSize,
@@ -266,7 +268,9 @@ public class OverState extends State {
         // 2nd
         if (rankedNames.size > 1) {
             sb.draw(
-                TextureManager.getFrame(getPigTextureForPlayer(rankedNames.get(1))),
+                TextureManager.getFrame(TextureManager.getOverTextureId(getPigColorForPlayer(
+                    rankedNames.get(1)
+                ))),
                 podiumX + podiumW * SECOND_X - pigSize / 2f,
                 podiumY + podiumH * SECOND_Y,
                 pigSize,
@@ -277,7 +281,9 @@ public class OverState extends State {
         // 3rd
         if (rankedNames.size > 2) {
             sb.draw(
-                TextureManager.getFrame(getPigTextureForPlayer(rankedNames.get(2))),
+                TextureManager.getFrame(TextureManager.getOverTextureId(getPigColorForPlayer(
+                    rankedNames.get(2)
+                ))),
                 podiumX + podiumW * THIRD_X - pigSize / 2f,
                 podiumY + podiumH * THIRD_Y,
                 pigSize,

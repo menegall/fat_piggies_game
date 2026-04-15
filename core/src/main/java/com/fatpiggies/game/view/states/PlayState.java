@@ -38,6 +38,7 @@ import com.fatpiggies.game.model.ecs.components.collision.ColliderComponent;
 import com.fatpiggies.game.model.utils.GameConstants;
 import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.setting.VibrationManager;
+import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
@@ -79,7 +80,7 @@ public class PlayState extends State {
     private InputMultiplexer multiplexer;
     private boolean joystickActive = false;
     private int joystickPointer = -1;
-    private final TextureId localTexture;
+    private final PlayerColor localColor;
 
     public PlayState(IViewActions viewActions, IReadOnlyGameWorld gameWorld, String playerId, boolean isHost) {
         super(viewActions);
@@ -92,7 +93,7 @@ public class PlayState extends State {
             Family.all(TransformComponent.class, RenderComponent.class).get()
         );
 
-        localTexture = gameWorld.getLocalPlayerTexture();
+        localColor = gameWorld.getLocalPlayerColor();
 
         createUI();
         setupInput();
@@ -287,10 +288,11 @@ public class PlayState extends State {
         for (int i = 1; i <= MAX_LIFE; i++) {
 
             boolean heartAlive = i <= life;
+            PlayerColor localColor = gameWorld.getLocalPlayerColor();
 
             TextureRegion frame = heartAlive
-                ? TextureManager.getFrame(TextureManager.getLifeTextureId(localTexture))
-                : TextureManager.getFrame(TextureManager.getLifeTextureId(localTexture), 3);
+                ? TextureManager.getFrame(TextureManager.getLifeTextureId(localColor))
+                : TextureManager.getFrame(TextureManager.getLifeTextureId(localColor), 3);
 
             if (!heartAlive) sb.setColor(0.3f, 0.3f, 0.3f, 1f);
 

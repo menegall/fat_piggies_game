@@ -207,9 +207,7 @@ public class LobbyState extends State {
             if (setup == null || setup.name == null) continue;
 
             Image pig = new Image(TextureManager.getFrame(
-                TextureManager.getLifeTextureId(
-                    TextureManager.getPigTextureId(PlayerColor.valueOf(setup.color))
-                )
+                TextureManager.getLifeTextureId(PlayerColor.valueOf(setup.color))
             ));
 
             float sizeX = screenWidth * IMAGE_SIZE_X;

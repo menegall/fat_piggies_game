@@ -77,7 +77,7 @@ public class MenuState extends State {
     private TextButton hostButton;
     private TextButton shopButton;
     private ImageButton colorButton;
-    private TextureId currentPig = TextureManager.getOverTextureId(TextureManager.getPigTextureId(PreferencesManager.loadColor()));
+    private PlayerColor currentColor = PreferencesManager.loadColor();
     private boolean showPigSelectionInfo = false;
     private CheckBox musicButton;
     private CheckBox soundButton;
@@ -234,7 +234,9 @@ public class MenuState extends State {
         btnSizeX = screenWidth * BTN_SIZE_X_RATIO;
         float btnSizeY = screenHeight * BTN_SIZE_Y_RATIO;
 
-        TextureRegionDrawable drawable = new TextureRegionDrawable(TextureManager.getFrame(currentPig));
+        TextureRegionDrawable drawable = new TextureRegionDrawable(TextureManager.getFrame(
+            TextureManager.getOverTextureId(currentColor)
+        ));
         colorButton = new ImageButton(drawable);
 
         colorButton.setSize(btnSizeX, btnSizeY);
@@ -247,8 +249,11 @@ public class MenuState extends State {
         colorButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                currentPig = TextureManager.nextPig(currentPig);
-                PreferencesManager.saveColor(TextureManager.getColorFromTexture(currentPig));
+                PlayerColor[] colors = PlayerColor.values();
+                int index = currentColor.ordinal();
+                currentColor = colors[(index + 1) % colors.length];
+
+                PreferencesManager.saveColor(currentColor);
                 showPigSelectionInfo = false;
                 updateColorButton();
                 VibrationManager.vibrate(200);
@@ -335,19 +340,20 @@ public class MenuState extends State {
 
 
     private void updateColorButton() {
-        TextureRegion region = TextureManager.getFrame(currentPig);
+        TextureRegion region = TextureManager.getFrame(
+            TextureManager.getOverTextureId(currentColor)
+        );
+
         colorButton.getStyle().imageUp = new TextureRegionDrawable(region);
     }
 
     private void onJoinClicked() {
         String name = nameField.getText();
 
-        PlayerColor color = TextureManager.getColorFromTexture(currentPig);
-
         viewActions.onJoinLobbyClicked(
             name,
             lobbyField.getText(),
-            color
+            currentColor
         );
 
         VibrationManager.vibrate(200);
@@ -357,11 +363,9 @@ public class MenuState extends State {
     private void onHostClicked() {
         String name = nameField.getText();
 
-        PlayerColor color = TextureManager.getColorFromTexture(currentPig);
-
         viewActions.onHostLobbyClicked(
             name,
-            color
+            currentColor
         );
 
         VibrationManager.vibrate(200);

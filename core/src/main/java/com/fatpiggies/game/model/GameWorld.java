@@ -50,7 +50,9 @@ import com.fatpiggies.game.network.dto.PlayerData;
 import com.fatpiggies.game.network.dto.PlayerInput;
 import com.fatpiggies.game.network.dto.PlayerSetup;
 import com.fatpiggies.game.network.dto.PowerupData;
+import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
+import com.fatpiggies.game.view.TextureManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -119,10 +121,10 @@ public class GameWorld implements IReadOnlyGameWorld {
      * The controller must call setLocalPlayer(...) explicitly.
      *
      * @param networkId Unique ID of the player
-     * @param textureId Texture ID of the pig
+     * @param playerColor Unique color of the pig
      * @return the created entity
      */
-    public Entity createHostPig(String networkId, TextureId textureId) {
+    public Entity createHostPig(String networkId, PlayerColor playerColor) {
         Entity entity = engine.createEntity();
 
         // Identity and Base Data
@@ -145,7 +147,7 @@ public class GameWorld implements IReadOnlyGameWorld {
         CollisionEventComponent collisions = new CollisionEventComponent();
 
         RenderComponent render = new RenderComponent();
-        render.textureId = textureId;
+        render.textureId = TextureManager.getPigTextureId(playerColor);
         render.width = PIG_WIDTH;
         render.height = PIG_HEIGHT;
         render.angleOffset = PIG_ANGLE_OFFSET;
@@ -162,9 +164,9 @@ public class GameWorld implements IReadOnlyGameWorld {
      * The Client will control this pig with his joystick.
      *
      * @param playerId  Unique ID of the player
-     * @param textureId Texture ID of the pig
+     * @param playerColor Unique color of the pig
      */
-    public void createLocalPig(String playerId, TextureId textureId) {
+    public void createLocalPig(String playerId, PlayerColor playerColor) {
         Entity entity = engine.createEntity();
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
@@ -180,7 +182,7 @@ public class GameWorld implements IReadOnlyGameWorld {
         input.multiplier = 1;
 
         RenderComponent render = new RenderComponent();
-        render.textureId = textureId;
+        render.textureId = TextureManager.getPigTextureId(playerColor);;
         render.width = PIG_WIDTH;
         render.height = PIG_HEIGHT;
         render.angleOffset = PIG_ANGLE_OFFSET;
@@ -196,9 +198,9 @@ public class GameWorld implements IReadOnlyGameWorld {
      * This pig will be controlled by the Network Lerp System.
      *
      * @param playerId  Unique ID of the player
-     * @param textureId Texture ID of the pig
+     * @param playerColor Unique color of the pig
      */
-    public void createRemotePig(String playerId, TextureId textureId) {
+    public void createRemotePig(String playerId, PlayerColor playerColor) {
         Entity entity = engine.createEntity();
 
         NetworkIdentityComponent netId = new NetworkIdentityComponent();
@@ -208,7 +210,7 @@ public class GameWorld implements IReadOnlyGameWorld {
         TransformComponent transform = new TransformComponent();
 
         RenderComponent render = new RenderComponent();
-        render.textureId = textureId;
+        render.textureId = TextureManager.getPigTextureId(playerColor);
         render.width = PIG_WIDTH;
         render.height = PIG_HEIGHT;
         render.angleOffset = PIG_ANGLE_OFFSET;
@@ -709,11 +711,26 @@ public class GameWorld implements IReadOnlyGameWorld {
     }
 
     @Override
-    public TextureId getLocalPlayerTexture() {
-        if (localPlayer == null) return null;
+    public PlayerColor getLocalPlayerColor() {
 
-        RenderComponent rc = localPlayer.getComponent(RenderComponent.class);
-        return rc != null ? rc.textureId : null;
+        if (localPlayer == null || playersSetup == null) {
+            return PlayerColor.BLUE;
+        }
+
+        NetworkIdentityComponent netId =
+            localPlayer.getComponent(NetworkIdentityComponent.class);
+
+        if (netId == null || netId.playerId == null) {
+            return PlayerColor.BLUE;
+        }
+
+        PlayerSetup setup = playersSetup.get(netId.playerId);
+
+        if (setup == null || setup.color == null) {
+            return PlayerColor.BLUE;
+        }
+
+        return PlayerColor.valueOf(setup.color);
     }
 
     @Override
