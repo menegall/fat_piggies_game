@@ -51,7 +51,16 @@ To run the project locally:
 2.  **Open in Android Studio:**
     * File -> Open -> Select the `build.gradle` file in the root folder.
 3.  **Sync Gradle:** Wait for dependencies to download.
-4.  **Run:** Select the `Desktop` configuration and press Play.
+4. **Run:** Select the `Android` configuration and press Play.
+
+---
+
+## Game Extension
+
+Take a look to these files based on what you would ike to extend:
+
+* [**Add new power-up**](./docs/NEW_POWERUP.md)
+* [**Add new theme**](./docs/NEW_THEME.md)
 
 ---
 
