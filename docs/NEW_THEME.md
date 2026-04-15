@@ -96,11 +96,11 @@ public static void loadTextures() {
     // ... existing UI textures ...
 
     // ===== THEMES =====
-    loadTheme("farm");
-    loadTheme("volcano");
-    loadTheme("pirate");
-    loadTheme("space");
-    loadTheme("jungle");  // ← NEW: load your theme here
+    loadTheme(Theme.FARM);
+    loadTheme(Theme.VOLCANO);
+    loadTheme(Theme.PIRATE);
+    loadTheme(Theme.SPACE);
+    loadTheme(Theme.JUNGLE); // ← NEW: load your theme here
     
     // ... rest of configuration ...
 }

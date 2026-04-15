@@ -67,7 +67,6 @@ public class OverState extends State {
     private final IReadOnlyLobbyModel lobbyModel;
 
     private Array<String> rankedNames = new Array<>();
-    private Array<String> lastNames = new Array<>();
 
     // ================= UI =================
     private TextButton lobbyButton;
@@ -90,6 +89,7 @@ public class OverState extends State {
         podium = TextureManager.getFrame(TextureId.PODIUM);
 
         createUI();
+        initRanking();
     }
 
     private void createUI() {
@@ -168,7 +168,7 @@ public class OverState extends State {
             case 0: return " + 20 coins.";
             case 1: return " + 10 coins.";
             case 2: return " +  5 coin.";
-            default: return (index + 1) + "";
+            default: return "";
         }
     }
 
@@ -185,7 +185,26 @@ public class OverState extends State {
 
 
     // ================= SCORE =================
+    private void initRanking() {
+        LinkedHashMap<String, PlayerSetup> ranking = lobbyModel.getFinalRanking();
+
+        if (ranking == null || ranking.isEmpty()) return;
+
+        Array<String> names = new Array<>();
+
+        for (PlayerSetup setup : ranking.values()) {
+            if (setup != null && setup.name != null) {
+                names.add(setup.name);
+            }
+        }
+
+        rankedNames = buildRankedNames(names);
+        updateScoreBoard(rankedNames);
+    }
+
     private void updateScoreBoard(Array<String> names) {
+        if (scoreTable == null) return; // safety
+
         scoreTable.clear();
 
         for (int i = 0; i < names.size; i++) {
@@ -208,22 +227,10 @@ public class OverState extends State {
 
     @Override
     public void update(float dt) {
-        Array<String> currentNames = new Array<>();
+        stage.act(dt);
 
-        LinkedHashMap<String, PlayerSetup> ranking = lobbyModel.getFinalRanking();
-
-        if (ranking == null || ranking.isEmpty()) return;
-
-        for (PlayerSetup setup : ranking.values()) {
-            if (setup != null && setup.name != null) {
-                currentNames.add(setup.name);
-            }
-        }
-
-        if (!currentNames.equals(lastNames)) {
-            lastNames = new Array<>(currentNames);
-            rankedNames = buildRankedNames(lastNames);
-            updateScoreBoard(rankedNames);
+        if (rankedNames.size == 0) {
+            initRanking(); // Retry till we receive it
         }
     }
 
