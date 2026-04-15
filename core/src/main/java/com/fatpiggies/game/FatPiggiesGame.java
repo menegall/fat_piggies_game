@@ -7,13 +7,11 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.fatpiggies.game.setting.MusicManager;
-import com.fatpiggies.game.setting.PreferencesManager;
-import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.controller.MainController;
 import com.fatpiggies.game.network.AuthService;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.setting.MusicManager;
+import com.fatpiggies.game.setting.PreferencesManager;
 import com.fatpiggies.game.setting.SoundsManager;
 import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.states.GameStateManager;
@@ -40,9 +38,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
         authService.signIn(new AuthService.AuthCallback() {
             @Override
             public void onSuccess(String userId) {
-                Gdx.app.postRunnable(() -> {
-                    main.getLobbyModel().setPlayerId(userId);
-                });
+                Gdx.app.postRunnable(() -> main.getLobbyModel().setPlayerId(userId));
             }
 
             @Override

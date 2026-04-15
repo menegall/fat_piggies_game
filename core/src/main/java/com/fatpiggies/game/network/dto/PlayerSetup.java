@@ -1,6 +1,5 @@
 package com.fatpiggies.game.network.dto;
 
-import com.fatpiggies.game.view.PlayerColor;
 
 public class PlayerSetup {
     public String name;

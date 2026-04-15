@@ -1,7 +1,6 @@
 package com.fatpiggies.game.controller.mainControllerInterfaces;
 
 import com.fatpiggies.game.view.PlayerColor;
-import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.Theme;
 
 public interface IViewActions {

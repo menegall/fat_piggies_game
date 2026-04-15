@@ -18,7 +18,6 @@ import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class OverState extends State {
 
