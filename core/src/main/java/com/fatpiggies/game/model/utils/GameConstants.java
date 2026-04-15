@@ -14,7 +14,7 @@ public final class GameConstants {
     public static final float RIGHT_BOUND = WORLD_WIDTH - LEFT_BOUND;
     public static final float BOTTOM_BOUND = 70f;
     public static final float TOP_BOUND = WORLD_HEIGHT - BOTTOM_BOUND;
-    public static final float GROUND_FRICTION = 450f;
+    public static final float GROUND_FRICTION = 400f;
     public static final float FORCE_FACTOR = 15f;
     public static final float STOP_THRESHOLD = 0.0001f;
     public static final float INPUT_DEADZONE = 0.1f;
@@ -32,7 +32,7 @@ public final class GameConstants {
     public static final int BASE_LIFE = 5;
     public static final float LERP_FACTOR = 15f;
     public static final int PLAYER_COLLISION_RADIUS = 60;
-    public static final float PLAYER_BOUNCINESS = 2.2f; // better if value between 1.5 and 3.0
+    public static final float PLAYER_BOUNCINESS = 2.4f; // better if value between 1.5 and 3.0
 
 
     // --- POWERUP SETTINGS ---
@@ -46,10 +46,10 @@ public final class GameConstants {
 
 
     // --- RECONCILIATION THRESHOLDS (Tune these values during playtesting) ---
-    public static final float SNAP_THRESHOLD = 500f;
+    public static final float SNAP_THRESHOLD = 400f;
     // Next two used in ReconciliationSystem
     public static final float IGNORE_THRESHOLD = 100f;
-    public static final float CORRECTION_LERP = 20f;
+    public static final float CORRECTION_LERP = 30f;
 
 
     // --- INPUT SETTINGS ---

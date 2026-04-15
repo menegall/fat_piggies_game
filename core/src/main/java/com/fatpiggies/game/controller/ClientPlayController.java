@@ -4,7 +4,9 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.fatpiggies.game.controller.mainControllerInterfaces.IPlayActions;
 import com.fatpiggies.game.model.GameWorld;
+import com.fatpiggies.game.model.ecs.systems.move.MovementSystem;
 import com.fatpiggies.game.model.ecs.systems.move.NetworkLerpSystem;
+import com.fatpiggies.game.model.ecs.systems.move.NetworkReconciliationSystem;
 import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.network.dto.GameState;
@@ -29,10 +31,7 @@ public class ClientPlayController implements IPlayController {
     private float lastStateTimestamp = 0f;
     private boolean gameRunning = false;
     private boolean firstStateReceived = false;
-    private float sendTimer = 0f;
     private float lastSendTime = 0f;
-
-    private static final float SEND_RATE = 1f / 20f; // 20 Hz
     private static final float KEEP_ALIVE = 0.2f;    // 200 ms
     private static final float DEADZONE = 0.02f;
 
@@ -41,6 +40,10 @@ public class ClientPlayController implements IPlayController {
 
         engine = new Engine();
 
+        // Used for client-side prediction
+        engine.addSystem(new MovementSystem());
+        engine.addSystem(new NetworkReconciliationSystem());
+        // Used for remote pigs
         engine.addSystem(new NetworkLerpSystem());
 
         world = new GameWorld(engine);
@@ -58,7 +61,6 @@ public class ClientPlayController implements IPlayController {
         gameRunning = true;
         lastStateTimestamp = 0f;
         firstStateReceived = false;
-        sendTimer = 0f;
         lastSendTime = 0f;
 
         // To not have old inputs
@@ -127,13 +129,8 @@ public class ClientPlayController implements IPlayController {
     }
 
     @Override
-    public void sendToServer(DatabaseService db, float dt) {
+    public void sendToServer(DatabaseService db, float timer) {
         if (!gameRunning || world == null) {
-            return;
-        }
-
-        sendTimer += dt;
-        if (sendTimer < SEND_RATE) {
             return;
         }
 
@@ -142,14 +139,12 @@ public class ClientPlayController implements IPlayController {
         boolean isMoving = Math.abs(input.jx) > 0.01f || Math.abs(input.jy) > 0.01f;
         boolean keepAlive = (input.ts - lastSendTime) >= KEEP_ALIVE;
 
-        // TOTO
+        input.ts += timer;
+
         if (isMoving || keepAlive) {
-            input.ts += SEND_RATE;
             db.pushPlayerInput(world.getLobbyId(), actions.getCurrentUserId(), input);
             lastSendTime = input.ts;
         }
-
-        sendTimer = 0f;
     }
 
     @Override

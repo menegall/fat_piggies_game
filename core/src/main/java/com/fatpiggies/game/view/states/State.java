@@ -42,7 +42,8 @@ public abstract class State {
         stage.dispose();
     }
 
-    public void showError(NetworkError error){};
+    public void showError(NetworkError error) {
+    }
 
     public void showMessage(String message) {}
 

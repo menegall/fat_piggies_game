@@ -80,8 +80,7 @@ public class NetworkLerpSystem extends IteratingSystem {
         if (input != null) {
             // Local Player
             if (input.joystickPercentageX != 0f || input.joystickPercentageY != 0f) {
-                float joystickAngle = MathUtils.atan2(input.joystickPercentageY, input.joystickPercentageX) * MathUtils.radiansToDegrees;
-                transform.angle = joystickAngle;
+                transform.angle = MathUtils.atan2(input.joystickPercentageY, input.joystickPercentageX) * MathUtils.radiansToDegrees;
             }
         } else {
             // Remote Player

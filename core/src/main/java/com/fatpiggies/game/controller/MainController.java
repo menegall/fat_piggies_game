@@ -14,7 +14,6 @@ import com.fatpiggies.game.network.DatabaseService;
 import com.fatpiggies.game.network.NetworkError;
 import com.fatpiggies.game.setting.PreferencesManager;
 import com.fatpiggies.game.view.PlayerColor;
-import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.TextureManager;
 import com.fatpiggies.game.view.Theme;
 import com.fatpiggies.game.view.states.GameStateManager;
@@ -271,9 +270,7 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
 
             @Override
             public void onError(NetworkError error) {
-                Gdx.app.postRunnable(() -> {
-                    showError(error);
-                });
+                Gdx.app.postRunnable(() -> showError(error));
             }
         });
         GameStateManager.getInstance().pushOverState(this, lobbyModel, lobbyModel.getIsHost());
