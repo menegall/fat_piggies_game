@@ -48,7 +48,7 @@ public final class GameConstants {
     // --- RECONCILIATION THRESHOLDS (Tune these values during playtesting) ---
     public static final float SNAP_THRESHOLD = 400f;
     // Next two used in ReconciliationSystem
-    public static final float IGNORE_THRESHOLD = 100f;
+    public static final float IGNORE_THRESHOLD = 150f;
     public static final float CORRECTION_LERP = 30f;
 
 

@@ -173,9 +173,6 @@ public class GameWorld implements IReadOnlyGameWorld {
 
         TransformComponent transform = new TransformComponent();
 
-        // For Client-Side prediction
-        attachPhysicComponents(entity);
-
         HealthComponent health = new HealthComponent();
         health.currentLife = BASE_LIFE;
 

@@ -50,9 +50,7 @@ public class NetworkLerpSystem extends IteratingSystem {
     private final ComponentMapper<PlayerInputComponent> pim = ComponentMapper.getFor(PlayerInputComponent.class);
 
     public NetworkLerpSystem() {
-        super(Family.all(TransformComponent.class, NetworkSyncComponent.class)
-            .exclude(PlayerInputComponent.class) // Exclude Local Pig (CSP)
-            .get());
+        super(Family.all(TransformComponent.class, NetworkSyncComponent.class).get());
     }
 
     @Override
@@ -79,7 +77,7 @@ public class NetworkLerpSystem extends IteratingSystem {
         transform.x += (deltaX) * lerpAlpha;
         transform.y += (deltaY) * lerpAlpha;
 
-        if (input != null) { // Never Executed with CSP
+        if (input != null) {
             // Local Player
             if (input.joystickPercentageX != 0f || input.joystickPercentageY != 0f) {
                 transform.angle = MathUtils.atan2(input.joystickPercentageY, input.joystickPercentageX) * MathUtils.radiansToDegrees;
