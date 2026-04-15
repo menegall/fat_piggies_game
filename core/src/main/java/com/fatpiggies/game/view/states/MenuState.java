@@ -77,7 +77,8 @@ public class MenuState extends State {
     private TextButton hostButton;
     private TextButton shopButton;
     private ImageButton colorButton;
-    private TextureId currentPig = PreferencesManager.loadPig();    private boolean showPigSelectionInfo = false;
+    private TextureId currentPig = TextureManager.getOverTextureId(TextureManager.getPigTextureId(PreferencesManager.loadColor()));
+    private boolean showPigSelectionInfo = false;
     private CheckBox musicButton;
     private CheckBox soundButton;
     private CheckBox vibrationButton;
@@ -247,7 +248,7 @@ public class MenuState extends State {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 currentPig = TextureManager.nextPig(currentPig);
-                PreferencesManager.savePig(currentPig);
+                PreferencesManager.saveColor(TextureManager.getColorFromTexture(currentPig));
                 showPigSelectionInfo = false;
                 updateColorButton();
                 VibrationManager.vibrate(200);

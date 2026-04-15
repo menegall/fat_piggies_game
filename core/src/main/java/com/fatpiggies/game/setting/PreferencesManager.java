@@ -2,6 +2,7 @@ package com.fatpiggies.game.setting;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.fatpiggies.game.view.PlayerColor;
 import com.fatpiggies.game.view.TextureId;
 import com.fatpiggies.game.view.Theme;
 
@@ -28,14 +29,14 @@ public class PreferencesManager {
     }
 
     // ===== PIG COLOR (last one) =====
-    public static void savePig(TextureId pig) {
-        prefs.putString("selected_pig", pig.name());
+    public static void saveColor(PlayerColor color) {
+        prefs.putString("selected_pig", color.name());
         prefs.flush();
     }
 
-    public static TextureId loadPig() {
-        return TextureId.valueOf(
-            prefs.getString("selected_pig", TextureId.OVER_BLUE_PIG.name())
+    public static PlayerColor loadColor() {
+        return PlayerColor.valueOf(
+            prefs.getString("selected_pig", PlayerColor.BLUE.name())
         );
     }
 

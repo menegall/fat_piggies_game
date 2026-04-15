@@ -273,7 +273,7 @@ public class ShopState extends State {
 
         // ===== PIG PREVIEW =====
         sb.draw(
-            TextureManager.getFrame(TextureId.BLUE_PIG),
+            TextureManager.getFrame(TextureManager.getPigTextureId(PreferencesManager.loadColor())),
             screenWidth * PIG_X_RATIO,
             screenHeight * PIG_Y_RATIO,
             screenWidth * PIG_WIDTH_RATIO,

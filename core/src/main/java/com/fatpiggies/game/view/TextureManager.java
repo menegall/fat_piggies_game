@@ -20,22 +20,21 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.badlogic.gdx.graphics.g2d.*;
+
 public class TextureManager {
 
     private TextureManager() {}
 
-    private static final Map<TextureId, Texture> textures = new HashMap<>();
-    private static final Map<TextureId, Animation> animations = new HashMap<>();
-    private static final Map<TextureId, AnimationConfig> configs = new HashMap<>();
-
-    private static final Map<Theme, Map<TextureId, TextureId>> themePigMap = new HashMap<>();
-    private static final Map<Theme, TextureId> themeBackgroundMap = new HashMap<>();
+    private static final Map<String, Texture> textures = new HashMap<>();
+    private static final Map<String, Animation> animations = new HashMap<>();
+    private static final Map<String, AnimationConfig> configs = new HashMap<>();
 
     private static Theme currentTheme = Theme.FARM;
     private static Theme previewTheme = null;
 
     // ========================
-    // THEME CONTROL
+    // THEME
     // ========================
 
     public static void setTheme(Theme theme) {
@@ -55,7 +54,7 @@ public class TextureManager {
     }
 
     // ========================
-    // CONFIG CLASS
+    // CONFIG
     // ========================
 
     private static class AnimationConfig {
@@ -83,66 +82,44 @@ public class TextureManager {
 
         if (!textures.isEmpty()) return;
 
-        textures.put(TextureId.LOGO, new Texture("logo.png"));
-        textures.put(TextureId.MENU_BACKGROUND, new Texture("backgrounds/menuBackground.png"));
-        textures.put(TextureId.OVER_BACKGROUND, new Texture("backgrounds/overBackground.png"));
+        textures.put("LOGO", new Texture("logo.png"));
+        textures.put("MENU_BACKGROUND", new Texture("backgrounds/menuBackground.png"));
+        textures.put("OVER_BACKGROUND", new Texture("backgrounds/overBackground.png"));
+        textures.put("PODIUM", new Texture("backgrounds/podium.png"));
 
+        textures.put("NEXT", new Texture("uiAssets/next.png"));
+        textures.put("PREVIOUS", new Texture("uiAssets/previous.png"));
+        textures.put("COIN", new Texture("uiAssets/coin.png"));
 
-        textures.put(TextureId.NEXT, new Texture("uiAssets/next.png"));
-        textures.put(TextureId.PREVIOUS, new Texture("uiAssets/previous.png"));
-        textures.put(TextureId.COIN, new Texture("uiAssets/coin.png"));
-        textures.put(TextureId.PODIUM, new Texture("backgrounds/podium.png"));
-        textures.put(TextureId.CROSS, new Texture("uiAssets/cross.png"));
-        textures.put(TextureId.BUBBLE, new Texture("uiAssets/bubble.png"));
-        textures.put(TextureId.BONUS, new Texture("events/items.png"));
+        textures.put("CROSS", new Texture("uiAssets/cross.png"));
+        textures.put("BUBBLE", new Texture("uiAssets/bubble.png"));
 
-        // ===== FARM =====
-        textures.put(TextureId.PLAY_BACKGROUND_FARM, new Texture("backgrounds/arena_farm.png"));
-        configs.put(TextureId.BLUE_PIG_FARM, new AnimationConfig("pig/farm/blue.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.RED_PIG_FARM, new AnimationConfig("pig/farm/red.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.GREEN_PIG_FARM, new AnimationConfig("pig/farm/green.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.YELLOW_PIG_FARM, new AnimationConfig("pig/farm/yellow.png", 2, 1, 2, -1, 1f));
+        // ===== THEMES =====
+        loadTheme("farm");
+        loadTheme("volcano");
+        loadTheme("pirate");
+        loadTheme("space");
 
-        // ===== VOLCANO =====
-        textures.put(TextureId.PLAY_BACKGROUND_VOLCANO, new Texture("backgrounds/arena_volcano.png"));
-        configs.put(TextureId.BLUE_PIG_VOLCANO, new AnimationConfig("pig/volcano/blue.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.RED_PIG_VOLCANO, new AnimationConfig("pig/volcano/red.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.GREEN_PIG_VOLCANO, new AnimationConfig("pig/volcano/green.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.YELLOW_PIG_VOLCANO, new AnimationConfig("pig/volcano/yellow.png", 2, 1, 2, -1, 1f));
+        configs.put("CROWN", new AnimationConfig("events/crown.png", 2, 2, 4, -1, 2f));
 
-        // ===== PIRATE =====
-        textures.put(TextureId.PLAY_BACKGROUND_PIRATE, new Texture("backgrounds/arena_pirate.png"));
-        configs.put(TextureId.BLUE_PIG_PIRATE, new AnimationConfig("pig/pirate/blue.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.RED_PIG_PIRATE, new AnimationConfig("pig/pirate/red.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.GREEN_PIG_PIRATE, new AnimationConfig("pig/pirate/green.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.YELLOW_PIG_PIRATE, new AnimationConfig("pig/pirate/yellow.png", 2, 1, 2, -1, 1f));
+        configs.put("LIFE_BLUE_PIG", new AnimationConfig("pig/life/blue.png", 2, 2, 3, -1, 2f));
+        configs.put("LIFE_GREEN_PIG", new AnimationConfig("pig/life/green.png", 2, 2, 3, -1, 2f));
+        configs.put("LIFE_RED_PIG", new AnimationConfig("pig/life/red.png", 2, 2, 3, -1, 2f));
+        configs.put("LIFE_YELLOW_PIG", new AnimationConfig("pig/life/yellow.png", 2, 2, 3, -1, 2f));
 
-        // ===== SPACE =====
-        textures.put(TextureId.PLAY_BACKGROUND_SPACE, new Texture("backgrounds/arena_space.png"));
-        configs.put(TextureId.BLUE_PIG_SPACE, new AnimationConfig("pig/space/blue.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.RED_PIG_SPACE, new AnimationConfig("pig/space/red.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.GREEN_PIG_SPACE, new AnimationConfig("pig/space/green.png", 2, 1, 2, -1, 1f));
-        configs.put(TextureId.YELLOW_PIG_SPACE, new AnimationConfig("pig/space/yellow.png", 2, 1, 2, -1, 1f));
+        configs.put("OVER_BLUE_PIG", new AnimationConfig("pig/over/blue.png", 2, 2, 4, -1, 2f));
+        configs.put("OVER_GREEN_PIG", new AnimationConfig("pig/over/green.png", 2, 2, 4, -1, 2f));
+        configs.put("OVER_RED_PIG", new AnimationConfig("pig/over/red.png", 2, 2, 4, -1, 2f));
+        configs.put("OVER_YELLOW_PIG", new AnimationConfig("pig/over/yellow.png", 2, 2, 4, -1, 2f));
 
-        // ===== ANIMATIONS =====
-        configs.put(TextureId.APPLE, new AnimationConfig("events/items.png", 2, 2, 4, 0, 2f));
-        configs.put(TextureId.DONUT, new AnimationConfig("events/items.png", 2, 2, 4, 1, 2f));
-        configs.put(TextureId.BEER, new AnimationConfig("events/items.png", 2, 2, 4, 2, 2f));
-        configs.put(TextureId.LIFE, new AnimationConfig("events/items.png", 2, 2, 4, 3, 2f));
+        // ===== EVENTS =====
+        configs.put("APPLE", new AnimationConfig("events/items.png", 2, 2, 4, 0, 2f));
+        configs.put("DONUT", new AnimationConfig("events/items.png", 2, 2, 4, 1, 2f));
+        configs.put("BEER", new AnimationConfig("events/items.png", 2, 2, 4, 2, 2f));
+        configs.put("LIFE", new AnimationConfig("events/items.png", 2, 2, 4, 3, 2f));
 
-        configs.put(TextureId.CROWN, new AnimationConfig("events/crown.png", 2, 2, 4, -1, 2f));
-
-        configs.put(TextureId.LIFE_BLUE_PIG, new AnimationConfig("pig/life/blue.png", 2, 2, 3, -1, 2f));
-        configs.put(TextureId.LIFE_GREEN_PIG, new AnimationConfig("pig/life/green.png", 2, 2, 3, -1, 2f));
-        configs.put(TextureId.LIFE_RED_PIG, new AnimationConfig("pig/life/red.png", 2, 2, 3, -1, 2f));
-        configs.put(TextureId.LIFE_YELLOW_PIG, new AnimationConfig("pig/life/yellow.png", 2, 2, 3, -1, 2f));
-
-        configs.put(TextureId.OVER_BLUE_PIG, new AnimationConfig("pig/over/blue.png", 2, 2, 4, -1, 2f));
-        configs.put(TextureId.OVER_GREEN_PIG, new AnimationConfig("pig/over/green.png", 2, 2, 4, -1, 2f));
-        configs.put(TextureId.OVER_RED_PIG, new AnimationConfig("pig/over/red.png", 2, 2, 4, -1, 2f));
-        configs.put(TextureId.OVER_YELLOW_PIG, new AnimationConfig("pig/over/yellow.png", 2, 2, 4, -1, 2f));
-
-        for (Map.Entry<TextureId, AnimationConfig> entry : configs.entrySet()) {
+        // build animations
+        for (Map.Entry<String, AnimationConfig> entry : configs.entrySet()) {
             AnimationConfig cfg = entry.getValue();
 
             Texture texture = new Texture(cfg.path);
@@ -158,42 +135,60 @@ public class TextureManager {
             animations.put(entry.getKey(), anim);
             textures.put(entry.getKey(), texture);
         }
+    }
 
-        // ===== THEME PIG MAP =====
-        Map<TextureId, TextureId> farm = new HashMap<>();
-        farm.put(TextureId.BLUE_PIG, TextureId.BLUE_PIG_FARM);
-        farm.put(TextureId.RED_PIG, TextureId.RED_PIG_FARM);
-        farm.put(TextureId.GREEN_PIG, TextureId.GREEN_PIG_FARM);
-        farm.put(TextureId.YELLOW_PIG, TextureId.YELLOW_PIG_FARM);
+    private static void loadTheme(String theme) {
 
-        Map<TextureId, TextureId> volcano = new HashMap<>();
-        volcano.put(TextureId.BLUE_PIG, TextureId.BLUE_PIG_VOLCANO);
-        volcano.put(TextureId.RED_PIG, TextureId.RED_PIG_VOLCANO);
-        volcano.put(TextureId.GREEN_PIG, TextureId.GREEN_PIG_VOLCANO);
-        volcano.put(TextureId.YELLOW_PIG, TextureId.YELLOW_PIG_VOLCANO);
+        // background
+        textures.put(
+            "PLAY_BACKGROUND_" + theme.toUpperCase(),
+            new Texture("backgrounds/arena_" + theme + ".png")
+        );
 
-        Map<TextureId, TextureId> pirate = new HashMap<>();
-        pirate.put(TextureId.BLUE_PIG, TextureId.BLUE_PIG_PIRATE);
-        pirate.put(TextureId.RED_PIG, TextureId.RED_PIG_PIRATE);
-        pirate.put(TextureId.GREEN_PIG, TextureId.GREEN_PIG_PIRATE);
-        pirate.put(TextureId.YELLOW_PIG, TextureId.YELLOW_PIG_PIRATE);
+        loadPig(theme, "blue");
+        loadPig(theme, "red");
+        loadPig(theme, "green");
+        loadPig(theme, "yellow");
+    }
 
-        Map<TextureId, TextureId> space = new HashMap<>();
-        space.put(TextureId.BLUE_PIG, TextureId.BLUE_PIG_SPACE);
-        space.put(TextureId.RED_PIG, TextureId.RED_PIG_SPACE);
-        space.put(TextureId.GREEN_PIG, TextureId.GREEN_PIG_SPACE);
-        space.put(TextureId.YELLOW_PIG, TextureId.YELLOW_PIG_SPACE);
+    private static void loadPig(String theme, String color) {
 
-        themePigMap.put(Theme.FARM, farm);
-        themePigMap.put(Theme.VOLCANO, volcano);
-        themePigMap.put(Theme.SPACE, space);
-        themePigMap.put(Theme.PIRATE, pirate);
+        String id = color.toUpperCase() + "_PIG_" + theme.toUpperCase();
 
-        // ===== THEME BACKGROUND =====
-        themeBackgroundMap.put(Theme.FARM, TextureId.PLAY_BACKGROUND_FARM);
-        themeBackgroundMap.put(Theme.VOLCANO, TextureId.PLAY_BACKGROUND_VOLCANO);
-        themeBackgroundMap.put(Theme.PIRATE, TextureId.PLAY_BACKGROUND_PIRATE);
-        themeBackgroundMap.put(Theme.SPACE, TextureId.PLAY_BACKGROUND_SPACE);
+        configs.put(id,
+            new AnimationConfig(
+                "pig/" + theme + "/" + color + ".png",
+                2, 1, 2, -1, 1f
+            )
+        );
+    }
+
+    // ========================
+    // RESOLVE
+    // ========================
+
+    private static String resolve(TextureId id) {
+
+        Theme theme = getActiveTheme();
+
+        // BACKGROUND
+        if (id == TextureId.PLAY_BACKGROUND) {
+            return "PLAY_BACKGROUND_" + theme.name();
+        }
+
+        // PIG
+        if (isPig(id)) {
+            return id.name() + "_" + theme.name();
+        }
+
+        return id.name();
+    }
+
+    private static boolean isPig(TextureId id) {
+        return id == TextureId.BLUE_PIG
+            || id == TextureId.RED_PIG
+            || id == TextureId.GREEN_PIG
+            || id == TextureId.YELLOW_PIG;
     }
 
     // ========================
@@ -207,42 +202,36 @@ public class TextureManager {
     }
 
     // ========================
-    // GETTERS
+    // GET FRAME
     // ========================
 
     public static TextureRegion getFrame(TextureId id) {
 
-        // ===== BACKGROUND DYNAMIC =====
-        if (id == TextureId.PLAY_BACKGROUND) {
-            id = themeBackgroundMap.get(getActiveTheme());
-        }
+        String key = resolve(id);
 
-        // ===== PIG THEME =====
-        if (themePigMap.containsKey(getActiveTheme()) &&
-            themePigMap.get(getActiveTheme()).containsKey(id)) {
-
-            id = themePigMap.get(getActiveTheme()).get(id);
-        }
-
-        // ===== ANIMATIONS =====
-        if (animations.containsKey(id)) {
-            AnimationConfig cfg = configs.get(id);
+        if (animations.containsKey(key)) {
+            AnimationConfig cfg = configs.get(key);
 
             if (cfg.forcedFrame != -1) {
-                return animations.get(id).getFrame(cfg.forcedFrame);
+                return animations.get(key).getFrame(cfg.forcedFrame);
             }
 
-            return animations.get(id).getFrame();
+            return animations.get(key).getFrame();
         }
 
-        Texture texture = textures.get(id);
+        Texture texture = textures.get(key);
 
         if (texture == null) {
-            throw new RuntimeException("Texture not loaded: " + id);
+            throw new RuntimeException("Missing texture: " + key);
         }
 
         return new TextureRegion(texture);
     }
+
+    // ========================
+    // GETTERS
+    // ========================
+
 
     public static TextureRegion getFrame(TextureId id, int i) {
         if (animations.containsKey(id)) {
