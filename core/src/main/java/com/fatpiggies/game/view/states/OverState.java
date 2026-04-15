@@ -219,7 +219,6 @@ public class OverState extends State {
     private Array<String> buildRankedNames(Array<String> sourceNames) {
         Array<String> result = new Array<>(); // First of the given list is last ranked
         for (int i = sourceNames.size - 1; i >= 0; i--) {
-            System.out.println(sourceNames);
             result.add(sourceNames.get(i));
         }
         return result;

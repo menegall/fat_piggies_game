@@ -26,7 +26,6 @@ public class ShopController {
         int price = getPrice(theme);
 
         if (coins < price) {
-            //System.out.println("Not enough coins");
             return false;
         }
 
