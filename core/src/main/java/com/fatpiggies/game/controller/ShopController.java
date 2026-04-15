@@ -62,8 +62,7 @@ public class ShopController {
         switch(theme){
             case FARM: return FARM_PRICE;
             case VOLCANO: return VOLCANO_PRICE;
-            case PIRATE:
-                return PIRATE_PRICE;
+            case PIRATE: return PIRATE_PRICE;
             case SPACE: return SPACE_PRICE;
             default: return FARM_PRICE;
         }

@@ -95,10 +95,10 @@ public class TextureManager {
         textures.put("BUBBLE", new Texture("uiAssets/bubble.png"));
 
         // ===== THEMES =====
-        loadTheme("farm");
-        loadTheme("volcano");
-        loadTheme("pirate");
-        loadTheme("space");
+        loadTheme(Theme.FARM);
+        loadTheme(Theme.VOLCANO);
+        loadTheme(Theme.PIRATE);
+        loadTheme(Theme.SPACE);
 
         configs.put("CROWN", new AnimationConfig("events/crown.png", 2, 2, 4, -1, 2f));
 
@@ -137,18 +137,19 @@ public class TextureManager {
         }
     }
 
-    private static void loadTheme(String theme) {
+    private static void loadTheme(Theme theme) {
+        String themeName = theme.name().toLowerCase();
 
         // background
         textures.put(
-            "PLAY_BACKGROUND_" + theme.toUpperCase(),
-            new Texture("backgrounds/arena_" + theme + ".png")
+            "PLAY_BACKGROUND_" + theme.name(),
+            new Texture("backgrounds/arena_" + themeName + ".png")
         );
 
-        loadPig(theme, "blue");
-        loadPig(theme, "red");
-        loadPig(theme, "green");
-        loadPig(theme, "yellow");
+        loadPig(themeName, "blue");
+        loadPig(themeName, "red");
+        loadPig(themeName, "green");
+        loadPig(themeName, "yellow");
     }
 
     private static void loadPig(String theme, String color) {
