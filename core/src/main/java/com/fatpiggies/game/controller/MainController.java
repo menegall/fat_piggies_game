@@ -266,6 +266,9 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
                 Gdx.app.postRunnable(() -> {
                     lobbyModel.setFinalRanking(rankedPlayerIds);
                     rewardIfWinner(rankedPlayerIds);
+                    GameStateManager.getInstance().pushOverState(
+                        MainController.this, lobbyModel, lobbyModel.getIsHost()
+                    );
                 });
             }
 
@@ -274,7 +277,6 @@ public class MainController implements IViewActions, ILobbyActions, IPlayActions
                 Gdx.app.postRunnable(() -> showError(error));
             }
         });
-        GameStateManager.getInstance().pushOverState(this, lobbyModel, lobbyModel.getIsHost());
     }
 
     @Override
