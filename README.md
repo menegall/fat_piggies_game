@@ -25,8 +25,6 @@ GitHub:
       You will need to allow this in your device settings to proceed with the installation.*
 4. Open the app and get ready to brawl!
 
----
-
 ## 🎮 How to play
 
 In a world where weight matters, players take control of bouncy pigs.
@@ -58,6 +56,8 @@ of the field of play.
 * **Framework:** [LibGDX](https://libgdx.com/), [Ashley](https://github.com/libgdx/ashley)
 * **IDE:** Android Studio
 * **Networking:** Firebase Realtime Database & Firebase Auth
+    * *Backend Agnostic:* The game logic is decoupled from Firebase. You can easily swap the backend
+      by creating new classes that implement our `DatabaseService` and `AuthService` interfaces.
 
 ---
 
@@ -74,7 +74,11 @@ To run the project locally and contribute to the code:
 3.  **Sync Gradle:** Wait for dependencies to download.
 4. **Run:** Select the `Android` configuration and press Play.
 
----
+> **Firebase Setup Required:**
+> This project uses Firebase for multiplayer networking. The database credentials
+> (`google-services.json`) are not included in this repository for security reasons.
+> To build and run the game locally, you must create your own Firebase project and place your
+> `google-services.json` file inside the `android/` folder.
 
 ## 🧩 Game Extension
 
@@ -83,17 +87,18 @@ Take a look at these files based on what you would like to extend in the game:
 * [**Add new power-up**](./docs/NEW_POWERUP.md)
 * [**Add new theme**](./docs/NEW_THEME.md)
 * [**Add new pig color**](./docs/NEW_PIG_COLOR.md)
+* [**Implementing a Custom Backend**](./docs/CUSTOM_BACKEND.md)
 
 ---
 
-## 👥 The Team
+## 👥 The Fat Piggies Team
 
 Built with ❤️ and coffee by:
 
-* **Gabin** - *Developer*
-* **Patrick** - *Developer*
-* **Liangchen**
-* **Pia**
-* **Paula**
-* **Gina**
-* **Ingvild**
+* **Gabin [Mayer]** - *Developer*
+* **Patrick [Menegalli-Boggelli]** - *Developer*
+* **Liangchen [Liu]**
+* **Paula [Lorentz]**
+* **Pia [Pirner]**
+* **Gina [Giske]**
+* **Ingvild [Kirkaune Sandven]**
