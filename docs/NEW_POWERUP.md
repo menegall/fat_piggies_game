@@ -85,8 +85,6 @@ method:
 ```java
 public static void loadTextures() {
     // ... existing code ...
-    
-    // Add animation configuration for your new powerup
 
     textures.put("SPEED_BOOST", new Texture("events/speedBoost.png"));
     
@@ -135,7 +133,7 @@ private void attachModifierAndRender(Entity entity, PowerUpType type) {
 > *Do next step only if you added a new modifier.*
 
 Edit `core/src/main/java/com/fatpiggies/game/model/ecs/systems/collision/CollisionResolutionSystem.java`
-in the `collect()` method:
+in the `collect(collector, item)` method:
 ```java
     // Add the mapper in the attribute of the system
     private final ComponentMapper<SpeedBoostModifierComponent> sbmMod = ComponentMapper.getFor(SpeedBoostModifierComponent.class);
@@ -167,7 +165,7 @@ private void collect(Entity collector, Entity item) {
 ### Step 8: Implement application of the new modifier (optional)
 
 Edit `core/src/main/java/com/fatpiggies/game/model/ecs/systems/StatSystem.java`
-in the `update()` method:
+in the `update(deltaTime)` method:
 
 ```java
 private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
@@ -178,7 +176,7 @@ private final ComponentMapper<SpeedBoostModifierComponent> sbmMod = ComponentMap
 public void update(float deltaTime) {
     // ... other code ...
 
-    // Apply Health Modifier
+    // Apply SpeedBoost Modifier
     if (sbmMod.has(powerup)) {
         VelocityComponent targetVel = vm.get(targetPig);
         SpeedBoostModifierComponent sbMod = sbmMod.get(powerup);

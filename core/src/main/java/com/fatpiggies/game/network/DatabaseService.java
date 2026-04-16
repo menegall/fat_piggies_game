@@ -102,8 +102,8 @@ public interface DatabaseService {
 
     /**
      * Fetches the lobby code once and returns it via a callback.
-     * * @param lobbyId The unique ID of the lobby.
      *
+     * @param lobbyId The unique ID of the lobby.
      * @param callback A simple interface to handle the result asynchronously.
      */
     void getLobbyCodeOnce(String lobbyId, CodeCallback callback);
