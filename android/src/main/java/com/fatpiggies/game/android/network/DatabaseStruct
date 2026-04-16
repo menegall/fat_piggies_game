@@ -3,27 +3,26 @@
         "lobby_uid": {
             "info": {
                 "status": "playing",
-                "code": "ABC123",
+                "code": "1234",
                 "host_id": "user_uid_1",
                 "playersSetup": {
-                    "user_uid_1": { "name": "Marco" },
-                    "user_uid_2": { "name": "Luca" }
+                    "user_uid_1": {
+                        "name": "Marco",
+                        "color": "red"
+                    },
+                    "user_uid_2": { ... }
                 }
             },
             "inputs": {
                 "user_uid_1": {
                     "jx": 0,
                     "jy": 0,
-                    "ts": 147  //Server Reconciliation
+                    "ts": 147
                 },
-                "user_uid_2": {
-                    "jx": 0.5,
-                    "jy": 0,
-                    "ts": 146
-                }
+                "user_uid_2": { ... }
             },
             "game_state": {
-                "ts": 150, // not real timestamp but increasing number
+                "ts": 150,      // increasing number
                 "players": {
                     "user_uid_1": {
                         "x": 100.5,
@@ -31,17 +30,12 @@
                         "vx": 0.5,
                         "vy": 0,
                         "hp": 4,     // Health points
-                        "fx": {
-                            "spd": 50, // used to modify maxVelocityComp by the Controller
-                            "m": -20,
-                        }
-                    },
+                        "fx": { },
                     "user_uid_2": { ... }
                 },
-
                 "powerups": {
                     "pu_uid_1": {
-                        "type": "apple",
+                        "textureId": "apple",
                         "x": 120,
                         "y": 50
                     }
