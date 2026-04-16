@@ -105,10 +105,10 @@ Take a look at these files based on what you would like to extend in the game:
 
 Built with ❤️ and coffee by:
 
-* **Gabin [Mayer]** - *Developer*
-* **Patrick [Menegalli-Boggelli]** - *Developer*
-* **Liangchen [Liu]**
-* **Paula [Lorentz]**
-* **Pia [Pirner]**
-* **Gina [Giske]**
-* **Ingvild [Kirkaune Sandven]**
+* **Gabin Mayer** - *Developer*
+* **Patrick Menegalli-Boggelli** - *Developer*
+* **Liangchen Liu**
+* **Paula Lorentz**
+* **Pia Pirner**
+* **Gina Giske**
+* **Ingvild Kirkaune Sandven**
