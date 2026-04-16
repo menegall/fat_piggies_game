@@ -4,7 +4,7 @@ This project uses the following third-party assets, which are governed by their 
 
 ## Fonts
 
-### "font_35.fnt" (Modified Version)
+### `font_35.fnt` (Modified Version)
 
 * **Based on:** "Jersey 15" designed by Sarah Cadigan-Fried
 * **Source:** https://github.com/scfried/soft-type-jersey
@@ -79,3 +79,19 @@ HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERA
 INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
 ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE 
 FONT SOFTWARE.
+```
+
+## Audio & Music
+
+### `musicLobby.mp3` (Original title: "Pixel Melody")
+
+* **Producer:** yoshiyuki_tatsuya
+* **Source:** [Pixabay](https://pixabay.com/music/upbeat-pixel-melody-430745/)
+* **License:** Pixabay License (Royalty-free)
+
+```text
+This music is available for free under the Pixabay license. 
+The copyright of the sound source belongs to the producer, Yoshiyuki_tatsuya.
+Please note: Reuploading, redistributing, or uploading the original sound source standalone to other 
+sites and platforms is prohibited.
+```
