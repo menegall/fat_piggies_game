@@ -5,6 +5,8 @@ import static com.fatpiggies.game.utils.Config.TAG_APP;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.fatpiggies.game.controller.MainController;
@@ -26,6 +28,8 @@ public class FatPiggiesGame extends ApplicationAdapter {
     private SpriteBatch batch;
     private MainController main;
 
+    BitmapFont font;
+
     public FatPiggiesGame(AuthService authService, DatabaseService databaseService) {
         this.authService = authService;
         this.databaseService = databaseService;
@@ -38,7 +42,10 @@ public class FatPiggiesGame extends ApplicationAdapter {
         authService.signIn(new AuthService.AuthCallback() {
             @Override
             public void onSuccess(String userId) {
-                Gdx.app.postRunnable(() -> main.getLobbyModel().setPlayerId(userId));
+                Gdx.app.postRunnable(() -> {
+                    main = new MainController(authService, databaseService);
+                    main.getLobbyModel().setPlayerId(userId);
+                });
             }
 
             @Override
@@ -59,14 +66,22 @@ public class FatPiggiesGame extends ApplicationAdapter {
 
         // To draw
         batch = new SpriteBatch();
-        main = new MainController(authService, databaseService);
+        font = TextureManager.getSkin().getFont("default-font");
 
     }
 
     @Override
     public void render() {
         float dt = Gdx.graphics.getDeltaTime();
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+        ScreenUtils.clear(Color.valueOf("EA6BEC"));
+
+        // This should only appear on the first launch
+        if (main == null){
+            batch.begin();
+            font.draw(batch, "Loading...", Gdx.graphics.getWidth()*0.43f, Gdx.graphics.getHeight()*0.5f);
+            batch.end();
+            return;
+        }
 
         // Main loop
         main.update(batch, dt);
@@ -74,7 +89,7 @@ public class FatPiggiesGame extends ApplicationAdapter {
 
     @Override
     public void resize(int width, int height) {
-        main.resize(width, height);
+        if (main != null) main.resize(width, height);
     }
 
 
@@ -82,15 +97,12 @@ public class FatPiggiesGame extends ApplicationAdapter {
     public void dispose() {
         Gdx.app.log(TAG_APP, "Dispose App");
 
-        if (main != null) {
-            main.dispose();
-        }
+        if (main != null) main.dispose();
 
         authService.signOut();
 
-        if (batch != null) {
-            batch.dispose();
-        }
+        if (batch != null) batch.dispose();
+
         TextureManager.dispose();
         SoundsManager.dispose();
         MusicManager.dispose();
@@ -100,6 +112,6 @@ public class FatPiggiesGame extends ApplicationAdapter {
 
     @Override
     public void pause() {
-        main.pause();
+        if (main != null) main.pause();
     }
 }
