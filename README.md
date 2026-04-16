@@ -91,6 +91,16 @@ Take a look at these files based on what you would like to extend in the game:
 
 ---
 
+## ⚖️ License & Credits
+
+* **Code:** This project is licensed under the [MIT License](LICENSE).
+* **Assets & Third-Party:** All external assets and their respective licenses are documented in the
+  [**THIRDPARTY.md**](./THIRDPARTY.md) file.
+* **Visual Assets:** All pig sprites, backgrounds, and UI elements were created by the Fat Piggies
+  Team.
+
+---
+
 ## 👥 The Fat Piggies Team
 
 Built with ❤️ and coffee by:
