@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.jpeg" alt="Fat Piggies Banner" width="100%">
+</p>
+
 # 🐽 Fat Piggies
 
 > **Status:** Final Version
