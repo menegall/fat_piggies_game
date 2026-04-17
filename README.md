@@ -10,7 +10,7 @@
 
 Fat Piggies is a high-energy, multiplayer physics-based brawler developed as a collaborative
 university project. The goal is simple: bump your opponents out of the arena and remain the last pig standing. Developed by a team of 7 for
-TDT4120-Software Architecture course at NTNU.
+TDT4240-Software Architecture course at NTNU.
 
 ---
 
