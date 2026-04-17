@@ -113,7 +113,7 @@ assets/
 * **Pig sprites:** for each themes
     * Grid layout: 2 rows × 1 column (2x1)
     * Contains 2 animated frames
-    * Format: PNG (transparent background recommended)
+    * Format: 32x32 pixel PNG (transparent background recommended)
   
 * **Life Pig sprites:**
     * Grid layout: 2 rows × 2 column (2x2)
