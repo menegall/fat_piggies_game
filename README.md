@@ -9,8 +9,7 @@
 > **Engine:** LibGDX (Java)
 
 Fat Piggies is a high-energy, multiplayer physics-based brawler developed as a collaborative
-university project. The goal is simple: be the heftiest pig on the block and shove your opponents
-off the arena to claim the title of Champion. Developed by a team of 7 for
+university project. The goal is simple: bump your opponents out of the arena and remain the last pig standing. Developed by a team of 7 for
 TDT4120-Software Architecture course at NTNU.
 
 ---
@@ -39,12 +38,12 @@ of the field of play.
 2. **Host or Join:** One player taps Host to create a lobby and receives a 4-digit code. Give that
    code to your friend. Up to 3 other friends can enter the code, tap join and enter the lobby.
 3. **The Brawl:** Use the virtual joystick to build up speed and ram into your opponents.
-4. **Power-ups:** Keep an eye out for items spawning in the arena!
+4. **Power-ups:** Keep an eye out for power ups spawning in the arena!
    Grab an Apple for a speed boost, a Donut to become heavy and immovable, or a Life to heal up. You
    can also grab a beer, but be aware of the consequence.
 5. **Survive & Win:** Push your rivals out of bounds. The last piggy remaining in the arena wins!
 6. **Customize:** Winning games earns you coins. Head to the Shop to spend your hard-earned coins
-   and unlock amazing new arena themes (like Space, Volcano, or Pirates).
+   and unlock amazing new arena themes (like Space, Volcano, or Pirate).
 
 ### 🚀 Key Features
 * **Multi-Device Connectivity:** Seamlessly join the action using your own device.
@@ -109,9 +108,9 @@ Take a look at these files based on what you would like to extend in the game:
 
 Built with ❤️ and coffee by:
 
-* **Gabin Mayer** - *Developer*
-* **Patrick Menegalli-Boggelli** - *Developer*
-* **Liangchen Liu**
+* **Gabin Mayer**
+* **Patrick Menegalli-Boggelli**
+* **Liangchen Liu** 
 * **Paula Lorentz**
 * **Pia Pirner**
 * **Gina Giske**
